@@ -1,0 +1,140 @@
+<%- include('../partials/user/header') %> 
+<link rel="stylesheet" href="/style/user/product_shop.css">
+
+
+<h2>Filter Products</h2>
+<div class="filter-container">
+    <!-- Search input -->
+    <input type="text" id="search" placeholder="Search by name">
+
+
+
+    <!-- Category filter -->
+    <select id="category">
+        <option value="">All Categories</option>
+        <option value="casual">Casual</option>
+        <option value="formal">Formal</option>
+        <option value="winter">Winter Wear</option>
+    </select>
+
+    <!-- Price range filter -->
+    <div class="price-range">
+        <label>Price Range: <span id="priceValue">0 - 3000</span></label>
+        <input type="range" id="minPrice" min="0" max="3000" step="100" value="0" oninput="updatePrice()">
+        <input type="range" id="maxPrice" min="0" max="3000" step="100" value="3000" oninput="updatePrice()">
+    </div>
+
+    <!-- Availability filter -->
+    <select id="availability">
+        <option value="">All</option>
+        <option value="in-stock">Available</option>
+        <option value="out-of-stock">Out of Stock</option>
+    </select>
+
+    <!-- Search Button -->
+    
+    <button onclick="applyFilters()">Search</button>
+    <p id="demo"></p>
+</div>
+
+<!-- Product list will be populated here -->
+<% if (items) { %>
+    <h1><%= items %></h1>
+<% } %>
+
+<!-- Product list will be populated here -->
+<div id="product-list">
+    <% if (products && products.length > 0) { %>
+        <div class="product-grid">
+            <% products.forEach(product => { %>
+                <div class="product">
+                    <img src="<%= product.productImage[0]%>" style="height:150px;width:150px">
+                    <h3><%= product.productName %></h3>
+                    <p>Category: <%= product.category.name %></p>
+                    <p>Price: $<%= product.salePrice %></p>
+                    <p>Status:<%= product.status %></p>
+                    <p> <%= product.quantity %> left</p>
+                </div>
+            <% }) %>
+        </div>
+    <% } else { %>
+        <p>No products found matching your criteria.</p>
+    <% } %>
+</div>
+
+<script>
+   
+
+   function  applyFilters() {
+    
+
+    let filters = {
+        search: document.getElementById('search').value,
+        category: document.getElementById('category').value,
+        minPrice: document.getElementById('minPrice').value,
+        maxPrice: document.getElementById('maxPrice').value,
+        availability: document.getElementById('availability').value
+    };
+
+  console.log(search)
+  console.log(category)
+  console.log(minPrice)
+  console.log(maxPrice)
+  console.log(availability)
+  
+    fetch('/user/filterproduct', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+            
+        },
+        body: JSON.stringify(filters)
+    })
+    .then(response => response.json())
+    .then(data => {
+        
+        console.log('Filtered Products Received:', data); // Debugging log
+        updateProductList(data);
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+// Update the price range label dynamically as the user slides
+function updatePrice() {
+    let minPrice = document.getElementById('minPrice').value;
+    let maxPrice = document.getElementById('maxPrice').value;
+    document.getElementById('priceValue').textContent = `${minPrice} - ${maxPrice}`;
+}
+
+// Render the filtered product list dynamically
+
+function updateProductList(products) {
+    const productList = document.getElementById('product-list');
+    productList.innerHTML = ''; // Clear previous products before adding new ones
+
+    if (!products || products.length === 0) {
+        productList.innerHTML = '<p>No products found matching your criteria.</p>';
+        return;
+    }
+
+    const productGrid = document.createElement('div');
+    productGrid.classList.add('product-grid');
+
+    products.forEach(product => {
+        const productElement = document.createElement('div');
+        productElement.classList.add('product');
+        productElement.innerHTML = `
+            <img src="${product.productImage?.[0] || '/images/default.png'}" style="height:150px;width:150px">
+            <h3>${product.productName || 'Unknown'}</h3>
+            <p>Category: ${product.category?.name || 'N/A'}</p>
+            <p>Price: $${product.salePrice || 'N/A'}</p>
+            <p>Status: ${product.status || 'N/A'}</p>
+            <p>${product.quantity || 0} left</p>
+        `;
+        productGrid.appendChild(productElement);
+    });
+
+    productList.appendChild(productGrid);
+}
+
+</script>

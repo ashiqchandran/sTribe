@@ -1,0 +1,166 @@
+
+.section-title h1 {
+    font-size: 36px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.section-title p {
+    font-size: 16px;
+    color: #555;
+    line-height: 1.5;
+}
+
+/* Product Items Styling */
+.single-product {
+    position: relative;
+    background-color: #fff;
+    border: 1px solid #eaeaea;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease-in-out;
+}
+
+.single-product:hover {
+    transform: translateY(-10px); /* Slight lift effect on hover */
+}
+
+.single-product img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    border-bottom: 1px solid #eaeaea;
+}
+
+.product-details {
+    padding: 15px;
+    text-align: center;
+}
+
+.product-details h6 {
+    font-size: 18px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.price h6 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #e53935;
+    margin-bottom: 5px;
+}
+
+.price .l-through {
+    font-size: 14px;
+    text-decoration: line-through;
+    color: #999;
+}
+
+.prd-bottom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    border-top: 1px solid #eaeaea;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.single-product:hover .prd-bottom {
+    opacity: 1;
+}
+
+.social-info {
+    text-align: center;
+    color: #333;
+    font-size: 16px;
+}
+
+.social-info span {
+    font-size: 20px;
+    margin-bottom: 5px;
+}
+
+.social-info p {
+    font-size: 12px;
+    color: #555;
+}
+
+.social-info:hover p {
+    color: #e53935;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 1199px) {
+    .single-product-slider .col-lg-3 {
+        width: 50%; /* Two items per row on medium screens */
+    }
+}
+
+@media screen and (max-width: 767px) {
+    .single-product-slider .col-lg-3 {
+        width: 100%; /* One item per row on smaller screens */
+    }
+}
+
+/* Owl Carousel Specific Styles */
+.owl-carousel .owl-nav {
+    display: flex;
+    justify-content: space-between;
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    z-index: 10;
+}
+
+.owl-prev, .owl-next {
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    border-radius: 50%;
+    padding: 10px;
+    font-size: 20px;
+}
+
+.owl-prev {
+    left: 10px;
+}
+
+.owl-next {
+    right: 10px;
+}
+
+.owl-prev:hover, .owl-next:hover {
+    background-color: #e53935;
+    cursor: pointer;
+}
+
+.owl-carousel .owl-dots {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.owl-carousel .owl-dots .owl-dot {
+    display: inline-block;
+    margin: 0 5px;
+    background-color: #ccc;
+    border-radius: 50%;
+    width: 12px;
+    height: 12px;
+    transition: background-color 0.3s ease;
+}
+
+.owl-carousel .owl-dots .owl-dot.active {
+    background-color: #e53935;
+}
+
+.bannerimage{
+    height:500px;
+    width: 300px;
+}

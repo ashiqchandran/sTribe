@@ -1,0 +1,279 @@
+<%-include("../../views/partials/user/header") %>
+<link rel="stylesheet" href="/style/user/home.css"> 
+<link rel="stylesheet" href="/style/user/homecotents.css">
+
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="new-arrival">New Arrivals</div>
+            <h1>Create your dream shop instantly.</h1>
+            <p>Keep your everyday style chic and on-trend with our selection 20+ styles to choose from.</p>
+            <button class="btn">See Collection</button>
+        </div>
+        <div class="hero-image">
+            <img src="/images/logo/banner-removebg-preview.png" alt="Fashion model"  >
+        </div>
+    </section>
+
+    <!-- Promo Banner -->
+    <div class="promo-banner">
+        70% Off Storewide — Limited time
+    </div>
+
+    <!-- Categories -->
+    <section class="categories">
+        <div class="category">
+            <img src="/images/women1.jpeg" alt="Women's Fashion">
+            <div class="category-content">
+                <h2>SHOP FOR WOMENS</h2>
+                <button class="btn"><a href="/shop" class="shop-now">Shop Now</a></button>
+            </div>
+        </div>
+        <div class="category">
+            <img src="/images/mens.jpeg" alt="Men's Fashion">
+            <div class="category-content">
+                <h2>SHOP FOR MENS</h2>
+                <button class="btn"><a href="/shop" class="shop-now">Shop Now</a></button>
+            </div>
+        </div>
+        
+    </section>
+    <!-- <div class="container">
+        <h1>Our Featured Products</h1>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.</p>
+        <div class="product-list">
+            
+            <div class="product-item">
+                <img src="path/to/mens-hoodie.jpg" alt="Man Sweet Hoodie">
+                <h2>Man Sweet Hoodie</h2>
+                <a href="">Go to Product</a>
+            </div>
+            <div class="product-item">
+                <img src="path/to/mens-formals.jpg" alt="Men Formals">
+                <h2>Men Formals</h2>
+                <a href="" onclick="sendVariable('formal')">Go to Product</a>
+            </div>
+            <div class="product-item">
+                <img src="path/to/mens-casual.jpg" alt="Men's Casual Wears">
+                <h2>Men's Casual Wears</h2>
+                <a href="" onclick="sendVariable('mencasual')">Go to Product</a>
+            </div>
+            <div class="product-item">
+                <img src="path/to/womens-hoodie.jpg" alt="Woman Sweet Hoodie">
+                <h2>Woman Sweet Hoodie</h2>
+                <a href="" onclick="sendVariable('womenSweat')">Go to Product</a>
+            </div>
+            <div class="product-item">
+                <img src="path/to/womens-traditional.jpg" alt="Woman Traditional's">
+                <h2>Woman Traditional's</h2>
+                <a href="" onclick="sendVariable('womenTraditional')">Go to Product</a>
+            </div>
+            <div class="product-item">
+                <img src="path/to/womens-casual.jpg" alt="Woman Casual Wears">
+                <h2>Woman Casual Wears</h2>
+                <a href="" onclick="sendVariable('womenCasual')">Go to Product</a>
+            </div>
+        </div>
+    </div>
+     -->
+
+    <section class="brands-section">
+        <div class="brands-container">
+            <div class="brands-header">
+                <h4 class="brand-head">Loved brands</h2>
+                <p class="brandcaption">We provide branded and trusted products direct from factory .</p>
+                <div class="homebrandbox"><a href="/shop"  class="seebutton">See all brands</a></div>
+            </div>    
+            <div class="brands-grid">
+                  <div class="container">
+                    <div class="row">
+                        <div class="col-4 ">            
+                        <img src="/images/puma.png" alt="" class="logoes"> &nbsp
+                        </div>
+                       
+                    <div class="col-4">
+                    <img src="/images/adidas.png" alt=""  class="logoes">&nbsp 
+                    </div>
+                  
+                    <div class="col-4">
+                    <img src="/images/armani.jpeg" alt=""  class="logoes"> 
+                    </div>
+                    </div><br>
+                    <div class="row">
+                        <div class="col-4 ">
+                        <img src="/images/england.jpeg" alt=""  class="logoes">
+                        </div>
+                        <div class="col-4">
+                        <img src="/images/nike.png" alt=""  class="logoes"> 
+                        </div>
+                        <div class="col-4">
+                        <img src="/images/suprime.jpeg" alt=""  class="logoes"> 
+                        </div>
+                        </div>
+                    </div>
+                  
+                 </div>
+            </div>
+        <div>          
+        </div>     
+        
+    </section>
+    <!-- for the product to add (sample) -->
+    
+<!-- start product Area -->
+<section class="owl-carousel active-product-area section_gap" id="product_section_main">
+    <!-- single product slide -->
+    <div class="single-product-slider">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-6 text-center">
+                    <div class="section-title">
+                        <h1>Latest Products</h1>
+                        <p>Discover the Latest and Trending Designs in the Market! .</p>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <!-- single product -->
+
+                <%for(let i=0;i< products.length; i++){%>
+
+                <div class="col-lg-3 col-md-6">
+                    <div class="single-product">
+                        <a href="/productDetails?id=<%=products[i]._id%>">
+                        <img class="img-fluid" src="<%= products[i].productImage[0] %>" alt="">
+                        <div class="product-details">
+                            <h6 class="productname"><%=products[i].productName%></h6>
+                            <div class="price">
+                                <h6 class="pricecommon"> <span class="saleprice"> ₹MRP: <%=products[i].regularPrice%> </span>&nbsp&nbsp <span  class="reg_price">  ₹Price: <%=products[i].salePrice%></span></h6>
+                               
+                            </div>
+                          </a>
+                            <div class="prd-bottom">
+
+                                <a href="#" onclick="addToCart('<%=products[i]._id%>')" class="social-info">
+                                    <span class="ti-bag"></span>
+                                    <p class="hover-text">add to cart &#128722</p>
+                                </a>
+                                <a href="#" onclick="addToWishlist('<%=products[i]._id%>')" class="social-info">
+                                    <span class="lnr lnr-heart"></span>
+                                    <p class="hover-text">Wishlist 	&#9825;</p>
+                                </a>
+                                <a href="/productDetails?id=<%=products[i]._id%>" class="social-info">
+                                    <span class="lnr lnr-move"></span>
+                                    <button class="hover-text view-btn">view more</button>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <%}%>
+                
+            </div>
+        </div>
+    </div>
+    <!-- single product slide -->
+    <div class="single-product-slider">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-6 text-center">
+                    <div class="section-title">
+                        <h1>Most Selling Products</h1>
+                        <p>Explore  Our Best-Selling Products ratted by Thousands!.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <!-- single product -->
+
+                <%for(let i=0;i< topSeller.length; i++){%>
+
+                    <div class="col-lg-3 col-md-6">
+                        <div class="single-product">
+                            <a class="hover-light" href="/productDetails?id=<%=products[i]._id%>">
+                            <img class="img-fluid" src="<%= topSeller[i].productImage[0] %>" alt="">
+                            <div class="product-details">
+                                <h6 class="productname"><%=topSeller[i].productName%></h6>
+                                <div class="price">
+                                   
+                               
+                                    <h6 class="pricecommon"> <span class="saleprice"> ₹MRP:  <%=topSeller[i].salePrice%>.00</span>&nbsp&nbsp <span  class="reg_price">  ₹Price:<%=topSeller[i].regularPrice%>.00</span></h6>
+                               
+                                </div>
+                              </a>
+                                <div class="prd-bottom">
+
+                                    <a href="/product_detail" onclick="addToCart('<%=products[i]._id%>')" class="social-info">
+                                        <span class="ti-bag"></span>
+                                        <p class="hover-text">add to cart</p>
+                                    </a>
+                                    <a href="#" onclick="addToWishlist('<%=products[i]._id%>')" class="social-info">
+                                        <span class="lnr lnr-heart"></span>
+                                        <p class="hover-text">Wishlist</p>
+                                    </a>
+                                    <a href="/productDetails?id=<%=products[i]._id%>" class="social-info">
+                                        <span class="lnr lnr-move"></span>
+                                        <button class="hover-text view-btn">view more</button>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <%}%>
+                
+            </div>
+        </div>
+    </div>
+</section>
+<!-- end product Area -->
+
+
+<%- include('../partials/user/footer')%>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+      
+       
+
+    function sendVariable(value) {
+        console.log("cloicked")
+        window.location.href = `productloader.ejs?item=${encodeURIComponent(value)}`;
+}
+
+
+function addToCart(productId) {
+                    fetch(`/addToCart?id=${productId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Added to Cart',
+                                    text: data.message,
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: data.message
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error:", error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Something went wrong. Please try again.'
+                            });
+                        });
+                }
+
+    </script>
+    
+
+   
+    

@@ -1,0 +1,138 @@
+/* General styling for the page */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f6f9;
+    margin: 0;
+    padding: 0;
+}
+
+/* Main content section */
+.content-main {
+    padding: 40px;
+}
+
+/* Header styling */
+.content-header {
+    margin-bottom: 20px;
+}
+
+.content-title {
+    font-size: 30px;
+    font-weight: bold;
+}
+
+/* Form styling */
+.brand-form {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.form-title {
+    font-size: 24px;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.form-control {
+    padding: 10px;
+    font-size: 16px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+.d-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+}
+
+.btn {
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.mt-4 {
+    margin-top: 15px;
+}
+
+.mt-20 {
+    margin-top: 20px;
+}
+
+/* Brand list table styling */
+.brand-table .table-title {
+    font-size: 24px;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.table-responsive {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.table th {
+    background-color: #f1f1f1;
+    color: #333;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f9f9f9;
+}
+
+/* Action buttons */
+.btn-action {
+    width: 100px;
+    margin-right: 5px;
+    font-size: 14px;
+    text-align: center;
+}
+
+.btn-action a {
+    color: white;
+    text-decoration: none;
+}
+
+.badge {
+    font-size: 14px;
+    padding: 5px 10px;
+    border-radius: 20px;
+}
+
+.badge-danger {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.badge-success {
+    background-color: #2ecc71;
+    color: white;
+}
+
+/* Pagination */
+.pagination-container {
+    margin-top: 30px;
+}
+
+.pagination-container a {
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    margin: 0 5px;
+    text-decoration: none;
+    color: white;
+    background-color: #6c757d;
+}
+
+.pagination-container a:hover {
+    background-color: #5a6268;
+}

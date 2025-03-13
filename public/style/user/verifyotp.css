@@ -1,0 +1,133 @@
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f6f6f6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    color: #333;
+}
+
+.container {
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 30px;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 1s ease;
+}
+
+h2 {
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #4CAF50;
+}
+
+p {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #666;
+}
+
+label {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 8px;
+    display: block;
+}
+
+#otp-container {
+    margin-bottom: 20px;
+    position: relative;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+input[type="text"]:focus {
+    border-color: #4CAF50;
+    box-shadow: 0 0 8px rgba(76, 175, 80, 0.2);
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background-color: #4CAF50;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 15px;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.otp-timer {
+    text-align: center;  /* Align the text to the right */
+    font-size: 18px;
+    margin-top: 20px;
+    margin-left: 20px;
+    font-weight: bold;
+    color: #333;
+}
+
+
+.error-message {
+    color: red;
+    font-size: 0.9em;
+    position: absolute;
+    top: 45px;
+    left: 0;
+}
+
+#resend-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+#resend-btn {
+    padding: 10px 20px;
+    background-color: #2196F3;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+#resend-btn:hover {
+    background-color: #0b79d0;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

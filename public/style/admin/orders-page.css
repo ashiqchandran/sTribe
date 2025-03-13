@@ -1,0 +1,157 @@
+
+    /* Container Styling */
+    .container-fluid {
+        padding: 30px;
+    }
+    
+    /* Heading Styling */
+    h1.mt-4 {
+        font-size: 2rem;
+        font-weight: 600;
+        margin-bottom: 20px;
+    }
+    
+    /* Card Styling */
+    .card {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .card-header {
+        background-color: #f8f9fa;
+        font-size: 1.1rem;
+        font-weight: 600;
+        padding: 15px;
+        border-bottom: 1px solid #ddd;
+    }
+    
+    .card-body {
+        padding: 20px;
+    }
+    
+    /* Table Styling */
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 1rem;
+        background-color: #fff;
+    }
+    
+    .table th,
+    .table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+        font-size: 0.9rem;
+    }
+    
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: #f9f9f9;
+    }
+    
+    /* Product Image in Table */
+    .table img {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 4px;
+    }
+    
+    /* Status Badge */
+    .status-badge {
+        padding: 5px 10px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        color: #fff;
+    }
+    
+    .status-badge.bg-success {
+        background-color: #28a745;
+    }
+    
+    .status-badge.bg-danger {
+        background-color: #dc3545;
+    }
+    
+    .status-badge.bg-info {
+        background-color: #17a2b8;
+    }
+    
+    .status-badge.bg-warning {
+        background-color: #ffc107;
+    }
+    
+    /* Order Actions Buttons */
+    .order-actions {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .order-actions .btn {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+    }
+    
+    .order-actions .btn-sm {
+        padding: 5px 10px;
+    }
+    
+    /* Action Button Colors */
+    .order-actions .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+    
+    .order-actions .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #004085;
+    }
+    
+    .order-actions .btn-info {
+        background-color: #17a2b8;
+        border-color: #17a2b8;
+    }
+    
+    .order-actions .btn-info:hover {
+        background-color: #138496;
+        border-color: #117a8b;
+    }
+    
+    .order-actions .btn-danger {
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+    
+    .order-actions .btn-danger:hover {
+        background-color: #c82333;
+        border-color: #bd2130;
+    }
+    
+    /* Sweetalert2 Modals */
+    .swal2-popup {
+        font-size: 1rem;
+    }
+    
+    .swal2-select {
+        font-size: 1rem;
+    }
+    
+    /* Responsive Table */
+    @media (max-width: 768px) {
+        .table th,
+        .table td {
+            padding: 8px;
+            font-size: 0.85rem;
+        }
+    
+        .order-actions {
+            flex-direction: column;
+            gap: 5px;
+        }
+    
+        .order-actions .btn {
+            width: 100%;
+        }
+    }
+    

@@ -1,0 +1,103 @@
+/* Global styling */
+body {
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Flexbox layout for the main content */
+.content-main {
+    display: flex;
+    flex-direction: column;
+}
+
+.content-header {
+    margin-bottom: 20px;
+}
+
+/* Form layout */
+form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px; /* Adds space between form fields */
+}
+
+/* Form fields styling */
+input.form-control, select.form-select, textarea.form-control {
+    width: 95%;
+    padding: 10px;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Card and header for images */
+.card-header h4 {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+/* Image thumbnails container */
+.thumbnails-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px; /* Adds space between thumbnail images */
+}
+
+.thumbnails-container img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+/* Spacing for card sections */
+.card {
+    margin-bottom: 20px; /* Adds space between cards */
+}
+
+/* Responsive Styles for Tablets and Mobiles */
+@media (max-width: 768px) {
+    /* Stack form fields vertically on small screens */
+    form {
+        grid-template-columns: 1fr;
+    }
+
+    .col-lg-4, .col-lg-6 {
+        width: 100%;
+    }
+
+    .thumbnails-container img {
+        width: 100px;
+        height: 100px;
+    }
+
+    /* Make image cropper larger on mobile */
+    .image-cropper img {
+        max-width: 100%;
+        height: auto;
+    }
+}
+
+@media (max-width: 576px) {
+    /* Reduce padding on smaller screens */
+    .container {
+        padding: 10px;
+    }
+
+    .card-header h4 {
+        font-size: 16px;
+    }
+
+    .content-title {
+        font-size: 20px;
+    }
+}

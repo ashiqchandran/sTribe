@@ -1,0 +1,88 @@
+/* Center the Error Message */
+.error-container {
+    display: flex;
+    justify-content: center;  /* Center horizontally */
+    /* align-items: center;  Center vertically */
+    height: 100%;  /* Take full height of the parent container */
+    padding: 20px;
+}
+
+.error-message {
+    background-color: #f8d7da;  /* Light red background for error */
+    color: #721c24;  /* Dark red text for error */
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    max-width: 600px;  /* Limit max width */
+    width: 100%;
+    text-align: center;  /* Center text inside */
+}
+
+.error-actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.error-actions .btn-retry,
+.error-actions .btn-home {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+.error-actions .btn-retry:hover,
+.error-actions .btn-home:hover {
+    background-color: #0056b3;
+}
+/* Styling for the "Oops" Text */
+.oops-text {
+    text-align: center;
+    font-family: Arial, sans-serif;
+    color: #fff;
+    background-color: #e74c3c;  /* Red background for the "Oops" section */
+    border-radius: 5px;
+    padding: 20px;
+    width: 100%;
+    max-width: 600px;  /* Limit the width */
+    margin: 0 auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Header styling */
+.oops-text h2 {
+    font-size: 36px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    animation: textFadeIn 2s ease-out;  /* Fade in effect */
+}
+
+/* Message Styling */
+.oops-text p {
+    font-size: 18px;
+    line-height: 1.5;
+    animation: textFadeIn 2.5s ease-out;  /* Fade in effect with delay */
+    animation-delay: 0.5s;
+}
+
+/* Interactive hover effect */
+.oops-text:hover {
+    background-color: #c0392b;  /* Darker red background on hover */
+    transform: scale(1.05);  /* Slight zoom-in effect */
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+/* Keyframe Animation for text fade-in */
+@keyframes textFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

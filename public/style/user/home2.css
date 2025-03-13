@@ -1,0 +1,30 @@
+.productname{
+    text-align: center;
+    font-weight: 900;
+    text-decoration: none;
+    font-size:1.2rem;
+    margin-top: 1.1rem;
+    color: black;
+    
+}
+.saleprice{
+    
+    font-weight: 900;
+    color: black;
+    text-decoration: line-through;
+}
+.reg_price{
+    font-weight: 900;
+    color: black;
+}
+.pricecommon{
+    text-align: center;
+}
+.social-info{
+    text-decoration: none;
+    color: black;
+   
+}
+.hover-text{
+   text-align: center;
+}

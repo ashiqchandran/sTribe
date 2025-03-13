@@ -1,0 +1,175 @@
+
+    /* Define dynamic CSS variables */
+    :root {
+        --primary-bg-color: #f8f9fa;           /* Background color */
+        --primary-text-color: #343a40;         /* Primary text color */
+        --primary-accent-color: #007bff;       /* Accent color (links, buttons) */
+        --button-hover-bg: #c82333;            /* Hover color for danger buttons */
+        --button-success-bg: #218838;          /* Hover color for success buttons */
+        --card-bg-color: #fff;                 /* Background color for cards */
+        --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Box shadow for cards */
+        --input-border-color: #ddd;            /* Border color for inputs */
+        --table-border-color: #ddd;            /* Border color for table */
+        --table-header-bg: #343a40;            /* Background color for table header */
+        --table-header-text-color: #fff;       /* Text color for table header */
+        --btn-radius: 50px;                    /* Border radius for buttons */
+        --btn-padding: 8px 20px;                /* Button padding */
+        --font-size-base: 16px;                /* Base font size */
+    }
+
+    /* Overall page background and font settings */
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: var(--primary-bg-color);
+        margin: 0;
+        padding: 0;
+        color: var(--primary-text-color);
+    }
+
+    /* Header styling */
+    .content-header {
+        background-color: var(--primary-text-color);
+        padding: 20px;
+        color: #fff;
+    }
+
+    .content-title {
+        font-size: 24px;
+        font-weight: bold;
+        margin: 0;
+    }
+
+    /* Search bar styling */
+    .card-header {
+        background-color: var(--card-bg-color);
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: var(--card-shadow);
+        display: flex;
+    }
+
+    .input-group {
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+        border-radius: var(--btn-radius);
+        overflow: hidden;
+        margin-left: 10vw;
+        margin-top:2vh;
+    }
+
+    .list{
+        font-weight:bold;
+        font-size: large;
+        
+        
+    }
+    .form-control {
+        border-radius: var(--btn-radius);
+        padding: 12px 20px;
+        font-size: var(--font-size-base);
+        border: 1px solid var(--input-border-color);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn {
+        border-radius: var(--btn-radius);
+        padding: var(--btn-padding);
+        font-size: 14px;
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+    }
+
+    .btn-danger {
+        background-color: var(--primary-accent-color);
+        color: #fff;
+    }
+
+    .btn-success {
+        background-color: #28a745;
+        color: #fff;
+    }
+
+    .btn a {
+        color: #fff;
+        text-decoration: none;
+    }
+
+    .btn-danger:hover {
+        background-color: var(--button-hover-bg);
+    }
+
+    .btn-success:hover {
+        background-color: var(--button-success-bg);
+    }
+
+    /* Table Styling */
+    .table {
+        width: 100%;
+        margin-top: 30px;
+        border-collapse: collapse;
+    }
+
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: #f2f2f2;
+    }
+
+    .table th, .table td {
+        padding: 15px;
+        text-align: left;
+        border: 1px solid var(--table-border-color);
+    }
+
+    .table th {
+        background-color: var(--table-header-bg);
+        color: var(--table-header-text-color);
+    }
+
+    /* Pagination Styling */
+    .pagination {
+        justify-content: center;
+    }
+
+    .pagination .page-item a {
+        color: var(--primary-accent-color);
+        text-decoration: none;
+        padding: 10px 15px;
+        border-radius: var(--btn-radius);
+        margin: 0 5px;
+        border: 1px solid var(--table-border-color);
+    }
+
+    .pagination .page-item a:hover {
+        background-color: var(--primary-accent-color);
+        color: #fff;
+    }
+
+    .pagination .page-item.active a {
+        background-color: var(--primary-accent-color);
+        color: #fff;
+        border-color: var(--primary-accent-color);
+    }
+
+    .pagination .page-item.disabled a {
+        color: #ddd;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .input-group {
+            width: 100%;
+        }
+
+        .table th, .table td {
+            padding: 10px;
+        }
+
+        .btn {
+            padding: 6px 15px;
+        }
+    }
+

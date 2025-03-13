@@ -1,0 +1,50 @@
+<link rel="stylesheet" href="/style/user/signin.css">
+<div class="container">
+    <div class="image-section">
+        <img src="/images/signin.png" alt="Woman in beige sweater">
+    </div>
+    <div class="form-section">
+        <div class="form-container">
+            <h1>Sign in</h1>
+            <p class="signup-text">Don't have an account yet? <a href="/signup">Sign up</a></p>
+            
+            <!-- Displaying the error message if it exists -->
+            <% if (message) { %>
+                <div class="wrong-user">
+                    <%= message %>
+                </div>
+            <% } %>
+            
+            <form action="/signin" method="post">
+                <div class="form-group">
+                    <label for="username">Username or Email</label>
+                    <input type="text" id="email" name="email" placeholder="Your username or email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Password" required>
+                </div>
+                
+                <div class="remember-forgot">
+                    <label class="remember-me">
+                        <input type="checkbox" name="rememberMe">
+                        <span>Remember me</span>
+                    </label>
+                    <a href="/forgotpassword" class="forgot-password">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="signin-button">Sign in</button>
+                
+                <div class="divider">Or</div>
+                
+                <button type="button" class="google-signin">
+                    <a href="/auth/google">
+                        <img src="/images/google.png" alt="Google logo" width="24" height="24">
+                        Sign in with Google
+                    </a>
+                </button>
+            </form>
+            <p class="signintohome">go back? <a href="/home">go back</a></p>
+        </div>
+    </div>
+</div>

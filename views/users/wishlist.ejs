@@ -1,0 +1,202 @@
+<html>
+ <head>
+  <title>Wishlist</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet"/>
+
+  <style>
+      .hero {
+          display: flex;
+          justify-content: space-between;
+          background-color: #e6f4f4;
+          align-items: center;
+          padding: 4rem 2rem;
+          width: 100%;
+          margin: 0 auto;
+          min-height: 50vh;
+      }
+
+      .hero-content {
+          max-width: 500px;
+          margin-left: 40%;
+      }
+
+      .hero-title {
+          font-size: 2rem;
+          line-height: 1.2;
+          color: #2c3e50;
+          margin-bottom: 1rem;
+      }
+
+      .hero-description {
+          color: #5d6d7e;
+          margin-bottom: 2rem;
+          line-height: 1.6;
+      }
+
+      .cta-button {
+          display: inline-block;
+          padding: 0.8rem 2rem;
+          background-color: #1a4741;
+          color: white;
+          text-decoration: none;
+          border-radius: 4px;
+          transition: background-color 0.3s ease;
+      }
+
+      .cta-button:hover {
+          background-color: #123530;
+      }
+
+      .hero-image {
+          width: 300px;
+          position: relative;
+          right: 100px;
+      }
+
+      @media (max-width: 768px) {
+          .hero {
+              flex-direction: column;
+              text-align: center;
+              padding: 2rem;
+          }
+          .hero-image {
+              width: 300px;
+              position: relative;
+              left: 30px;
+          }
+      }
+  </style>
+ </head>
+
+ <body class="bg-gray-100" style="font-family: 'Roboto', sans-serif;">
+    <%- include('../partials/user/header') %> 
+
+    <main class="hero w-full">
+      <div class="hero-content">
+         <b><h1 class="hero-title">Wishlist</h1></b>
+          <p class="hero-description">
+             <a href="/">Home</a> <span> > </span> <a href="/wishlist">Wishlist</a>
+          </p>
+      </div>
+      <img src="/img/skinova cover.png" alt="Skinova Cover" class="hero-image">
+    </main>
+
+    <div class="container mx-auto mt-8">
+      <div class="overflow-x-auto">
+        <table class="min-w-full bg-white">
+          <thead>
+            <tr class="w-full bg-teal-400 text-white">
+              <th class="py-2 px-4">Product</th>
+              <th class="py-2 px-4">Price</th>
+              <th class="py-2 px-4">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (wishlist && wishlist.products.length > 0) { %>
+              <% wishlist.products.forEach(item => { %>
+                <% if (item.productId) { %> 
+                  <tr class="border-b">
+                    <td class="py-4 px-4 flex items-center">
+                      <a href="/removeFromWishlist?id=<%= item.productId._id %>" class="text-red-500 hover:text-red-600 mr-2">
+                        <i class="fas fa-times"></i>
+                      </a>
+                      <img src="<%= item.productId.productImage[0] %>" class="w-16 h-16 mr-4" alt="Product Image">
+                      <div>
+                        <h2 class="font-bold"><%= item.productId.productName %></h2>
+                        <p><%= item.productId.description %></p>
+                      </div>
+                    </td>
+                    <td class="py-4 px-4">₹<%= item.productId.salePrice %></td>
+                    <td class="py-4 px-4">
+                      <button onclick="addToCart('<%= item.productId._id %>')" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                        Add to Cart
+                      </button>
+                    </td>
+                  </tr>
+                <% } %>  
+              <% }) %>
+            <% } else { %>
+              <tr>
+                <td colspan="3" class="text-center py-4">Your Wishlist is empty</td>
+              </tr>
+            <% } %>
+            
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+      async function addToWishlist(productId) {
+          try {
+              const response = await fetch(`/addToWishlist?id=${productId}`, {
+                  method: 'GET'
+              });
+
+              const data = await response.json();
+
+              if (data.success) {
+                  Swal.fire({
+                      icon: 'success',
+                      title: 'Added to Wishlist',
+                      text: data.message,
+                      timer: 1500,
+                      showConfirmButton: false
+                  });
+              } else {
+                  Swal.fire({
+                      icon: 'error',
+                      title: 'Oops...',
+                      text: data.message || 'Something went wrong!',
+                  });
+              }
+          } catch (error) {
+              Swal.fire({
+                  icon: 'error',
+                  title: 'Oops...',
+                  text: 'Something went wrong!',
+              });
+              console.error("Error adding to wishlist:", error);
+          }
+      }
+
+async function addToCart(productId) {
+    try {
+        const response = await fetch(`/addToCart?id=${productId}`, {
+            method: 'GET',
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Added to Cart',
+                text: data.message,
+                timer: 1500,
+                showConfirmButton: false
+            });
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: data.message || 'Something went wrong!',
+            });
+        }
+    } catch (error) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Something went wrong!',
+        });
+        console.error("Error adding to cart:", error);
+    }
+}
+
+
+    </script>
+
+ </body>
+</html>

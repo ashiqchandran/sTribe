@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/style/admin/dashboard.css">
+    <title>Admin Dashboard</title>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar Section -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <!-- <img src="/images/admin_logo.png" alt="Logo" class="logo"> -->
+                <h3>Style Tribe</h3>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="/admin/dashboard">Dashboard</a></li>
+                <li><a href="/admin/users">Customers</a></li>
+                <li><a href="/admin/category">Categories</a></li>
+                <li><a href="/admin/orders">order</a></li>
+                <li><a href="/admin/brands">Brands</a></li>
+                <li><a href="/admin/products">Add Products</a></li>
+                <li><a href="/admin/allProducts">Products</a></li>
+                <li><a href="/admin/coupons">Coupons</a></li>
+                <li><a href="/admin/banner">Banners</a></li>
+                <li><a href="/admin/others">Others</a></li>
+            </ul>
+        </div>
+
+        <!-- Main Content Section -->
+        <div class="main-content">
+            <!-- Admin Info Box -->
+            <div class="admin-info-box">
+                <div class="top-header">
+                    <div class="admin-info">
+                        <img src="/images/admin.jpg" alt="Admin Image" class="admin-img">
+                        <span class="admin-name">nijas</span>
+                        <!-- Logout button -->
+                        <button type="submit" class="logout-btn" onclick="confirmAdminLogout(event)">Logout</button>
+                    </div>
+                </div>
+            </div>
+            <div class="service-table-box">
+     
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function confirmAdminLogout(event) {
+            event.preventDefault();
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You will be logged out of the admin panel!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Yes, Logout!",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "/admin/logout";
+                }
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+    const sidebarLinks = document.querySelectorAll(".sidebar-menu li a");
+    const currentPath = window.location.pathname; // Get current route
+
+    sidebarLinks.forEach(link => {
+        const linkPath = new URL(link.href).pathname; // Get the path from the link
+        
+        if (linkPath === currentPath) {
+            link.classList.add("active"); // Add active class only to the exact match
+        } else {
+            link.classList.remove("active"); // Remove active class from non-matching links
+        }
+    });
+});
+
+    </script>

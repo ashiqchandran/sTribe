@@ -1,0 +1,89 @@
+<%- include("../../views/partials/admin/header") %>
+<link rel="stylesheet" href="/style/admin/brand.css">
+
+
+<section class="content-main">
+  <div class="content-header">
+      <div>
+          <h2 class="content-title card-title">Brands Management</h2>
+      </div>
+  </div>
+
+  <div class="card">
+      <div class="card-body">
+          <div class="row">
+              <!-- Add New Brand Form -->
+              <div class="col-md-4 brand-form">
+                  <h4 class="form-title">Add New Brand</h4>
+                  <form method="post" action="/admin/addBrand" enctype="multipart/form-data">
+                      <div class="mb-4">
+                          <label for="brand_name" class="form-label">Brand Name</label>
+                          <input type="text" name="name" id="brand_name" class="form-control" placeholder="Enter brand name" required />
+                      </div>
+
+                      <div class="mb-4">
+                          <label for="brand_image" class="form-label">Brand Image</label>
+                          <input type="file" name="image" id="brand_image" class="form-control" required />
+                      </div>
+
+                      <div class="d-grid">
+                          <button class="btn btn-primary mt-4" type="submit">Add Brand</button>
+                      </div>
+                  </form>
+              </div>
+
+              <!-- Brand List Table -->
+              <div class="col-md-8 brand-table">
+                  <h4 class="table-title">Brands List</h4>
+                  <div class="table-responsive">
+                      <table class="table table-hover">
+                          <thead>
+                              <tr>
+                                  <th>Brand Name</th>
+                                  <th>Logo</th>
+                                  <th>Status</th>
+                                  <th>Actions</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              <% data.forEach(brand => { %>
+                                  <tr>
+                                      <td><%= brand.brandName %></td>
+                                      <td>
+                                          <div class="logo-img">
+                                              <img src="/uploads/re-image/<%= brand.brandImage[0] %>" alt="<%= brand.brandName %>" class="img-fluid" />
+                                          </div>
+                                      </td>
+                                      <td>
+                                          <span class="badge <%= brand.isBlocked ? 'badge-danger' : 'badge-success' %>">
+                                              <%= brand.isBlocked ? 'Blocked' : 'Active' %>
+                                          </span>
+                                      </td>
+                                      <td>
+                                          <button class="btn btn-danger btn-action" data-id="<%= brand._id %>">Block</button>
+                                          <button class="btn btn-success btn-action" data-id="<%= brand._id %>">Unblock</button>
+                                          <button class="btn btn-danger btn-action" data-id="<%= brand._id %>">Delete</button>
+                                      </td>
+                                  </tr>
+                              <% }); %>
+                          </tbody>
+                      </table>
+                  </div>
+              </div>
+          </div>
+
+          <!-- Pagination -->
+          <div class="pagination-container text-center mt-4">
+              <% if (currentPage > 1) { %>
+                  <a href="/brands?page=<%= currentPage - 1 %>" class="btn btn-secondary">Previous</a>
+              <% } %>
+
+              <% if (currentPage < totalPages) { %>
+                  <a href="/brands?page=<%= currentPage + 1 %>" class="btn btn-secondary">Next</a>
+              <% } %>
+          </div>
+      </div>
+  </div>
+</section>
+</div>
+</div>      

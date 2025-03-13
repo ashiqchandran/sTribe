@@ -1,0 +1,159 @@
+<%- include('../partials/user/header') %> 
+    <title>About Us - Style Tribe</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 20px 0;
+            text-align: center;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+        .about-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            width: 100%; /* Increased width */
+        }
+        .about-content h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .about-content p {
+            font-size: 1.1em;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .team {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+        .team-member {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 30%; /* Increased width */
+            text-align: center;
+        }
+        .team-member img {
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            margin-bottom: 15px;
+        }
+        .team-member h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .team-member p {
+            font-size: 1em;
+            color: #666;
+        }
+        .upcoming-product {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%; /* Increased width */
+        }
+        .upcoming-product .text-content {
+            width: 48%;
+        }
+        .upcoming-product .text-content h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .upcoming-product .text-content p {
+            font-size: 1.1em;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .upcoming-product .image-content {
+            width: 48%;
+            text-align: center;
+        }
+        .upcoming-product .image-content img {
+            max-width: 100%;
+            border-radius: 8px;
+        }
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>About Us</h1>
+        </div>
+    </header>
+    <div class="container">
+        <div class="about-content">
+            <h2>Our Story</h2>
+            <p>Welcome to Style Tribe, where fashion meets passion. Our journey began with a simple idea: to create exclusive, hand-picked products that make you shine. Designed and made in India with premium materials from Thirupur, our products are crafted with love and care in our own factory, ensuring export quality at a fraction of the price.</p>
+            <p>We believe in offering you the best, and our commitment to quality and affordability is what sets us apart. Join us on this journey and experience the difference with Style Tribe.</p>
+        </div>
+        <div class="about-content">
+            <h2>Our Team</h2>
+            <div class="team">
+                <div class="team-member">
+                    <img src="https://via.placeholder.com/100" alt="Team Member 1">
+                    <h3>John Doe</h3>
+                    <p>Founder & CEO</p>
+                </div>
+                <div class="team-member">
+                    <img src="https://via.placeholder.com/100" alt="Team Member 2">
+                    <h3>Jane Smith</h3>
+                    <p>Head Designer</p>
+                </div>
+                <div class="team-member">
+                    <img src="https://via.placeholder.com/100" alt="Team Member 3">
+                    <h3>Mike Johnson</h3>
+                    <p>Marketing Director</p>
+                </div>
+            </div>
+        </div>
+        <div class="upcoming-product">
+            <div class="text-content">
+                <h2>Upcoming Product</h2>
+                <p>We are excited to announce our upcoming product release! Stay tuned for a new addition to our collection that combines style, comfort, and affordability. This new release is designed to elevate your wardrobe and make you stand out.</p>
+                <p>Sign up for our newsletter to be the first to know when it's available!</p>
+            </div>
+            <div class="image-content">
+                <img src="https://via.placeholder.com/400" alt="Upcoming Product">
+            </div>
+        </div>
+        <footer>
+            <p>&copy; 2023 Style Tribe. All rights reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>

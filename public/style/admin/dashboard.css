@@ -1,0 +1,149 @@
+/* General container setup */
+.admin-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar Styling */
+.sidebar {
+    width: 250px;  /* Increased width for sidebar */
+    background-color: #333;
+    color: #fff;
+    padding: 20px;
+    position: fixed;
+    height: 100%;
+}
+
+.sidebar-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.sidebar-header .logo {
+    width: 120px;  /* Increased logo width */
+    margin-bottom: 10px;
+}
+
+.sidebar-header h3 {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar-menu li {
+    margin: 20px 0;
+}
+
+.sidebar-menu li a {
+    color: #fff;
+    text-decoration: none;
+    display: block;
+    padding: 12px;
+    transition: background-color 0.3s;
+}
+
+.sidebar-menu li a:hover {
+    background-color: #555;
+}
+
+/* Main Content Styling */
+.main-content {
+    margin-left: 300px; /* Increased the left margin to accommodate the wider sidebar */
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Admin Info Box */
+.admin-info-box {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    position: relative;
+    margin-left:2vw;
+    width:75vw;
+}
+
+.admin-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.admin-name {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.admin-img {
+    width: 70px;  /* Size of the admin image */
+    height: 70px;  /* Size of the admin image */
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+
+.logout-btn {
+    padding: 8px 16px;
+    background-color: #d33;
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    margin-top: 5px;
+}
+
+.admin-info-box:hover .logout-btn {
+    display: block;
+}
+
+/* Service Table Box */
+.service-table-box {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+   margin-left: 2vw;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+
+button {
+    padding: 6px 12px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+.sidebar-menu li a.active {
+    background-color: #afb0b2; /* Highlight color */
+    color: #fff; /* Ensure text color is visible */
+    font-weight: bold; /* Make the text stand out */
+}
+
+
+.logo{
+    height: 40px;
+    width:20px;
+}
+
+
+
+
+
+
+
+

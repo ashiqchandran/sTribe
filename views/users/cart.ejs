@@ -1,0 +1,365 @@
+<%- include('../partials/user/header') %>
+  <header>
+    <nav>
+      <a href="/" class="logo">MAGIC10</a>
+      <div class="nav-links">
+        <a href="/">HOME</a>
+        <a href="/shop">SHOP</a>
+        <a href="/about">ABOUT</a>
+        <a href="/contact">CONTACT</a>
+
+        <!-- Wishlist and Cart Buttons -->
+        <div class="header-icons">
+          <a href="/wishlist" class="icon-link">
+            <i class="fas fa-heart"></i>
+          </a>
+          <a href="/cart" class="icon-link">
+            <i class="fas fa-shopping-bag"></i>
+          </a>
+        </div>
+        <div class="custom-dropdown">
+          <a href="#" class="sign-in-link">
+            <%= user.username %>
+          </a>
+          <div class="dropdown-content">
+            <a href="/userProfile">Profile</a>
+            <a href="/logout">Logout</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <style>
+    .cart-container {
+      max-width: 1200px;
+      margin: 3rem auto;
+      padding: 2rem;
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 3rem;
+    }
+
+    .cart-items {
+      background: var(--secondary-bg);
+      border-radius: 8px;
+      padding: 2rem;
+    }
+
+    .cart-item {
+      display: grid;
+      grid-template-columns: 100px 1fr 150px;
+      gap: 1.5rem;
+      padding: 1.5rem 0;
+      border-bottom: 1px solid rgba(196, 162, 119, 0.1);
+    }
+
+    .cart-item:last-child {
+      border-bottom: none;
+    }
+
+    .item-image {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 4px;
+    }
+
+    .item-details {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .item-title {
+      color: var(--text-primary);
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .item-price {
+      color: var(--accent-gold);
+      font-size: 1.1rem;
+    }
+
+    .stock-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .stock-input {
+      width: 50px;
+      text-align: center;
+      background: var(--dark-bg);
+      border: 1px solid rgba(196, 162, 119, 0.2);
+      color: var(--text-primary);
+      padding: 0.3rem;
+      border-radius: 4px;
+    }
+
+    .stock-btn {
+      background: var(--accent-gold);
+      color: var(--dark-bg);
+      border: none;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .stock-btn:hover {
+      background: #d4b487;
+    }
+
+    .remove-item {
+      color: #dc3545;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+    }
+
+    .remove-item:hover {
+      color: #bb2d3b;
+    }
+
+    .order-summary {
+      background: var(--secondary-bg);
+      border-radius: 8px;
+      padding: 2rem;
+      height: fit-content;
+    }
+
+    .summary-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .total {
+      border-top: 1px solid rgba(196, 162, 119, 0.1);
+      padding-top: 1rem;
+      font-size: 1.2rem;
+    }
+
+    .promo-code {
+      margin: 1.5rem 0;
+    }
+
+    .promo-input {
+      background: var(--dark-bg);
+      border: 1px solid rgba(196, 162, 119, 0.2);
+      color: var(--text-primary);
+      padding: 0.75rem;
+      border-radius: 4px;
+      width: 100%;
+      margin-bottom: 0.5rem;
+    }
+
+    .empty-cart {
+      text-align: center;
+      padding: 4rem;
+      color: var(--text-secondary);
+    }
+
+    @media (max-width: 768px) {
+      .cart-container {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+ 
+ <div class="cart-container">
+  <div class="cart-items">
+    <% if (cartItems && cartItems.length > 0) { %>
+      <% cartItems.forEach(item => { %>
+        <div class="cart-item">
+          <img src="<%= item.product.productImage[0] %>" alt="<%= item.product.productName %>" class="item-image">
+          <div class="item-details">
+            <h3 class="item-title">
+              <%= item.product.productName %>
+            </h3>
+            <p class="item-price">₹<%= item.product.salePrice %></p>
+            <span class="remove-item" data-id="<%= item.product._id %>">
+              <i class="fas fa-trash"></i> Remove
+            </span>
+          </div>
+          <div class="stock-controls">
+            <button class="stock-btn decrement">-</button>
+            <input type="number" class="stock-input" value="<%= item.quantity %>" min="1"
+              data-max-stock="<%= item.product.quantity %>" data-product-id="<%= item.product._id %>">
+            <button class="stock-btn increment">+</button>
+          </div>
+        </div>
+      <% }) %>
+    <% } else { %>
+      <div class="empty-cart">
+        <h3>Your cart is empty</h3>
+        <p>Start adding items to your cart!</p>
+        <a href="/shop" class="btn-gold mt-2">Continue Shopping</a>
+      </div>
+    <% } %>
+  </div>
+
+  <% if (cartItems && cartItems.length > 0) { %>
+    <div class="order-summary">
+      <h2 class="mb-3">Order Summary</h2>
+      <div class="summary-item">
+        <span>Subtotal:</span>
+        <span>₹<%= subtotal %></span>  <!-- Display the subtotal here -->
+      </div>
+      <div class="summary-item">
+        <span>Shipping:</span>
+        <span>₹<%= shipping %></span>  <!-- Display the shipping cost here -->
+      </div>
+      <div class="summary-item total">
+        <span>Total:</span>
+        <span>₹<%= grandTotal %></span>
+      </div>
+
+      <a href="/checkout"><button class="btn-gold checkout-button" style="width: 100%">Proceed to Checkout</button></a>
+    </div>
+  <% } %>
+</div>
+
+
+<script>
+  // remove item // Remove item from the cartdocument.querySelector('.cart-items').addEventListener('click', function(event) {
+    document.querySelector('.cart-items').addEventListener('click', function(event) {
+  if (event.target && event.target.classList.contains('remove-item')) {
+    const productId = event.target.dataset.id; // Get the product ID from the data-id attribute
+    Swal.fire({
+      title: 'Remove Item?',
+      text: 'Are you sure you want to remove this item from your cart?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#dc3545',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Yes, remove it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Sending DELETE request to remove the item
+        fetch('/removeCartItem', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ productId }) // Send the product ID in the request body
+        })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              Swal.fire('Removed!', 'Item has been removed.', 'success')
+                .then(() => window.location.reload()); // Reload the page to reflect the change
+            } else {
+              Swal.fire('Error!', data.message || 'Could not remove item.', 'error');
+            }
+          })
+          .catch(err => {
+            console.error('Remove error:', err);
+            Swal.fire('Error!', 'Something went wrong.', 'error');
+          });
+      }
+    });
+  }
+});
+
+
+  // increment and decrement
+  document.querySelectorAll('.stock-btn').forEach(btn => {
+    btn.addEventListener('click', function () {
+      const input = this.parentElement.querySelector('.stock-input');
+      let currentValue = parseInt(input.value);
+      const maxStock = parseInt(input.dataset.maxStock);
+      const productId = input.dataset.productId;
+
+      if (this.classList.contains('increment')) {
+        const maxAllowed = Math.min(maxStock, 5);
+        if (currentValue < maxAllowed) {
+          currentValue++;
+        } else {
+          if (maxStock < 5) {
+            Swal.fire({
+              title: 'Stock Limit Reached!',
+              text: `Only ${maxStock} stocks are available.`,
+              icon: 'info'
+            });
+          } else {
+            Swal.fire({
+              title: 'Maximum Number Reached',
+              text: 'Only 5 quantity per person allowed.',
+              icon: 'info'
+            });
+          }
+        }
+      } else {
+        if (currentValue > 1) {
+          currentValue--;
+        }
+      }
+      input.value = currentValue;
+
+      updateServerQuantity(productId, currentValue);
+      updateTotals();
+    });
+  });
+
+  // update quantity in the server side
+  function updateServerQuantity(productId, newQuantity) {
+    fetch('/updateCartQuantity', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ productId, newQuantity })
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (!data.success) {
+          Swal.fire('Error', data.message || 'Could not update quantity.', 'error');
+        }
+      })
+      .catch(err => {
+        console.error('Error updating quantity:', err);
+        Swal.fire('Error', 'Something went wrong.', 'error');
+      });
+  }
+
+  // apply promocode
+  let currentPromoCode = null;
+  document.querySelector('.apply-promo-button')?.addEventListener('click', function () {
+    const promoInput = document.querySelector('.promo-input').value.trim();
+    if (promoInput === 'SAVE10') {
+      currentPromoCode = 'SAVE10';
+      Swal.fire('Promo Applied!', 'You got 10% off!', 'success');
+    } else {
+      currentPromoCode = null;
+      Swal.fire('Invalid Promo', 'This code is not valid.', 'error');
+    }
+    updateTotals();
+  });
+
+  function updateTotals() {
+    let subtotal = 0;
+    document.querySelectorAll('.cart-item').forEach(item => {
+      const price = parseFloat(item.querySelector('.item-price').textContent.replace('₹', ''));
+      const quantity = parseInt(item.querySelector('.stock-input').value);
+      subtotal += price * quantity;
+    });
+
+    const shipping = (subtotal > 5000) ? 0 : 100;
+
+    let discount = 0;
+    if (currentPromoCode === 'SAVE10') {
+      discount = subtotal * 0.10;
+    }
+
+    const total = subtotal + shipping - discount;
+
+    document.getElementById('subtotal').textContent = subtotal.toFixed(2);
+    document.getElementById('shipping').textContent = shipping.toFixed(2);
+    document.getElementById('discount').textContent = discount.toFixed(2);
+    document.getElementById('total').textContent = total.toFixed(2);
+  }
+
+  updateTotals();
+</script>
+
+<%- include('../partials/user/footer') %>
