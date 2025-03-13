@@ -1,0 +1,2 @@
+# sTribe
+Project using ejs
