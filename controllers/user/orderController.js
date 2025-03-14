@@ -8,9 +8,10 @@ const mongoose = require('mongoose');
 const placeOrder = async (req, res) => {
     try {
         console.log("Received placeOrder request");
-        const userId = req.session.user;
+        const userId = req.session.user._id;
+        console.log("user id = ",userId)
         const { addressId } = req.body;
-
+        console.log("address id = ",addressId)
         // Aggregate to fetch cart and product details
         const cart = await Cart.aggregate([
             { $match: { userId: new mongoose.Types.ObjectId(userId) } },
@@ -27,6 +28,7 @@ const placeOrder = async (req, res) => {
             {
                 $project: {
                     _id: 0,
+                    userId:"$userId",
                     productId: "$productDetails._id",
                     productName: "$productDetails.productName",
                     salePrice: "$productDetails.salePrice",
@@ -34,7 +36,8 @@ const placeOrder = async (req, res) => {
                 }
             }
         ]);
-
+        console.log("placeorder aggregate is working")
+console.log("cart=",cart    )
         if (!cart || cart.length === 0) {
             return res.status(400).json({
                 success: false,
@@ -61,13 +64,14 @@ const placeOrder = async (req, res) => {
         // Create orders from cart items
         const orders = await Promise.all(cart.map(async (item) => {
             const order = new Order({
-                userId: userId,
-                orderedItems: [{
+                
+                orderItems: [{
                     product: item.productId,
                     quantity: item.quantity,
                     price: item.salePrice,
                     status: 'pending'
                 }],
+                userId: userId,
                 totalPrice: item.salePrice * item.quantity,
                 finalAmount: item.salePrice * item.quantity,
                 address: selectedAddress,
@@ -82,7 +86,7 @@ const placeOrder = async (req, res) => {
 
             return order.save();
         }));
-
+console.log("cart = ",cart)
         // Clear cart after placing the order
         // await Cart.findOneAndUpdate({ userId: userId }, { $set: { items: [] } });
 
@@ -103,29 +107,58 @@ const placeOrder = async (req, res) => {
 
 const getOrders = async (req, res) => {
     try {
-        const user = req.session.user;
-        if (!user || !user._id) {
-            return res.status(400).send("User not logged in");
-        }
-        const userId = new mongoose.Types.ObjectId(user._id);
+        const userId = req.session.user._id;
 
-        // Aggregate orders with populated fields
-        console.log("User  session:", req.session.user);
-        console.log("User  ID:", userId);
-        db.orders.find({ userId: ObjectId("your_user_id_here") });
         const orders = await Order.aggregate([
-            { $match: { userId } }
+            {
+                $match: { userId: new mongoose.Types.ObjectId(userId) }  // Match orders by userId
+            },
+            {
+                $lookup: {  // Join with the `products` collection
+                    from: 'products',
+                    localField: 'orderItems.product',  // Join on the `product` field inside `orderItems`
+                    foreignField: '_id',  // Match with `_id` of the `Product` collection
+                    as: 'productDetails'  // Store result in `productDetails`
+                }
+            },
+            {
+                $unwind: '$orderItems'  // Unwind the orderItems array to treat each item individually
+            },
+            {
+                $unwind: '$productDetails'  // Unwind the `productDetails` array
+            },
+            {
+                $project: {  // Include only the necessary fields
+                    _id: 0,
+                    orderId: '$_id',
+                    productName: '$productDetails.productName',
+                    finalPrice: '$finalAmount',
+                    productImage: '$productDetails.productImage',
+                    price: '$productDetails.price',
+                    quantity: '$orderItems.quantity',
+                    status: '$orderItems.status',
+                    createdOn: 1  // Include order creation date
+                }
+            },
+            {
+                $sort: { createdOn: -1 }  // Sort by order creation date in descending order
+            }
         ]);
-        console.log("Order items:", orders.map(order => order.orderItems));
-        console.error("Error in getOrders:", error.message);
 
-        res.render("orders", { success: true, orders });
+        // Get user details
+        const user = await User.findById(userId);
+
+        res.render("orders", {
+            orders: orders,
+            user: user
+        });
 
     } catch (error) {
         console.error("Error in getOrders:", error);
-        res.status(500).render("orders", { success: false, orders: [], message: "Internal server error" });
+        res.status(500).json({ error: "Internal server error" });
     }
 };
+
 
 
 const loadOrderDetails = async (req, res) => {

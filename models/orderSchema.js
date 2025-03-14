@@ -9,6 +9,13 @@ orderId:{
     default:()=>uuidv4(),
     unique:true
 },
+
+userId:{
+    type:Schema.Types.ObjectId,
+        ref:'user',
+        required:true
+},
+
 orderItems:[{
     product:{
         type:Schema.Types.ObjectId,
@@ -21,7 +28,12 @@ orderItems:[{
     },price:{
         type:Number,
         default:0
+    },
+    status:{
+        type:String,
+        default:"pending"
     }
+
 }],
 totalPrice:{
     type:Number,

@@ -183,32 +183,40 @@ const loadCheckoutPage = async (req, res) => {
     // Aggregation pipeline for Cart
     const cart = await Cart.aggregate([
       {
-        $match: { userId: new mongoose.Types.ObjectId(userId) },  // Match the cart by userId
-      },
-      {
-        $unwind: "$items"  // Unwind the items array to process each item separately
-      },
-      {
-        $lookup: {
-          from: "products",               // Join the `products` collection
-          localField: "items.productId",  // The field in `items.productId`
-          foreignField: "_id",            // The field in `products._id`
-          as: "productDetails"            // The field where the product details will be stored
+        $match: {
+          userId: new mongoose.Types.ObjectId(userId._id) // Match by userId
         }
       },
       {
-        $unwind: "$productDetails"  // Unwind the productDetails to access each product
+        $unwind: "$items"  // Unwind the `items` array so each item is treated individually
       },
       {
         $lookup: {
-          from: "categories",           // Join the `categories` collection
-          localField: "productDetails.category",  // The field in `productDetails` that references category
-          foreignField: "_id",          // The field in `categories`
-          as: "categoryDetails"         // The field where the category details will be stored
+          from: "products",  // Join with the `products` collection
+          localField: "items.productId",  // Match the `items.productId` with the `products._id`
+          foreignField: "_id",  // Match `productId` in items with the `_id` of products
+          as: "productDetails"  // Store the result in `productDetails`
         }
       },
       {
-        $unwind: "$categoryDetails"  // Unwind categoryDetails to access category
+        $unwind: {
+          path: "$productDetails",  // Unwind the `productDetails` array
+          preserveNullAndEmptyArrays: true  // Don't exclude the document if no matching product is found
+        }
+      },
+      {
+        $lookup: {
+          from: "categories",  // Join with the `categories` collection
+          localField: "productDetails.category",  // Match `productDetails.category` with `categories._id`
+          foreignField: "_id",  // Match the category with the `_id` in categories collection
+          as: "categoryDetails"  // Store the result in `categoryDetails`
+        }
+      },
+      {
+        $unwind: {
+          path: "$categoryDetails",  // Unwind the `categoryDetails` array
+          preserveNullAndEmptyArrays: true  // Don't exclude the document if no matching category is found
+        }
       },
       {
         $match: {
@@ -220,24 +228,27 @@ const loadCheckoutPage = async (req, res) => {
         $project: {
           _id: 0,
           product: "$productDetails",  // Include the product details
-          quantity: "$items.quantity",  // Include the quantity
-          totalPrice: { 
-            $multiply: ["$items.quantity", "$productDetails.salePrice"]  // Calculate total price
+          quantity: "$items.quantity",  // Corrected reference to quantity
+          totalPrice: {
+            $multiply: ["$items.quantity", "$productDetails.salePrice"]  // Corrected reference to quantity
           }
         }
       },
       {
         $group: {
-          _id: null,                         // Group all the results into one document
-          cartItems: { $push: {             // Push each cart item into an array
-            product: "$product",
-            quantity: "$quantity",
-            totalPrice: "$totalPrice"
-          } },
-          grandTotal: { $sum: "$totalPrice" } // Calculate the grand total
+          _id: null,  // Group all the results into one document
+          cartItems: { 
+            $push: {  // Push each cart item into an array
+              product: "$product", 
+              quantity: "$quantity", 
+              totalPrice: "$totalPrice"
+            } 
+          },
+          grandTotal: { $sum: "$totalPrice" }  // Calculate the grand total
         }
       }
-    ]);
+    ])
+    console.log("aggrigate is working")
 
     // If no cart found or the cartItems array is empty, handle it gracefully
     if (!cart || cart.length === 0 || !cart[0].cartItems || cart[0].cartItems.length === 0) {
@@ -260,6 +271,7 @@ const loadCheckoutPage = async (req, res) => {
     if (!addressData) {
       return res.status(400).send("Address not found");
     }
+
 
     // Render the checkout page with the populated cart items, subtotal, shipping, and grand total
     res.render("checkout", {
