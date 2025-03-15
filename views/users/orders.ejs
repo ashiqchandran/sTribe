@@ -157,96 +157,127 @@
             background-color: orange;
             color: white;
         }
+        .order-body .product-image {
+    max-width: 100px;  /* Set a max width */
+    max-height: 100px; /* Set a max height */
+    object-fit: cover; /* Ensures the aspect ratio is maintained and image is cropped to fit the box */
+    width: auto;  /* Allow automatic scaling while maintaining the aspect ratio */
+    height: auto; /* Allow automatic scaling while maintaining the aspect ratio */
+}
+.order-body .product-image {
+    max-width: 100px;  /* Set a max width */
+    max-height: 100px; /* Set a max height */
+    object-fit: cover; /* Ensures the aspect ratio is maintained and image is cropped to fit the box */
+    width: auto;  /* Allow automatic scaling while maintaining the aspect ratio */
+    height: auto; /* Allow automatic scaling while maintaining the aspect ratio */
+}
+.col-md-9{
+    margin-left: auto;
+    margin-right: auto;
+}
 </style>
 
-
-<div class="container mt-5">
-    <h2 class="mb-4">Your Orders</h2>
-
-    <% if (orders && orders.length > 0) { %>
-        <% orders.forEach(order => { %>
-            <div class="order-card">
-                <div class="order-header">
-                    <div class="row align-items-center">
-                        <div class="col-md-3">
-                            <small class="text-muted">ORDER PLACED</small><br>
-                            <%= new Date(order.createdOn).toLocaleDateString() %>
-                        </div>
-                        <div class="col-md-3">
-                            <small class="text-muted">TOTAL</small><br>
-                            ₹ <%= order.finalPrice %>
-                        </div>
-                        <div class="col-md-3">
-                            <small class="text-muted">ORDER ID</small><br>
-                            #<%= order.orderId %>
-                        </div>
-                        <div class="col-md-3">
-                            <span class="status-badge <%= 
-                                order?.status === 'delivered' ? 'bg-success' :
-                                order?.status === 'cancelled' ? 'bg-danger' :
-                                order?.status === 'shipped' ? 'bg-info' :
-                                'bg-warning'
-                            %>">
-                                <%= order?.status?.toUpperCase() || 'PENDING' %>
-                            </span>
-                        </div>
-                    </div>
+<section class="banner-area organic-breadcrumb">
+    <div class="container">
+        <div class="breadcrumb-banner d-flex flex-wrap align-items-center justify-content-between">
+            <div class="col-left d-flex align-items-center">
+                <div class="profile-image-container">
+                    
                 </div>
-
-                <div class="order-body">
-                    <div class="row align-items-center">
-                        <% if (order.orderItems && order.orderItems.length > 0) { %>
-                            <div class="col-md-2">
-                                <img src="<%= order.orderItems[0].productImage?.[0] || '/default-image.jpg' %>" 
-                                     alt="<%= order.orderItems[0].productName || 'Product' %>"
-                                     class="product-image">
-                            </div>
-                            <div class="col-md-6">
-                                <h5><%= order.orderItems[0].productName %></h5>
-                                <p class="text-muted mb-0">Quantity: <%= order.orderItems[0].quantity %></p>
-                                <p class="text-muted">Price: ₹<%= order.orderItems[0].price %></p>
-                            </div>
-                            <div class="col-md-4 text-end">
-                                <a href="/order-details?orderId=<%= order.orderId %>" class="btn btn-outline-primary btn-sm">
-                                    View Details
-                                </a>
-                                
-                                <% if (order.status !== 'cancelled' && order.status !== 'delivered') { %>
-                                    <button onclick="cancelOrder('<%= order._id %>')" 
-                                            class="btn btn-outline-danger btn-sm mt-2">
-                                        Cancel Order
-                                    </button>
-                                <% } %>
-                            </div>
-                        <% } %>
-                    </div>
+                <div class="ml-3">
+                    <h5 id="fullName" style="color: #121311;"><%= user.name || 'John Doe' %></h5>
+                    <p id="email" style="color: #121311;"><%= user.email || 'johndoe@example.com' %></p>
                 </div>
             </div>
-        <% }); %>
-    <% } else { %>
-        <div class="text-center py-5">
-            <div class="mb-4">
-                <i class="fas fa-shopping-bag fa-3x text-muted"></i>
-            </div>
-            <h3>No orders yet</h3>
-            <p class="text-muted">When you place an order, it will appear here.</p>
-            <a href="/shop" class="btn btn-primary mt-3">Start Shopping</a>
+            
         </div>
-    <% } %>
+    </div>
+</section>
+
+
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <h2 class="mb-4">Your Orders</h2>
+            
+            <% if (orders && orders.length > 0) { %>
+                <% orders.forEach(order => { %>
+                    <div class="order-card">
+                        <div class="order-header">
+                            <div class="row align-items-center">
+                                <div class="col-md-3">
+                                    <small class="text-muted">ORDER PLACED</small><br>
+                                    <%= new Date(order.createdOn).toLocaleDateString() %>
+                                </div>
+                                <div class="col-md-3">
+                                    <small class="text-muted">TOTAL</small><br>
+                                    ₹<%= order.finalAmount %>
+                                </div>
+                                <div class="col-md-3">
+                                    <small class="text-muted">ORDER ID</small><br>
+                                    #<%= order.orderId %>
+                                </div>
+                                <div class="col-md-3">
+                                    <span class="status-badge <%= 
+                                        order.status === 'delivered' ? 'bg-success' :
+                                        order.status === 'cancelled' ? 'bg-danger' :
+                                        order.status === 'shipped' ? 'bg-info' :
+                                        'bg-warning'
+                                    %>">
+                                        <%= order.status.toUpperCase() %>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="order-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-2">
+                                    <img src="<%= order.productImage[0] %>" 
+                                         alt="<%= order.productName %>"
+                                         class="product-image">
+                                </div>
+                                <div class="col-md-6">
+                                    <h5><%= order.productName %></h5>
+                                    <p class="text-muted mb-0">Quantity: <%= order.quantity %></p>
+                                    <p class="text-muted">Price: ₹<%= order.price %></p>
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    <a href="/order-details?orderId=<%= order.orderId %>" 
+                                       class="btn btn-outline-primary btn-sm">View Details</a>
+                                    
+                                    <% if (order.status !== 'cancelled' && order.status !== 'delivered') { %>
+                                        <button onclick="cancelOrder('<%= order.orderId%>')" 
+                                                class="btn btn-outline-danger btn-sm mt-2">
+                                            Cancel Order
+                                        </button>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <div class="text-center py-5">
+                    <div class="mb-4">
+                        <i class="fas fa-shopping-bag fa-3x text-muted"></i>
+                    </div>
+                    <h3>No orders yet</h3>
+                    <p class="text-muted">When you place an order, it will appear here.</p>
+                    <a href="/shop" class="btn btn-primary mt-3">Start Shopping</a>
+                </div>
+            <% } %>
+        </div>
+    </div>
 </div>
 
+<!-- SweetAlert2 for dialogs -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     async function cancelOrder(orderId) {
-        if (!orderId) {
-            console.error("Order ID is missing");
-            return;
-        }
-
         const { value: reason } = await Swal.fire({
             title: 'Cancel Order',
             input: 'textarea',
-            inputLabel: 'Reason for cancellation',
+            inputLabel: 'Please provide a reason for cancellation',
             inputPlaceholder: 'Type your reason here...',
             showCancelButton: true,
             inputValidator: (value) => {
@@ -260,22 +291,52 @@
             try {
                 const response = await fetch('/orders/cancel', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
                     body: JSON.stringify({ orderId, reason }),
                 });
 
                 const data = await response.json();
+                
                 if (data.success) {
-                    await Swal.fire({ icon: 'success', title: 'Success', text: 'Order cancelled successfully', timer: 1500 });
+                    await Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: 'Order cancelled successfully',
+                        timer: 1500
+                    });
                     location.reload();
                 } else {
                     throw new Error(data.message);
                 }
             } catch (error) {
                 console.error('Error:', error);
-                await Swal.fire({ icon: 'error', title: 'Error', text: error.message || 'Failed to cancel order' });
+                await Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message || 'Failed to cancel order'
+                });
             }
         }
+    }
+
+    function confirmLogout(event) {
+        event.preventDefault(); // Prevent default link behavior
+
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You will be logged out!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, Logout"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "/logout"; // Redirect only if confirmed
+            }
+        });
     }
 </script>
 

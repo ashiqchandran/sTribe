@@ -4,21 +4,24 @@ const Product = require("../../models/productSchema");
 
 
 const getOrders = async (req, res) => {
+    
     try {
+        console.log("Fetching orders...");
+    
         const orders = await Order.aggregate([
             {
                 $lookup: {
                     from: "products", // Collection name for the products
-                    localField: "orderedItems.product", // Field in 'Order' document
+                    localField: "orderItems.product", // Field in 'Order' document
                     foreignField: "_id", // Field in 'Product' document
-                    as: "orderedItems.productDetails" // Field to store the product data
+                    as: "orderItems.productDetails" // Field to store the product data
                 }
             },
             {
-                $unwind: "$orderedItems" // Flatten the orderedItems array
+                $unwind: "$orderItems" // Flatten the orderItems array
             },
             {
-                $unwind: "$orderedItems.productDetails" // Flatten the productDetails array
+                $unwind: "$orderItems.productDetails" // Flatten the productDetails array
             },
             {
                 $project: {
@@ -27,28 +30,28 @@ const getOrders = async (req, res) => {
                     finalAmount: 1,
                     status: 1,
                     address: 1,
-                    "orderedItems.product": "$orderedItems.productDetails.productName", // Extract product name
-                    "orderedItems.productImage": "$orderedItems.productDetails.productImage", // Extract product image
-                    "orderedItems.price": "$orderedItems.productDetails.price", // Extract product price
-                    "orderedItems.quantity": "$orderedItems.quantity" // Keep quantity from the order
+                    "orderItems.product": "$orderItems.productDetails.productName", // Extract product name
+                    "orderItems.productImage": "$orderItems.productDetails.productImage", // Extract product image
+                    "orderItems.price": "$orderItems.productDetails.price", // Extract product price
+                    "orderItems.quantity": "$orderItems.quantity" // Keep quantity from the order
                 }
             },
             {
                 $sort: { createdOn: -1 } // Sort by created date in descending order
             }
         ]);
-console.log(orders)
+    
+        console.log(orders); // Check the structure of the data
+    
         res.render("admin-orders", {
             orders,
             title: "Order Management",
         });
     } catch (error) {
-        console.error("Error fetching orders:", error);
+        console.error("Error fetching orders:", error.message);
         res.status(500).send("Internal Server Error");
     }
-};
-
-
+}
 const getOrderDetails = async (req, res) => {
     try {
         const orderId = req.params.id;
@@ -98,34 +101,58 @@ const updateOrderStatus = async (req, res) => {
     }
 };
 
+
 const cancelOrder = async (req, res) => {
     try {
-        const { orderId } = req.body;
-        const order = await Order.findById(orderId);
+        const { orderId, reason } = req.body;
+        console.log("orderId = ", orderId);
+        console.log("reason =", reason);
+        const userId = req.session.user;
 
+        // Fetch the order details using the orderId directly (no need to convert to ObjectId if it's UUID)
+        const order = await Order.findOne({ orderId: orderId, userId: userId });
+
+        // Check if order exists
         if (!order) {
-            return res.status(404).json({ success: false, message: "Order not found" });
+            return res.status(404).json({ success: false, message: 'Order not found' });
         }
 
+        // If the order is neither cancelled nor delivered, cancel it
         if (order.status !== 'cancelled' && order.status !== 'delivered') {
-            order.status = 'cancelled';
-            order.orderedItems[0].status = 'cancelled';
+            // Update the order status to 'cancelled' and apply the cancellation reason to the items
+            const updateOrder = await Order.updateOne(
+                { orderId: orderId, userId: userId }, // No need to convert orderId here
+                {
+                    $set: {
+                        status: 'cancelled',
+                        cancelReason: reason,
+                        'orderItems.$[].status': 'cancelled',  // Using $[] to update all items in the array
+                        'orderItems.$[].cancelReason': reason  // Apply reason to all items
+                    },
+                    $inc: { 
+                        'orderItems.$[].quantity': 1 // Restock all items
+                    }
+                }
+            );
 
-            // Return product quantity to stock
-            await Product.findByIdAndUpdate(order.orderedItems[0].product, {
-                $inc: { quantity: order.orderedItems[0].quantity }
-            });
+            // Loop through each order item and update product stock
+            await Promise.all(order.orderItems.map(async (item) => {
+                await Product.findByIdAndUpdate(item.product, {
+                    $inc: { quantity: item.quantity } // Increase stock by item quantity
+                });
+            }));
 
-            await order.save();
-            res.json({ success: true, message: "Order cancelled successfully" });
+            return res.json({ success: true, message: 'Order cancelled successfully' });
         } else {
-            res.status(400).json({ success: false, message: "Order cannot be cancelled" });
+            return res.status(400).json({ success: false, message: 'Order cannot be cancelled' });
         }
+
     } catch (error) {
-        console.error("Error cancelling order:", error);
-        res.status(500).json({ success: false, message: "Internal server error" });
+        console.error('Error in cancelOrder:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
     }
 };
+
 
 module.exports = {
     getOrders,

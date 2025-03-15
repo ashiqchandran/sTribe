@@ -130,11 +130,11 @@ const getOrders = async (req, res) => {
             {
                 $project: {  // Include only the necessary fields
                     _id: 0,
-                    orderId: '$_id',
+                    orderId: '$orderId',
                     productName: '$productDetails.productName',
-                    finalPrice: '$finalAmount',
+                    finalAmount: '$finalAmount',
                     productImage: '$productDetails.productImage',
-                    price: '$productDetails.price',
+                    price: '$productDetails.salePrice',
                     quantity: '$orderItems.quantity',
                     status: '$orderItems.status',
                     createdOn: 1  // Include order creation date
@@ -187,6 +187,7 @@ const loadOrderDetails = async (req, res) => {
             {
                 $project: {
                     orderId: 1,
+                    userId:1,
                     status: 1,
                     orderedItems: 1,
                     shippingAddress: 1,
@@ -218,56 +219,66 @@ const loadOrderDetails = async (req, res) => {
 const cancelOrder = async (req, res) => {
     try {
         const { orderId, reason } = req.body;
-        const userId = req.session.user;
+        console.log("orderId = ", orderId);
+        console.log("reason =", reason);
+        const userId = req.session.user._id;
 
-        const order = await Order.aggregate([
-            {
-                $match: { _id: new mongoose.Types.ObjectId(orderId), userId: userId }
-            },
-            {
-                $unwind: '$orderedItems'
-            },
-            {
-                $project: {
-                    orderId: 1,
-                    status: 1,
-                    orderedItems: 1,
-                    cancelReason: 1
-                }
-            }
-        ]);
+        // Fetch the order details using the orderId and userId
+        const order = await Order.findOne({ orderId: orderId, userId: userId });
 
-        if (order.length === 0) {
+        // Check if order exists
+        if (!order) {
             return res.status(404).json({ success: false, message: 'Order not found' });
         }
 
-        const currentOrder = order[0];
+        console.log("Order found:", order); // Check if order exists and contains orderItems
 
-        if (currentOrder.status !== 'cancelled' && currentOrder.status !== 'delivered') {
-            // Update the order status to 'cancelled'
+        // If the order is neither cancelled nor delivered, cancel it
+        if (order.status !== 'cancelled' && order.status !== 'delivered') {
+            console.log("Cancelling order: ", orderId);
+
+            // Update the order status to 'cancelled' and apply the cancellation reason to the items
             const updateOrder = await Order.updateOne(
-                { _id: new mongoose.Types.ObjectId(orderId), userId: userId },
+                { orderId: orderId, userId: userId },
                 {
-                    $set: { 
+                    $set: {
                         status: 'cancelled',
                         cancelReason: reason,
-                        'orderedItems.$[item].status': 'cancelled',
-                        'orderedItems.$[item].cancelReason': reason
+                        'orderItems.$[].status': 'cancelled',  // Using $[] to update all items in the array
+                        'orderItems.$[].cancelReason': reason  // Apply reason to all items
                     },
                     $inc: { 
-                        'orderedItems.$[item].quantity': 1 // Increase the product quantity by 1 (restocking)
+                        'orderItems.$[].quantity': 1 // Restock all items
                     }
-                },
-                {
-                    arrayFilters: [{ 'item.product': currentOrder.orderedItems.product }],
-                    new: true
                 }
             );
 
-            // Return product quantity to stock
-            await Product.findByIdAndUpdate(currentOrder.orderedItems.product, {
-                $inc: { quantity: currentOrder.orderedItems.quantity }
+            console.log("Order updated successfully:", updateOrder);
+
+            // Ensure that orderItems exists and is an array
+            if (!Array.isArray(order.orderItems) || order.orderItems.length === 0) {
+                return res.status(400).json({ success: false, message: 'No items to cancel' });
+            }
+
+            // Loop through each order item and update product stock
+            const productUpdates = order.orderItems.map(async (item) => {
+                console.log(`Restocking product: ${item.product}, Quantity: ${item.quantity}`);
+
+                // Find the product and update stock
+                const productUpdateResult = await Product.findByIdAndUpdate(item.product, {
+                    $inc: { quantity: item.quantity } // Increase stock by item quantity
+                });
+
+                if (!productUpdateResult) {
+                    console.log(`Failed to update product: ${item.product}`);
+                    throw new Error(`Failed to update product stock for ${item.product}`);
+                }
+
+                console.log(`Product ${item.product} stock updated successfully.`);
             });
+
+            // Wait for all product stock updates to complete
+            await Promise.all(productUpdates);
 
             return res.json({ success: true, message: 'Order cancelled successfully' });
         } else {
@@ -279,6 +290,7 @@ const cancelOrder = async (req, res) => {
         res.status(500).json({ success: false, message: 'Internal server error' });
     }
 };
+
 
 
 module.exports = {
