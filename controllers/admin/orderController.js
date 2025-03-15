@@ -79,7 +79,7 @@ const updateOrderStatus = async (req, res) => {
     try {
         const { orderId, status } = req.body;
         const order = await Order.findById(orderId);
-
+console.log("orer order =",order)
         if (!order) {
             return res.status(404).json({ success: false, message: "Order not found" });
         }
@@ -91,7 +91,7 @@ const updateOrderStatus = async (req, res) => {
 
         // Update order status
         order.status = status;
-        order.orderedItems[0].status = status;
+        order.orderItems[0].status = status;
 
         await order.save();
         res.json({ success: true, message: "Order status updated successfully" });
@@ -101,7 +101,47 @@ const updateOrderStatus = async (req, res) => {
     }
 };
 
-
+const orderCancelled = async (req, res) => {
+    try {
+      const { orderId } = req.body;
+      const order = await Order.findById(orderId);
+  
+      // Check if the order exists
+      if (!order) {
+        return res.json({ success: false, message: `Cannot find the order` });
+      }
+  
+      // Check if the order is already cancelled
+      if (order.status === 'cancelled') {
+        return res.json({ success: false, message: `Order already cancelled` });
+      }
+  
+      // Loop through all order items to restock each product
+      await Promise.all(order.orderItems.map(async (item) => {
+        const product = await Product.findById(item.product); // Ensure we're using the correct product
+        if (!product) {
+          console.log(`Product not found for productId: ${item.product}`);
+          return;
+        }
+  
+        // Calculate the new product quantity
+        product.quantity += item.quantity; // Add the quantity of the canceled order item to the stock
+        await product.save();
+      }));
+  
+      // Mark the order as cancelled and save
+      order.status = 'cancelled';
+      await order.save();
+  
+      return res.json({ success: true, message: 'Order cancelled successfully' });
+  
+    } catch (error) {
+      console.error('Error occurred while cancelling the order', error);
+      return res.status(500).send('Internal Server Error');
+    }
+  };
+  
+  
 const cancelOrder = async (req, res) => {
     try {
         const { orderId, reason } = req.body;
@@ -158,5 +198,6 @@ module.exports = {
     getOrders,
     getOrderDetails,
     updateOrderStatus,
-    cancelOrder
+    cancelOrder,
+    orderCancelled
 };

@@ -73,5 +73,6 @@ router.get("/banner",adminAuth, bannerController.getBanner)
 router.get('/orders', adminAuth, orderController.getOrders);
 router.get('/orders/:id', adminAuth, orderController.getOrderDetails);
 router.post('/orders/update-status', adminAuth, orderController.updateOrderStatus);
+router.post('/orders/cancel',adminAuth,orderController.orderCancelled)
 
 module.exports = router;

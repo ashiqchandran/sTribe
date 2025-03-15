@@ -27,17 +27,16 @@
                     <tbody>
                         <% orders.forEach(order => { %>
                             <tr>
-                                
                                 <td>#<%= order.orderId %></td>
                                 <td><%= new Date(order.createdOn).toLocaleDateString() %></td>
-                                <tad><%= order.address.name %></td>
+                                <td><%= order.address.name %></td>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <img src="<%= order.orderItems.product.productImage[0] %>" 
+                                        <img src="<%= order.orderItems.productImage && order.orderItems.productImage.length > 0 ? order.orderItems.productImage[0] : '/default-image.jpg' %>" 
                                              alt="Product" 
                                              style="width: 50px; height: 50px; object-fit: cover;"
                                              class="me-2">
-                                        <span><%= order.orderItems[0].product.productName %></span>
+                                        <span><%= order.orderItems.product %></span>
                                     </div>
                                 </td>
                                 <td>₹<%= order.finalAmount %></td>
@@ -69,6 +68,7 @@
                                 </td>
                             </tr>
                         <% }); %>
+                        
                     </tbody>
                 </table>
             </div>

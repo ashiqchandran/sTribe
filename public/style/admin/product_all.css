@@ -309,3 +309,53 @@ body {
     outline: none;
     box-shadow: none;
 }
+/* Remove the default decoration */
+.pagination {
+    list-style: none; /* Remove bullets */
+    margin: 0;
+    padding: 0;
+    text-align: center; /* Center the pagination */
+}
+
+.pagination .page-item {
+    display: inline-block;
+    margin: 0 5px; /* Space between pagination items */
+}
+
+.pagination .page-link {
+    display: inline-block;
+    padding: 8px 16px; /* Adjust size */
+    text-decoration: none; /* Remove underline */
+    color: #007bff; /* Set text color */
+    border: 1px solid #ddd; /* Add border around pagination links */
+    border-radius: 4px; /* Round corners */
+    background-color: #fff; /* White background */
+    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transitions */
+}
+
+/* Style for active pagination link */
+.pagination .page-item.active .page-link {
+    background-color: #007bff; /* Active page color */
+    color: #fff; /* Active page text color */
+    border-color: #007bff;
+}
+
+/* Hover effect */
+.pagination .page-link:hover {
+    background-color: #f8f9fa; /* Hover background color */
+    color: #0056b3; /* Hover text color */
+}
+
+/* Disabled page link */
+.pagination .page-item.disabled .page-link {
+    color: #ccc; /* Disabled text color */
+    border-color: #ddd; /* Disabled border color */
+    pointer-events: none; /* Disable clicking */
+}
+
+/* Pagination alignment in the center */
+.pagination {
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+}
