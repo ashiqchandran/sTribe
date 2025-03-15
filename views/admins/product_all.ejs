@@ -1,259 +1,124 @@
-    <%- include("../../views/partials/admin/header") %>
+<%- include("../../views/partials/admin/header") %>
 
-    <head>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
-        <link rel="stylesheet" href="/style/admin/product_all.css">
-    </head>
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
+    <link rel="stylesheet" href="/style/admin/product_all.css">
+</head>
 
-    <div class="content-header">
-        <h2 class="content-title">Products Management</h2>
-    </div>
+<div class="content-header">
+    <h2 class="content-title">Products Management</h2>
+</div>
 
-    <div class="container">
-        <form action="" method="get" class="search-form text-center mb-4">
-            <div class="input-group">
-                <input type="text" class="form-control search-input" placeholder="Search products or brands" name="search">
-                <button class="btn search-button" type="submit">Search</button>
-            </div>
-        </form>
-
-        <!-- <div class="mb-4">
-            <label class="form-label">Upload Product Images</label>
-            <input type="file" id="imageInput" class="form-control" accept="image/png, image/jpeg" multiple>
-
-            <div id="image-preview" class="d-flex flex-wrap mt-3"></div>
-
-            <input type="hidden" name="croppedImages" id="croppedImages">
-        </div> -->
-
-        <button id="uploadButton" class="btn btn-primary">Upload & Save</button>
-
-        <div class="table-responsive mt-5">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Image</th>
-                        <th>Product Name</th>
-                        <th>&nbsp&nbsp&nbsp&nbsp&nbsp&nbspCategory &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</th>
-                        <th>Sale Price&nbsp&nbsp&nbsp</th>
-                        <th>Regular Price</th>
-                        <th>color</th>
-                        <th>brand</th>
-                        <th>Offer</th>
-                        <th>&nbsp&nbsp&nbspQuantity</th>
-                        <th>&nbsp&nbsp&nbspAction</th>
-                        <th>Edit</th>
-                        <th>delete</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% for (let i = data.length - 1; i >= 0; i--) { %>
-                    <tr>
-                        <td>
-                            <% if (data[i].productImage && data[i].productImage.length > 0) { %>
-                                <% data[i].productImage.forEach((image) => { %>
-                                    <img src="<%= image %>"
-                                        alt="<%= data[i].productName %>" 
-                                        class="product-image" 
-                                        style="width: 50px; height: 50px; margin: 2px;">
-                                <% }); %>
-                            <% } else { %>
-                                <img src="/images/placeholder.svg" 
-                                    alt="No image" 
-                                    class="product-image" 
-                                    style="width: 50px; height: 50px;">
-                            <% } %>
-                        </td>
-                        <td>&nbsp&nbsp&nbsp<%= data[i].productName %></td>
-                        <td>&nbsp&nbsp&nbsp<%= data[i].category ? data[i].category.name : 'N/A' %></td>
-                        <td>&nbsp&nbsp&nbsp<%= data[i].salePrice %></td>
-                        
-                        <td><%= data[i].regularPrice %></td>
-                        <td><%= data[i].color %></td>
-                        <td><%= data[i].brand %></td>
-                        <td>
-                            <% if (data[i].productOffer) { %>
-                                <%= data[i].productOffer %>% Off
-                                <button class="btn btn-sm btn-warning" onclick="editOffer('<%= data[i]._id %>', '<%= data[i].productOffer ? data[i].productOffer : 0 %>')">Edit</button>
-                                <button class="btn btn-sm btn-danger" onclick="removeOffer('<%= data[i]._id %>')">Remove</button>
-                            <% } else { %>
-                                0%
-                                <button class="btn btn-sm btn-info" onclick="addOffer('<%= data[i]._id %>')">Add Offer</button>
-                            <% } %>
-                        </td>
-                        <td>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<%= data[i].quantity %></td>
-                       
-                        
-                        <td>
-                            <% if (data[i].isBlocked == false) { %>
-                                <a href="#" onclick="confirmBlock(event, '<%= data[i]._id %>')" class="btn btn-sm btn-danger">Block</a>
-                              <% } else { %>
-                                <a href="#" onclick="confirmUnblock(event, '<%= data[i]._id %>')" class="btn btn-sm btn-success">Unblock</a>
-                              <% } %>
-                              
-                          </td>
-                          
-                    
-                        <td>
-                            <button class="btn btn-info">
-                                <a href="/admin/editProduct?id=<%= data[i]._id %>" class="text-white" style="text-decoration: none;">Edit</a>
-                            </button>
-                        </td>
-                        <td>
-                            <button class="btn btn-sm btn-danger" onclick="confirmDelete(event, '<%= data[i]._id %>')">Delete</button>
-                        </td>
-                    </tr>
-                    <% } %>
-                </tbody>
-            </table>
+<div class="container">
+    <!-- Search form -->
+    <form action="" method="get" class="search-form text-center mb-4">
+        <div class="input-group">
+            <input type="text" class="form-control search-input" placeholder="Search products or brands" name="search">
+            <button class="btn search-button" type="submit">Search</button>
         </div>
+    </form>
+
+    <button id="uploadButton" class="btn btn-primary">Upload & Save</button>
+
+    <!-- Product Table -->
+    <div class="table-responsive mt-5">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Product Name</th>
+                    <th>Category</th>
+                    <th>Sale Price</th>
+                    <th>Regular Price</th>
+                    <th>Color</th>
+                    <th>Brand</th>
+                    <th>Offer</th>
+                    <th>Quantity</th>
+                    <th>Action</th>
+                    <th>Edit</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% for (let i = data.length - 1; i >= 0; i--) { %>
+                <tr>
+                    <td>
+                        <% if (data[i].productImage && data[i].productImage.length > 0) { %>
+                            <% data[i].productImage.forEach((image) => { %>
+                                <img src="<%= image %>"
+                                     alt="<%= data[i].productName %>" 
+                                     class="product-image" 
+                                     style="width: 50px; height: 50px; margin: 2px;">
+                            <% }); %>
+                        <% } else { %>
+                            <img src="/images/placeholder.svg" 
+                                 alt="No image" 
+                                 class="product-image" 
+                                 style="width: 50px; height: 50px;">
+                        <% } %>
+                    </td>
+                    <td><%= data[i].productName %></td>
+                    <td><%= data[i].category ? data[i].category.name : 'N/A' %></td>
+                    <td><%= data[i].salePrice %></td>
+                    <td><%= data[i].regularPrice %></td>
+                    <td><%= data[i].color %></td>
+                    <td><%= data[i].brand %></td>
+                    <td>
+                        <% if (data[i].productOffer) { %>
+                            <%= data[i].productOffer %>% Off
+                            <button class="btn btn-sm btn-warning" onclick="editOffer('<%= data[i]._id %>', '<%= data[i].productOffer ? data[i].productOffer : 0 %>')">Edit</button>
+                            <button class="btn btn-sm btn-danger" onclick="removeOffer('<%= data[i]._id %>')">Remove</button>
+                        <% } else { %>
+                            0%
+                            <button class="btn btn-sm btn-info" onclick="addOffer('<%= data[i]._id %>')">Add Offer</button>
+                        <% } %>
+                    </td>
+                    <td><%= data[i].quantity %></td>
+                    <td>
+                        <% if (data[i].isBlocked == false) { %>
+                            <a href="#" onclick="confirmBlock(event, '<%= data[i]._id %>')" class="btn btn-sm btn-danger">Block</a>
+                        <% } else { %>
+                            <a href="#" onclick="confirmUnblock(event, '<%= data[i]._id %>')" class="btn btn-sm btn-success">Unblock</a>
+                        <% } %>
+                    </td>
+                    <td>
+                        <a href="/admin/editProduct?id=<%= data[i]._id %>" class="btn btn-info text-white">Edit</a>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-danger" onclick="confirmDelete(event, '<%= data[i]._id %>')">Delete</button>
+                    </td>
+                </tr>
+                <% } %>
+            </tbody>
+        </table>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+    <!-- Pagination Section -->
+    <div class="pagination">
+        <ul class="pagination justify-content-center">
+            <% if (currentPage > 1) { %>
+                <li class="page-item"><a class="page-link" href="?page=<%= currentPage - 1 %>">Previous</a></li>
+            <% } %>
+            <% for (let i = 1; i <= totalPages; i++) { %>
+                <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                    <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                </li>
+            <% } %>
+            <% if (currentPage < totalPages) { %>
+                <li class="page-item"><a class="page-link" href="?page=<%= currentPage + 1 %>">Next</a></li>
+            <% } %>
+        </ul>
+    </div>
+</div>
 
-    <script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
 
-function confirmBlock(event, productId) {
-  event.preventDefault(); // Prevent default link action
-  Swal.fire({
-    title: "Are you sure?",
-    text: "You are about to block this product!",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#d33",
-    cancelButtonColor: "#3085d6",
-    confirmButtonText: "Yes, Block!",
-  }).then((result) => {
-    if (result.isConfirmed) {
-      // Build the URL with the productId dynamically
-      const url = new URL('/admin/blockProduct', window.location.origin);
-      url.searchParams.set('id', productId); // Add productId as a query parameter
+<script>
+    // Pagination logic already handled in EJS (currentPage, totalPages)
+    // Ensure your pagination buttons are working properly with the query parameters.
+</script>
 
-      // Redirect to the block product route
-      window.location.href = url.toString();
-    }
-  });
-}
-
-function confirmUnblock(event, productId) {
-  event.preventDefault(); // Prevent default link action
-  Swal.fire({
-    title: "Are you sure?",
-    text: "You are about to unblock this product",
-    icon: "info",
-    showCancelButton: true,
-    confirmButtonColor: "#28a745",
-    cancelButtonColor: "#3085d6",
-    confirmButtonText: "Yes, Unblock!",
-  }).then((result) => {
-    if (result.isConfirmed) {
-      // Build the URL with the productId dynamically
-      const url = new URL('/admin/unblockProduct', window.location.origin);
-      url.searchParams.set('id', productId); // Add productId as a query parameter
-
-      // Redirect to the block product route
-      window.location.href = url.toString();
-    }
-  });
-}
-
-        let croppedImagesArray = [];
-
-        document.getElementById("imageInput").addEventListener("change", function (event) {
-            const files = event.target.files;
-            const previewContainer = document.getElementById("image-preview");
-            previewContainer.innerHTML = ""; 
-
-            for (let file of files) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    const imgContainer = document.createElement("div");
-                    imgContainer.classList.add("image-container", "m-2");
-
-                    const imgElement = document.createElement("img");
-                    imgElement.src = e.target.result;
-                    imgElement.style.width = "100px";
-                    imgElement.style.height = "100px";
-                    imgElement.style.border = "1px solid #ddd";
-                    imgElement.style.borderRadius = "5px";
-
-                    const cropButton = document.createElement("button");
-                    cropButton.innerText = "Crop";
-                    cropButton.classList.add("btn", "btn-sm", "btn-primary");
-
-                    cropButton.addEventListener("click", function () {
-                        const cropperModal = document.createElement("div");
-                        cropperModal.innerHTML = `
-                            <div class="modal-overlay">
-                                <img id="cropper-image" src="${e.target.result}">
-                                <button class="btn btn-success mt-2" id="saveCrop">Save Crop</button>
-                            </div>
-                        `;
-                        document.body.appendChild(cropperModal);
-
-                        const cropperImage = document.getElementById("cropper-image");
-                        const cropper = new Cropper(cropperImage, { aspectRatio: 1, viewMode: 2 });
-
-                        document.getElementById("saveCrop").addEventListener("click", function () {
-                            cropper.getCroppedCanvas().toBlob((blob) => {
-                                const croppedUrl = URL.createObjectURL(blob);
-                                imgElement.src = croppedUrl;
-                                croppedImagesArray.push(blob);
-                                cropperModal.remove();
-                            }, "image/jpeg");
-                        });
-                    });
-
-                    imgContainer.appendChild(imgElement);
-                    imgContainer.appendChild(cropButton);
-                    previewContainer.appendChild(imgContainer);
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        document.getElementById("uploadButton").addEventListener("click", function () {
-            const formData = new FormData();
-
-            croppedImagesArray.forEach((blob, index) => {
-                formData.append("images", blob, `cropped-image-${index}.jpg`);
-            });
-
-            fetch("/admin/addProduct", {
-                method: "POST",
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => alert("Product Images Uploaded Successfully!"))
-            .catch(error => console.error("Error:", error));
-        });
-
-        function confirmDelete(event, productId) {
-  event.preventDefault(); // Prevent the default action (link or button click)
-
-  Swal.fire({
-    title: "Are you sure?",
-    text: "You are about to delete this product. This action cannot be undone.",
-    icon: "error",
-    showCancelButton: true,
-    confirmButtonColor: "#d33",
-    cancelButtonColor: "#3085d6",
-    confirmButtonText: "Yes, Delete!",
-  }).then((result) => {
-    if (result.isConfirmed) {
-      // Build the URL with the productId dynamically
-      const url = new URL('/admin/deleteProduct', window.location.origin);
-      url.searchParams.set('id', productId); // Add productId as a query parameter
-
-      // Redirect to the delete product route
-      window.location.href = url.toString();
-    }
-  });
-}
-
-    </script>
-
-    <%- include("../../views/partials/admin/footer") %>
+<%- include("../../views/partials/admin/footer") %>

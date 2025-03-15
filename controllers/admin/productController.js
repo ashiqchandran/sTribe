@@ -13,6 +13,7 @@ const pageNotFound = async (req, res) => {
   res.render("pageError");
 };
 
+
 const getProductAddPage = async (req, res) => {
   try {
       const categories = await Category.find();

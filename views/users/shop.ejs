@@ -8,227 +8,217 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="/style/user/shop.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-<style>
-    carousel-container {
-    width: 100%;
-    overflow: hidden;
-    height: 30vh;
-}
+    <style>
+        carousel-container {
+        width: 100%;
+        overflow: hidden;
+        height: 30vh;
+        }
 
-.carousel {
-    display: flex;
-    transition: transform 1s ease-in-out;
-}
+        .carousel {
+        display: flex;
+        transition: transform 1s ease-in-out;
+        }
 
-.carousel-slide {
-    width: 100%;
-    height: 100%;
-    position: relative;
-    background-color: #ccc;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-shrink: 0;
-}
+        .carousel-slide {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        background-color: #ccc;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-shrink: 0;
+        }
 
-.carousel-slide img {
-    width: 80%;
-    height: auto;
-    object-fit: cover;
-}
+        .carousel-slide img {
+        width: 80%;
+        height: auto;
+        object-fit: cover;
+        }
 
-.text-overlay {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: white;
-    font-size: 2rem;
-    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
-}
+        .text-overlay {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: white;
+        font-size: 2rem;
+        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+        }
 
-.carousel-slide:nth-child(1) {
-    background-color: red;
-}
+        .carousel-slide:nth-child(1) {
+        background-color: red;
+        }
 
-.carousel-slide:nth-child(2) {
-    background-color: blue;
-}
+        .carousel-slide:nth-child(2) {
+        background-color: blue;
+        }
 
-.carousel-slide:nth-child(3) {
-    background-color: green;
-}
-</style>
+        .carousel-slide:nth-child(3) {
+        background-color: green;
+        }
+        .pagination{
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
 </head>
 <body class="bg-gray-100">
     <%- include('../partials/user/header') %> 
     
     <!-- Banner Section -->
     <div class="relative w-full h-[40vh] flex items-center bg-gray-200 banner" style="background-image: url('/images/shop/bbb.jpeg');" >
-        
-        <!-- Left-aligned Text Content (40vw) -->
-   
-        
-
-        <!-- Right-side Image (40vw to 100vw) -->
-        <!-- <div class="absolute right-0 w-[60vw] h-full">
-            <img src="" class="w-full h-full object-cover" alt="Fashion Banner">
-        </div> -->
-
-    </div>
-    <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
-        <div class="carousel-inner">
-          <div class="carousel-item active">
-           
-          </div>...
-          <div class="carousel-item">
-           
-          </div>
-          <div class="carousel-item">
-           
-          </div>
-        </div>
-        <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
-          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-          
-        </a>
-        <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
-          <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        
-        </a>
-      </div>
-   <!-- Main Shop Layout -->
-   <div class="shop-container">
-        
-    <!-- Sidebar -->
-    <div class="filter-container">
-        <h2 class="text-xl font-semibold mb-4">CATEGORIES</h2>
-        <ul class="mb-8">
-            <% for (let i = 0; i < category.length; i++) { %>
-                <li class="mb-2">
-                    <a class="text-gray-700" href="/filter?category=<%= category[i]._id %>">
-                        <%= category[i].name %>
-                    </a>
-                </li>
-            <% } %>
-        </ul>
-
-
-        <br><div class="flex justify-end mb-4">
-            <form action="/shop" method="GET" class="form-inline">
-                
-      <!-- Price Range -->
-<h2 class="text-xl font-semibold mb-4">PRICE RANGE</h2>
-<div class="mb-4">
-    <label class="block text-gray-700">Price From:</label>
-    <input class="w-full p-2 border rounded" id="price-from" type="number" name="price-from" value="<%= priceFrom || 1 %>"/>
-</div>
-<div class="mb-4">
-    <label class="block text-gray-700">Price To:</label>
-    <input class="w-full p-2 border rounded" id="price-to" type="number" name="price-to" value="<%= priceTo || 2000 %>"/>
-</div>
-                <div class="form-group mr-2">
-                    <input type="text" id="advanced-search-glow" name="search" class="form-control" placeholder="Search products...">
-                </div>
-                <div class="form-group mr-2">
-                    <select name="sort" class="form-control">
-                        <option value="">Sort by...</option>
-                        <option value="popularity">Popularity</option>
-                        <option value="price_asc">Price: Low to High</option>
-                        <option value="price_desc">Price: High to Low</option>
-                        <option value="rating">Average Ratings</option>
-                        <option value="featured">Featured</option>
-                        <option value="new">New Arrivals</option>
-                        <option value="name_asc">Name: A to Z</option>
-                        <option value="name_desc">Name: Z to A</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn btn-primary  applybtn">Apply</button>
-                <a href="/shop"><button type="button" class="btn btn-danger">Clear All</button></a>
-            </form>
-        </div>
     </div>
 
-    <!-- Product Listing -->
-    <div class="product-section">
-        <div class="product-grid">
-            <% for (let i = 0; i < products.length; i++) { %>
-                <div class="product">
-                    <a href="/productDetails?id=<%= products[i]._id %>">
-                        <div class="image-container">
-                            <img alt="<%= products[i].productName %>" src="<%= products[i].productImage[0] %>"/>
-                        </div>
-                        <h3 class="text-lg font-semibold mb-2">
-                            <%= products[i].productName %>
-                        </h3>
-                    </a>
-                    <p class="text-gray-700 mb-2">Buy now<span style="font-weight: 900;">&nbsp   ₹<%= products[i].salePrice.toLocaleString('en-IN') %></span> </p>
-                    <div class="flex justify-between items-center">
-                        
-                        <a onclick="addToCart('<%= products[i]._id %>')" class="btn-primary">
-                            Add to Cart
+    <!-- Main Shop Layout -->
+    <div class="shop-container">
+        
+        <!-- Sidebar -->
+        <div class="filter-container">
+            <h2 class="text-xl font-semibold mb-4">CATEGORIES</h2>
+            <ul class="mb-8">
+                <% for (let i = 0; i < category.length; i++) { %>
+                    <li class="mb-2">
+                        <a class="text-gray-700" href="/filter?category=<%= category[i]._id %>">
+                            <%= category[i].name %>
                         </a>
-               
-                      
+                    </li>
+                <% } %>
+            </ul>
+
+            <br><div class="flex justify-end mb-4">
+                <form action="/shop" method="GET" class="form-inline">
+                    <!-- Price Range -->
+                    <h2 class="text-xl font-semibold mb-4">PRICE RANGE</h2>
+                    <div class="mb-4">
+                        <label class="block text-gray-700">Price From:</label>
+                        <input class="w-full p-2 border rounded" id="price-from" type="number" name="price-from" value="<%= priceFrom || 1 %>"/>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700">Price To:</label>
+                        <input class="w-full p-2 border rounded" id="price-to" type="number" name="price-to" value="<%= priceTo || 2000 %>"/>
+                    </div>
+                    <div class="form-group mr-2">
+                        <input type="text" id="advanced-search-glow" name="search" class="form-control" placeholder="Search products..." value="<%= search || '' %>">
+                    </div>
+                    <div class="form-group mr-2">
+                        <select name="sort" class="form-control">
+                            <option value="">Sort by...</option>
+                            <option value="popularity" <%= sort === 'popularity' ? 'selected' : '' %>>Popularity</option>
+                            <option value="price_asc" <%= sort === 'price_asc' ? 'selected' : '' %>>Price: Low to High</option>
+                            <option value="price_desc" <%= sort === 'price_desc' ? 'selected' : '' %>>Price: High to Low</option>
+                            <option value="rating" <%= sort === 'rating' ? 'selected' : '' %>>Average Ratings</option>
+                            <option value="featured" <%= sort === 'featured' ? 'selected' : '' %>>Featured</option>
+                            <option value="new" <%= sort === 'new' ? 'selected' : '' %>>New Arrivals</option>
+                            <option value="name_asc" <%= sort === 'name_asc' ? 'selected' : '' %>>Name: A to Z</option>
+                            <option value="name_desc" <%= sort === 'name_desc' ? 'selected' : '' %>>Name: Z to A</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary applybtn">Apply</button>
+                    <a href="/shop"><button type="button" class="btn btn-danger">Clear All</button></a>
+                </form>
+            </div>
+        </div>
+
+        <!-- Product Listing -->
+        <div class="product-section">
+            <div class="product-grid">
+                <% for (let i = 0; i < products.length; i++) { %>
+                    <div class="product">
+                        <a href="/productDetails?id=<%= products[i]._id %>">
+                            <div class="image-container">
+                                <img alt="<%= products[i].productName %>" src="<%= products[i].productImage[0] %>"/>
+                            </div>
+                            <h3 class="text-lg font-semibold mb-2">
+                                <%= products[i].productName %>
+                            </h3>
+                        </a>
+                        <p class="text-gray-700 mb-2">Buy now<span style="font-weight: 900;">&nbsp ₹<%= products[i].salePrice.toLocaleString('en-IN') %></span> </p>
+                        <div class="flex justify-between items-center">
+                            <a onclick="addToCart('<%= products[i]._id %>')" class="btn-primary">
+                                Add to Cart
+                            </a>
                             <button class="wishlist-button" onclick="addToWishlist('<%= products[i]._id %>', this)">
                                 <i class="fas fa-heart text-xl"></i>
                             </button>
-                     
+                        </div>
                     </div>
-                </div>
-            <% } %>
+                <% } %>
+            </div>
         </div>
-    </div>
 
+       
+    </div>
+ <!-- Pagination -->
+ <div class="pagination">
+    <ul class="pagination">
+        <% if (currentPage > 1) { %>
+            <li class="page-item">
+                <a class="page-link" href="/shop?page=<%= currentPage - 1 %>&search=<%= search %>&sort=<%= sort %>&price-from=<%= priceFrom %>&price-to=<%= priceTo %>">Previous</a>
+            </li>
+        <% } %>
+
+        <% for (let i = 1; i <= totalPages; i++) { %>
+            <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                <a class="page-link" href="/shop?page=<%= i %>&search=<%= search %>&sort=<%= sort %>&price-from=<%= priceFrom %>&price-to=<%= priceTo %>"><%= i %></a>
+            </li>
+        <% } %>
+
+        <% if (currentPage < totalPages) { %>
+            <li class="page-item">
+                <a class="page-link" href="/shop?page=<%= currentPage + 1 %>&search=<%= search %>&sort=<%= sort %>&price-from=<%= priceFrom %>&price-to=<%= priceTo %>">Next</a>
+            </li>
+        <% } %>
+    </ul>
 </div>
 
-<%- include('../partials/user/footer') %>
+    <%- include('../partials/user/footer') %>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-    function addToCart(productId) {
-        fetch(`/addToCart?id=${productId}`)
-            .then(response => response.json())
-            .then(data => {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Added to Cart',
-                    text: data.message,
-                    timer: 2000,
-                    showConfirmButton: false
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function addToCart(productId) {
+            fetch(`/addToCart?id=${productId}`)
+                .then(response => response.json())
+                .then(data => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Added to Cart',
+                        text: data.message,
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
                 });
-            });
-    }
-    function addToWishlist(productId) {
-    if (!productId) {
-        console.error("Product ID is missing.");
-        return;
-    }
+        }
 
-    fetch(`/addToWishlist?id=${productId}`)
-        .then(response => response.json())
-        .then(data => {
-            Swal.fire({
-                icon: data.success ? 'success' : 'error',
-                title: data.success ? 'Added to Wishlist' : 'Already in Wishlist',
-                text: data.message,
-                timer: 2000,
-                showConfirmButton: false
-            });
-        })
-        .catch(error => {
-            console.error("Error adding to wishlist:", error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Failed to add item to wishlist. Please try again.',
-                timer: 2000,
-                showConfirmButton: false
-            });
-        });
-}
+        function addToWishlist(productId) {
+            if (!productId) {
+                console.error("Product ID is missing.");
+                return;
+            }
 
-
-</script>
+            fetch(`/addToWishlist?id=${productId}`)
+                .then(response => response.json())
+                .then(data => {
+                    Swal.fire({
+                        icon: data.success ? 'success' : 'error',
+                        title: data.success ? 'Added to Wishlist' : 'Already in Wishlist',
+                        text: data.message,
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                })
+                .catch(error => {
+                    console.error("Error adding to wishlist:", error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to add item to wishlist. Please try again.',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                });
+        }
+    </script>
 </body>
 </html>

@@ -463,7 +463,7 @@ const loadShoppingPage = async (req, res) => {
 
         // Pagination setup
         const page = parseInt(req.query.page) || 1;
-        const limit = 9;
+        const limit = 10;
         const skip = (page - 1) * limit;
 
         // Build query object
@@ -583,17 +583,17 @@ const loadShoppingPage = async (req, res) => {
     }
 };
 
-
 const filterProduct = async (req, res) => {
     try {
         const user = req.session.user;
         const category = req.query.category;
-        const priceRange = req.query.price;
+        const priceFrom = req.query["price-from"] || 1;  // Set default value for priceFrom
+        const priceTo = req.query["price-to"] || 2000;  // Set default value for priceTo
 
-        console.log("Received Filters:", { category, priceRange }); // Debugging
+        console.log("Received Filters:", { category, priceFrom, priceTo }); // Debugging
 
         const findCategory = category ? await Category.findOne({ _id: category }) : null;
-
+        
         const query = {
             isBlocked: false,
             quantity: { $gt: 0 }
@@ -603,10 +603,8 @@ const filterProduct = async (req, res) => {
             query.category = findCategory._id;
         }
 
-        if (priceRange) {
-            const [minPrice, maxPrice] = priceRange.split('-').map(Number);
-            console.log("Parsed Price Range:", { minPrice, maxPrice }); // Debugging
-            query.price = { $gte: minPrice, $lte: maxPrice };
+        if (priceFrom && priceTo) {
+            query.price = { $gte: Number(priceFrom), $lte: Number(priceTo) };
         }
 
         console.log("Final Query to DB:", query); // Debugging
@@ -617,11 +615,10 @@ const filterProduct = async (req, res) => {
         findProducts.sort((a, b) => new Date(b.createdOn) - new Date(a.createdOn));
 
         const categories = await Category.find({ isListed: true });
-
         const categoriesWithCounts = await Promise.all(categories.map(async (category) => {
             const count = await Product.countDocuments({
                 category: category._id,
-                isBlocked: false,
+                
                 quantity: { $gt: 0 }
             });
             return { _id: category._id, name: category.name, productCount: count };
@@ -646,7 +643,8 @@ const filterProduct = async (req, res) => {
             totalPages,
             currentPage,
             selectedCategory: category || null,
-            selectedPrice: priceRange || null
+            selectedPriceFrom: priceFrom,  // Pass priceFrom
+            selectedPriceTo: priceTo      // Pass priceTo
         });
 
     } catch (error) {
@@ -654,6 +652,7 @@ const filterProduct = async (req, res) => {
         res.redirect("/pageNotFound");
     }
 };
+
 
 
 module.exports = { 
