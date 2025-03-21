@@ -2,6 +2,10 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const userSchema = new Schema({
+    userImage:{
+        type: [String]
+
+    },
     fullname: {
         type: String,
         required: true
@@ -78,6 +82,11 @@ const userSchema = new Schema({
             default: Date.now
         }
     }]
+    ,
+    image:{
+        type:[String],
+        // required:true
+      },
 });
 
 const User = mongoose.model("User", userSchema);

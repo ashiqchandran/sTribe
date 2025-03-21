@@ -1,0 +1,97 @@
+/* Update the .banner-area to have full width, height of 200px, and a light blue background */
+.banner-area {
+    width: 100%; /* Full width */
+    height: 200px; /* Fixed height */
+    background-color: #e3f2fd; /* Light blue background */
+    color: #333; /* Dark text color for contrast */
+    display: flex; /* Flexbox to center content vertically */
+    align-items: center; /* Vertically center */
+    padding: 0 20px; /* Optional: Add padding for spacing */
+    border-radius: 8px; /* Optional: Border radius for rounded corners */
+}
+
+/* Adjust breadcrumb styling inside .banner-area */
+.breadcrumb-banner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    width: 100%;
+}
+
+/* Styling for the breadcrumb text */
+.breadcrumb-banner .col-first h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #333; /* Ensure text color is dark */
+}
+
+/* Styling for breadcrumb links */
+.breadcrumb-banner nav a {
+    color: #333; /* Dark text color */
+    font-size: 1rem;
+    margin-right: 1px; /* Space between links */
+    text-decoration: none;
+}
+
+/* Highlight links on hover */
+.breadcrumb-banner nav a:hover {
+    color: #ffc107; /* Highlight links with golden color */
+}
+
+/* Styling for breadcrumb arrows */
+.breadcrumb-banner nav span {
+    color: #333; /* Arrow color */
+    margin: 2px; /* Space between arrow and link */
+}
+
+a{
+    text-decoration: none;
+}
+.order-summary {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+.order-summary img {
+    width: 50px;
+    height: 50px;
+}
+.order-summary .product-name {
+    font-size: 14px;
+}
+.order-summary .product-mn {
+    font-size: 12px;
+    color: gray;
+}
+.order-summary .product-price {
+    color: blue;
+    font-weight: bold;
+}
+.order-summary .total-price {
+    color: blue;
+    font-weight: bold;
+}
+.order-summary .apply-btn {
+    background-color: #ffc107;
+    color: white;
+}
+.order-summary .place-order-btn {
+    background-color: #ffc107;
+    color: white;
+}
+.hero-content{
+    height: 35vh;
+    padding-top:10px;
+    padding-left:50px
+}
+.col-first a{
+    
+    text-decoration: none;
+    color: white;
+  
+  
+
+}

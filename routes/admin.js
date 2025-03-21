@@ -50,15 +50,15 @@ router.get("/products", adminAuth, productController.getProductAddPage);
 router.post("/addProduct", upload.array("images", 5), productController.addProduct);
 router.get("/allProducts",adminAuth,productController.getAllProducts)
 router.get("/pageError",adminAuth,productController.pageNotFound)
+router.post("/addProductOffer", adminAuth, productController.updateProductOffer); // Add product offer
 
-router.post("/addProductOffer",adminAuth,productController.addProductOffer)
-router.post("/removeProductOffer",adminAuth,productController.removeProductOffer)
+router.post("/removeProductOffer", adminAuth, productController.removeProductOffer); // Remove product offer
+router.post("/blockProduct", adminAuth, productController.blockProduct); // Block product
+router.post("/unblockProduct", adminAuth, productController.unblockProduct); // Unblock product
+router.get("/editProduct", adminAuth, productController.getEditProduct); // Get product for editing
+router.post("/deleteImage", adminAuth, productController.deleteSingleImage); // Delete single image
 
-router.get("/blockProduct",adminAuth,productController.blockProduct);
-router.get("/unblockProduct",adminAuth,productController.unblockProduct);
-router.get("/editProduct",adminAuth,productController.getEditProduct)
-router.post("/deleteImage",adminAuth,productController.deleteSingleImage)
-router.get("/deleteproduct",adminAuth,productController.deleteProduct)
+router.post("/deleteproduct", adminAuth, productController.deleteProduct); // Delete product
 
 router.post("/editProduct/:id", adminAuth, upload.fields([
     { name: 'image1', maxCount: 1 },

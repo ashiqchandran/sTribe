@@ -73,6 +73,8 @@ const filePath = path.join(uploadDir, fileName);
           category: req.body.category,
           regularPrice: req.body.regularPrice,
           salePrice: req.body.salePrice,
+          size:req.body.size,
+          color:req.body.color,
           quantity: req.body.quantity,
           productImage: imagePaths,
       });
@@ -124,26 +126,31 @@ const getAllProducts = async (req, res) => {
   }
 };
 
-
-const addProductOffer = async (req, res) => {
+const updateProductOffer = async (req, res) => {
   try {
-    const { productId, percentage } = req.body;
-    const product = await Product.findById(productId);
+      const { productId, percentage } = req.body;
+      console.log("Received data:", { productId, percentage }); // Debugging line
 
-    if (!product) {
-      return res.status(404).json({ status: false, message: "Product not found" });
-    }
+      if (!productId || !percentage) {
+          return res.status(400).json({ status: false, message: "Product ID and offer percentage are required" });
+      }
 
-    product.productOffer = parseInt(percentage);
-    product.salePrice = Math.round(product.regularPrice * (1 - percentage / 100));
-    await product.save();
+      // Assuming 'productOffer' is the field to update
+      const product = await Product.findById(productId);
+      if (!product) {
+          return res.status(404).json({ status: false, message: "Product not found" });
+      }
 
-    res.json({ status: true, message: "Offer added successfully" });
+      product.productOffer = percentage;  // Update the product offer
+      await product.save();
+
+      res.json({ status: true, message: "Offer updated successfully" });
   } catch (error) {
-    console.error("Error in addProductOffer:", error);
-    res.status(500).json({ status: false, message: "Internal server error" });
+      console.error("Error updating offer:", error);
+      res.status(500).json({ status: false, message: "An error occurred while updating the offer" });
   }
 };
+
 
 const removeProductOffer = async (req, res) => {
   try {
@@ -303,62 +310,76 @@ const deleteSingleImage = async (req, res) => {
 
 const blockProduct = async (req, res) => {
   try {
-    const id = req.query.id;
-    if (!id) {
-      return res.status(400).send("Product ID is required");
+    const id = req.body.id; // Change to body, since it's a POST request
+
+    // Check if the ID is provided and valid
+    if (!id || !isValidObjectId(id)) {
+      return res.status(400).send("Valid Product ID is required");
     }
 
-    const page = req.query.page || 1;
-    const search = req.query.search || "";
+    const page = req.body.page || 1; // Get page number from body (for consistency)
+    const search = req.body.search || "";
 
-    const products = await Product.findById(id);
-    if (!products) {
+    // Find the product by ID
+    const product = await Product.findById(id);
+    if (!product) {
       return res.status(404).send("Product not found");
     }
 
     // Block the product by setting isBlocked to true
-    await Product.updateOne({ _id: id }, { $set: {isBlocked: true } });
+    await Product.updateOne({ _id: id }, { $set: { isBlocked: true } });
 
     // Emit an event when a product is blocked
     productBlockedEmitter.emit("productBlocked", id);
 
-    // Redirect back to the product listing page
-    
-    res.redirect(`/admin/allProducts?page=${page}&search=${encodeURIComponent(search)}`);
+    // Respond with a success message (instead of redirecting)
+    res.json({ success: true, message: "Product blocked successfully" });
+
   } catch (error) {
     console.error("Error blocking product:", error);
-    res.status(500).redirect("/pageerror");
+    res.status(500).json({ success: false, message: "An error occurred" });
   }
 };
 
 const unblockProduct = async (req, res) => {
   try {
-      const id = req.query.id;
-      const page = req.query.page || 1;
-      const search = req.query.search || "";
+    const id = req.body.id; // Change to body, since it's a POST request
 
-      // Check if the product exists
-      const products = await Product.findById(id);
-      if (!products) {
-          return res.status(404).send("Product not found");
-      }
+    // Check if the ID is provided and valid
+    if (!id || !isValidObjectId(id)) {
+      return res.status(400).send("Valid Product ID is required");
+    }
 
-      // Unblock the product by setting isBlocked to false
-      await Product.updateOne({ _id: id }, { $set: { isBlocked: false } });
+    const page = req.body.page || 1; // Get page number from body
+    const search = req.body.search || "";
 
-    
-console.log("product",products.productName,products._id)
-      // Emit an event when a product is unblocked
-      productBlockedEmitter.emit("productUnblocked", id);
+    // Find the product by ID
+    const product = await Product.findById(id);
+    if (!product) {
+      return res.status(404).send("Product not found");
+    }
 
-      // Redirect back to the product listing page
-      
-      res.redirect(`/admin/allProducts?page=${page}&search=${search}`);
+    // Unblock the product by setting isBlocked to false
+    await Product.updateOne({ _id: id }, { $set: { isBlocked: false } });
+
+    // Emit an event when a product is unblocked
+    productBlockedEmitter.emit("productUnblocked", id);
+
+    // Respond with a success message (instead of redirecting)
+    res.json({ success: true, message: "Product unblocked successfully" });
+
   } catch (error) {
-      console.error("Error unblocking product: ", error);
-      res.status(500).redirect("/pageerror");
+    console.error("Error unblocking product:", error);
+    res.status(500).json({ success: false, message: "An error occurred" });
   }
 };
+
+
+// Utility function to check if the provided id is a valid ObjectId
+const isValidObjectId = (id) => {
+  return /^[0-9a-fA-F]{24}$/.test(id);
+};
+
 
 
 
@@ -390,10 +411,9 @@ const uploadProductImages = async (req, res) => {
   }
 };
 
-
 const deleteProduct = async (req, res) => {
   try {
-    const { id } = req.params; // Get product ID from the route parameter
+    const { id } = req.body; // Get product ID from the request body
 
     // Find the product by ID
     const product = await Product.findById(id);
@@ -421,14 +441,13 @@ const deleteProduct = async (req, res) => {
   }
 };
 
-
 // Export all functions
 module.exports = {
   getProductAddPage,
   pageNotFound,
   addProduct,
   getAllProducts,
-  addProductOffer,
+  updateProductOffer,
   removeProductOffer,
   editProduct,
   getEditProduct,

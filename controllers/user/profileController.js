@@ -385,8 +385,24 @@ const updateEmail = async (req, res) => {
     } catch (error) {
         res.redirect('/pageNotFound');
     }
-};
+}; 
 
+
+const addProfile =  async (req, res) => {
+    try {
+        const userId = req.params.id;
+        const imagePath = `/uploads/profile/${req.file.filename}`; // Save the relative path
+        console.log(imagePath)
+        // Update user in database
+        await User.findByIdAndUpdate(userId, { image: imagePath });
+  
+        res.json({ success: true, imagePath });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Error uploading image' });
+    }
+  }
+  
+  
 module.exports={
     getprofile,
     loadAddressPage,
@@ -400,6 +416,7 @@ changePassword ,
 updateEmail ,
  verifyEmailOtp ,
    changeEmailValid  ,
-   changeEmail
+   changeEmail,
+   addProfile
 
 }

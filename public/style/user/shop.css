@@ -222,3 +222,21 @@
 .banner{
     height:390px;
 }
+
+.pagination{
+    margin-left: auto;
+    margin-right: auto;
+}
+/* In your shop.css file */
+
+/* Reduce font size by 40% for h3 */
+h3 {
+    font-size: 90%;  /* Reduces the font size by 40% */
+    text-decoration: none;  /* Removes any text decoration */
+}
+
+/* If you want to target all <a> tags to remove text decoration */
+a {
+    text-decoration: none;  /* Removes underline or any other decoration */
+}
+

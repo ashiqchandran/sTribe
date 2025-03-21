@@ -9,40 +9,52 @@ const saltround = 10
 
 const loadHomePage = async (req, res) => {
     try {
-        const user = req.session.user;
+        const user = req.session.user;  // Check if user is logged in
+        console.log("user = ",user)
+        // Fetching categories that are listed
         const categories = await Category.find({ isListed: true });
 
+        // Fetching products (products that are not blocked, belong to the listed categories, and have quantity > 0)
         const productData = await Product.find({
             isBlocked: false,
             category: { $in: categories.map(category => category._id) },
             quantity: { $gt: 0 }
         })
-        .populate('category', 'name image') // Populate category name & image
-        .sort({ createdOn: -1 }) // Sort by newest
-        .limit(4); // Get only the latest 4
+        .populate('category', 'name image') // Populate category details (name & image)
+        .sort({ createdOn: -1 }) // Sort by the most recently added products
+        .limit(4); // Limit to 4 products
 
-       
+        // Fetching most selling products (products that are not blocked, belong to the listed categories, and have quantity <= 10)
         const mostsellingProduct = await Product.find({
             isBlocked: false,
             category: { $in: categories.map(category => category._id) },
             quantity: { $lte: 10 }
         })
-        .populate('category', 'name image') // Populate category name & image
+        .populate('category', 'name image') // Populate category details
         .sort({ createdOn: -1 }) // Sort by newest
-        .limit(4); // Get only the latest 4
+        .limit(4); // Limit to 4 most selling products
 
+        // If user is logged in, fetch user data
+        let userData = null;
         if (user) {
-            const userData = await User.findById(user);
-            return res.render('home', { user: userData, products: productData ,topSeller:mostsellingProduct});
-        } 
+            userData = await User.findOne({ _id: user });  // Fetch user details from the User collection
+        }
+        
 
-        res.render('home', { products: productData,topSeller:mostsellingProduct});
+        // Render the home page and pass the user details, products, and top sellers to the view
+        
+        res.render('home', {
+            user: userData,               // Passing the user details (if logged in)
+            products: productData,        // Passing the latest products
+            topSeller: mostsellingProduct // Passing the most selling products
+        });
 
     } catch (error) {
         console.error('Error loading home page:', error);
         res.status(500).send('Server Error');
     }
 };
+
 
 
 

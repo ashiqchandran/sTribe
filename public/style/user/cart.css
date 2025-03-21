@@ -1,0 +1,137 @@
+.cart-container {
+    max-width: 1200px;
+    margin: 3rem auto;
+    padding: 2rem;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 3rem;
+  }
+
+  .cart-items {
+    background: var(--secondary-bg);
+    border-radius: 8px;
+    padding: 2rem;
+  }
+
+  .cart-item {
+    display: grid;
+    grid-template-columns: 100px 1fr 150px;
+    gap: 1.5rem;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid rgba(196, 162, 119, 0.1);
+  }
+
+  .cart-item:last-child {
+    border-bottom: none;
+  }
+
+  .item-image {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 4px;
+  }
+
+  .item-details {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .item-title {
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .item-price {
+    color: var(--accent-gold);
+    font-size: 1.1rem;
+  }
+
+  .stock-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .stock-input {
+    width: 50px;
+    text-align: center;
+    background: var(--dark-bg);
+    border: 1px solid rgba(196, 162, 119, 0.2);
+    color: var(--text-primary);
+    padding: 0.3rem;
+    border-radius: 4px;
+  }
+
+  .stock-btn {
+    background: var(--accent-gold);
+    color: var(--dark-bg);
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .stock-btn:hover {
+    background: #d4b487;
+  }
+
+  .remove-item {
+    color: #dc3545;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+  }
+
+  .remove-item:hover {
+    color: #bb2d3b;
+  }
+
+  .order-summary {
+    background: var(--secondary-bg);
+    border-radius: 8px;
+    padding: 2rem;
+    height: fit-content;
+  }
+
+  .summary-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+
+  .total {
+    border-top: 1px solid rgba(196, 162, 119, 0.1);
+    padding-top: 1rem;
+    font-size: 1.2rem;
+  }
+
+  .promo-code {
+    margin: 1.5rem 0;
+  }
+
+  .promo-input {
+    background: var(--dark-bg);
+    border: 1px solid rgba(196, 162, 119, 0.2);
+    color: var(--text-primary);
+    padding: 0.75rem;
+    border-radius: 4px;
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+
+  .empty-cart {
+    text-align: center;
+    padding: 4rem;
+    color: var(--text-secondary);
+  }
+
+  @media (max-width: 768px) {
+    .cart-container {
+      grid-template-columns: 1fr;
+    }
+  }

@@ -1,0 +1,242 @@
+.card-green {
+    background-color: #ADD8E6;
+  }
+  .main {
+    padding: 30px 0;
+  }
+ 
+  .dashboard-menu {
+    background-color: #cce3e6;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+ 
+  .dashboard-menu .nav-link {
+    font-weight: bold;
+    color: #30683c;
+    box-shadow: 0 4px 10px rgba(123, 131, 112, 0.3), 0 4px 20px rgba(0, 191, 255, 0.2);
+    transition: box-shadow 0.3s ease;
+  }
+ 
+  .dashboard-menu .nav-link:hover {
+    color: #00bfff;
+    box-shadow: 0 4px 15px rgba(173, 255, 47, 0.5), 0 6px 25px rgba(0, 191, 255, 0.4);
+  }
+ 
+  .card {
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    margin-bottom: 20px;
+  }
+ 
+  .card-header {
+    background-color: #487379;
+    color: white;
+    border-radius: 10px 10px 0 0;
+  }
+ 
+  .profile-image-container {
+    display: flex;
+    align-items: center;
+  }
+ 
+  .rounded-circle {
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  }
+ 
+  .ml-3 {
+    margin-left: 15px;
+  }
+ 
+  @media (max-width: 768px) {
+    .dashboard-menu {
+      padding: 10px;
+    }
+    .card {
+      margin-bottom: 15px;
+    }
+  }
+  body {
+             background-color: #f7f7f7;
+         }
+         .sidebar {
+             background-color: white;
+             padding: 20px;
+             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+         }
+         .sidebar a {
+             color: #333;
+             display: block;
+             padding: 10px 0;
+             text-decoration: none;
+         }
+         .sidebar a.active {
+             color: #ff6600;
+         }
+         .sidebar a:hover {
+             color: #ff6600;
+         }
+         .sidebar a i {
+             margin-right: 10px;
+         }
+         .main-content {
+             background-color: white;
+             padding: 20px;
+             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+         }
+         .main-content h2 {
+             margin-bottom: 20px;
+         }
+         .form-group label {
+             font-weight: bold;
+         }
+         .form-group span {
+             color: red;
+         }
+         .btn-orange {
+             background-color: #ff6600;
+             color: white;
+         }
+         .btn-orange:hover {
+             background-color: #e65c00;
+         }
+         .btn-blue {
+             background-color: #0000ff;
+             color: white;
+         }
+         .btn-blue:hover {
+             background-color: #0000cc;
+         }
+         .photo img {
+             width: 40px;
+             height: 40px;
+             border-radius: 50%;
+             margin-right: 10px;
+         }
+         .order-header {
+             background-color: #f0f0f0;
+             padding: 10px;
+             border-top-left-radius: 5px;
+             border-top-right-radius: 5px;
+         }
+         .order-body {
+             padding: 20px;
+         }
+         .order-footer {
+             padding: 10px;
+             border-bottom-left-radius: 5px;
+             border-bottom-right-radius: 5px;
+         }
+         .order-card {
+             border: 1px solid #dee2e6;
+             border-radius: 5px;
+             margin-bottom: 20px;
+         }
+         .order-status {
+             color: red;
+         }
+         .order-ship-to {
+             color: green;
+         }
+         .order-link {
+             color: blue;
+             text-decoration: none;
+         }
+         .order-link:hover {
+             text-decoration: underline;
+         }
+         .btn-orange {
+             background-color: orange;
+             color: white;
+         }
+         .order-body .product-image {
+     max-width: 100px;  /* Set a max width */
+     max-height: 100px; /* Set a max height */
+     object-fit: cover; /* Ensures the aspect ratio is maintained and image is cropped to fit the box */
+     width: auto;  /* Allow automatic scaling while maintaining the aspect ratio */
+     height: auto; /* Allow automatic scaling while maintaining the aspect ratio */
+ }
+ .order-body .product-image {
+     max-width: 100px;  /* Set a max width */
+     max-height: 100px; /* Set a max height */
+     object-fit: cover; /* Ensures the aspect ratio is maintained and image is cropped to fit the box */
+     width: auto;  /* Allow automatic scaling while maintaining the aspect ratio */
+     height: auto; /* Allow automatic scaling while maintaining the aspect ratio */
+ }
+ .col-md-9{
+     margin-left: auto;
+     margin-right: auto;
+ }
+
+ .organic-breadcrumb{
+    height: 35vh;
+ }
+
+ .breadcrumbers a{
+    text-decoration: none;
+    color: white;
+    float: left;
+    text-align: left;
+ }
+ .breadcrumbers a:hover{
+    color: gold;
+ }
+ /* Style for Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.pagination a {
+    color: #007bff;
+    text-decoration: none;
+    padding: 8px 15px;
+    margin: 0 5px;
+    border: 1px solid #007bff;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.pagination a:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+.pagination span {
+    font-size: 14px;
+    margin: 0 10px;
+    color: #555;
+}
+
+.pagination .btn-sm {
+    font-size: 14px;
+    padding: 5px 10px;
+}
+
+.pagination .disabled {
+    color: #ccc;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.pagination .disabled a {
+    background-color: #f1f1f1;
+    border-color: #f1f1f1;
+}
+
+.pagination .active a {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+/* Ensure there's space between the order cards and the pagination */
+.order-card {
+    margin-bottom: 20px;
+}

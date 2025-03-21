@@ -106,14 +106,45 @@
                             </div>
                         </div>
 
-                        <div class="mb-4">
-                            <label class="form-label">Category</label>
-                            <select class="form-select border" name="category" required>
-                                <% for (let i = 0; i < categories.length; i++) { %>
-                                    <option value="<%= categories[i]._id %>"><%= categories[i].name %></option>
-                                <% } %>
-                            </select>
-                        </div>
+                       <div class="mb-4">
+    <div class="row">
+        <!-- Category Dropdown -->
+        <div class="col-lg-4">
+            <label class="form-label">Category</label>
+            <select class="form-select border" name="category" required>
+                <% for (let i = 0; i < categories.length; i++) { %>
+                    <option value="<%= categories[i]._id %>"><%= categories[i].name %></option>
+                <% } %>
+            </select>
+        </div>
+
+        <!-- Size Dropdown -->
+        <div class="col-lg-4">
+            <label class="form-label">Size</label>
+            <select class="form-select border" name="size" required>
+                <option value="small">Small</option>
+                <option value="medium">Medium</option>
+                <option value="large">Large</option>
+                <option value="extra-large">Extra Large</option>
+            </select>
+        </div>
+
+        <!-- Color Input (Manual or Color Picker) -->
+           <div class="col-lg-4">
+            <label class="form-label">Color</label>
+            
+            <!-- Color Name Input (Text Input) -->
+            <div class="mb-2">
+                <input type="text" id="color-name" class="form-control border" name="colorName" placeholder="Enter color name (e.g., red)" oninput="toggleColorSelection()">
+            </div>
+
+            <!-- Color Picker -->
+            <!-- <div class="mb-2">
+                <input type="color" id="color-picker" class="form-control border" name="color-picker" onchange="toggleColorSelection()">
+            </div>   -->
+    </div>
+</div>
+
 
                         <div class="mb-4">
                             <label class="form-label">Product Description</label>
@@ -124,7 +155,7 @@
                        
                             <div class="mb-4">
                                 <label class="form-label">Upload Product Images (Minimum 4)</label>
-                                <input type="file" id="imageInput" class="form-control" accept="image/png, image/jpeg" multiple>
+                                <input type="file" id="imageInput" class="form-control" accept="image/png, image/jpeg" multiple required>
                                 <div id="image-preview" class="d-flex flex-wrap mt-3"></div>
                                 <input type="hidden" name="croppedImages" id="croppedImages">
                             </div>
@@ -247,7 +278,8 @@ document.addEventListener("DOMContentLoaded", function () {
         formData.append("quantity", productForm.quantity.value);
         formData.append("category", productForm.category.value);
         formData.append("description", productForm.description.value);
-
+        formData.append("size", productForm.size.value);
+        formData.append("color", productForm.colorName.value);
         // Append images one by one
         croppedImagesArray.forEach((blob, index) => {
             formData.append("images", blob, `cropped-image-${index}.jpg`);
@@ -266,4 +298,19 @@ document.addEventListener("DOMContentLoaded", function () {
             .catch(error => console.error("Error:", error));
     });
 });
+     function toggleColorSelection() {
+                    const colorNameInput = document.getElementById('color-name');
+                    const colorPicker = document.getElementById('color-picker');
+
+                    if (colorNameInput.value.trim() !== "") {
+                        colorPicker.style.display = 'none';  // Hide color picker if user types a color name
+                    } else {
+                        colorPicker.style.display = 'block'; // Show color picker if nothing is typed
+                    }
+                }
+
+                // Initial state setup to hide the color picker when the color name is typed
+                document.addEventListener('DOMContentLoaded', function() {
+                    toggleColorSelection();
+                }); 
 </script>

@@ -27,17 +27,17 @@
             <thead>
                 <tr>
                     <th>Image</th>
-                    <th>Product Name</th>
-                    <th>Category</th>
-                    <th>Sale Price</th>
-                    <th>Regular Price</th>
-                    <th>Color</th>
-                    <th>Brand</th>
-                    <th>Offer</th>
-                    <th>Quantity</th>
-                    <th>Action</th>
-                    <th>Edit</th>
-                    <th>Delete</th>
+                    <th>&nbsp&nbsp Product Name</th>
+                    <th>&nbsp&nbsp Category</th>
+                    <th>&nbsp&nbsp Sale Price</th>
+                    <th>&nbsp&nbsp Regular Price</th>
+                    <th>&nbsp&nbsp Color</th>
+                    <th> &nbsp&nbsp Brand</th>
+                    <th>&nbsp&nbsp Offer</th>
+                    <th>&nbsp&nbsp Quantity</th>
+                    <th>&nbsp&nbsp Action</th>
+                    <th>&nbsp&nbsp Edit</th>
+                    <th>&nbsp&nbsp Delete</th>
                 </tr>
             </thead>
             <tbody>
@@ -64,7 +64,7 @@
                     <td><%= data[i].regularPrice %></td>
                     <td><%= data[i].color %></td>
                     <td><%= data[i].brand %></td>
-                    <td>
+                    <td>&nbsp&nbsp &nbsp&nbsp 
                         <% if (data[i].productOffer) { %>
                             <%= data[i].productOffer %>% Off
                             <button class="btn btn-sm btn-warning" onclick="editOffer('<%= data[i]._id %>', '<%= data[i].productOffer ? data[i].productOffer : 0 %>')">Edit</button>
@@ -117,8 +117,233 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
 
 <script>
-    // Pagination logic already handled in EJS (currentPage, totalPages)
-    // Ensure your pagination buttons are working properly with the query parameters.
+  // Add a product offer
+async function addOffer(productId) {
+    const { value: percentage } = await Swal.fire({
+        title: "Add Offer",
+        input: "number",
+        inputLabel: "Offer Percentage",
+        inputPlaceholder: "Enter offer percentage",
+        inputAttributes: {
+            min: 1,
+            max: 99,
+            step: 1
+        },
+        showCancelButton: true,
+        inputValidator: (value) => {
+            if (!value || value < 1 || value > 99) {
+                return "Please enter a valid percentage between 1 and 99";
+            }
+        }
+    });
+
+    if (percentage) {
+        updateOffer(productId, percentage);
+    }
+}
+
+// Edit an existing offer
+async function editOffer(productId, currentOffer) {
+    const { value: percentage } = await Swal.fire({
+        title: "Edit Offer",
+        input: "number",
+        inputLabel: "Offer Percentage",
+        inputPlaceholder: "Enter offer percentage",
+        inputValue: currentOffer,
+        inputAttributes: {
+            min: 1,
+            max: 99,
+            step: 1
+        },
+        showCancelButton: true,
+        inputValidator: (value) => {
+            if (!value || value < 1 || value > 99) {
+                return "Please enter a valid percentage between 1 and 99";
+            }
+        }
+    });
+
+    if (percentage) {
+        updateOffer(productId, percentage);
+    }
+}
+
+// Update offer by sending data to the server
+// Update offer by sending data to the server
+function updateOffer(productId, percentage) {
+    $.ajax({
+        url: "/admin/addProductOffer",
+        method: "POST",
+        contentType: "application/json", // Ensure content type is JSON
+        data: JSON.stringify({
+            productId: productId,
+            percentage: percentage
+        }),
+        success: (response) => {
+            if (response.status) {
+                Swal.fire('Success', 'Offer updated successfully', 'success').then(() => {
+                    location.reload(); // Reload the page after success
+                });
+            } else {
+                Swal.fire('Error', response.message || 'Failed to update offer', 'error');
+            }
+        },
+        error: (error) => {
+            console.error('Error:', error);
+            Swal.fire('Error', 'An unexpected error occurred', 'error');
+        }
+    });
+}
+
+
+// Remove an offer from a product
+function removeOffer(productId) {
+    Swal.fire({
+        title: "Remove offer",
+        text: "Are you sure you want to remove this offer?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, remove it"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: "/admin/removeProductOffer",
+                method: 'POST',
+                data: { productId: productId },
+                success: (response) => {
+                    if (response.status) {
+                        Swal.fire("Removed!", "The offer has been removed", "success").then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire('Error', response.message || 'Failed to remove offer', 'error');
+                    }
+                },
+                error: (error) => {
+                    console.error('Error:', error);
+                    Swal.fire('Error', 'An unexpected error occurred', 'error');
+                }
+            });
+        }
+    });
+}
+
+// Confirm and Block a product
+function confirmBlock(event, productId) {
+    event.preventDefault();
+    Swal.fire({
+        title: "Are you sure?",
+        text: "You are about to block this product!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, Block!"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            handleProductBlockUnblock(productId, 'block');
+        }
+    });
+}
+
+// Confirm and Unblock a product
+function confirmUnblock(event, productId) {
+    event.preventDefault();
+    Swal.fire({
+        title: "Are you sure?",
+        text: "You are about to unblock this product!",
+        icon: "info",
+        showCancelButton: true,
+        confirmButtonColor: "#28a745",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, Unblock!"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            handleProductBlockUnblock(productId, 'unblock');
+        }
+    });
+}
+
+// Handle block/unblock action for a product
+// Handle block/unblock action for a product
+function handleProductBlockUnblock(productId, action) {
+    const url = `/admin/${action}Product`; // General URL to block/unblock
+
+    console.log(`Sending ${action} request for product ID:`, productId); // Log the action and ID
+
+    fetch(url, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ id: productId })  // Make sure productId is correctly sent
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Response from server:', data); // Log the server response
+        if (data.success) {
+            Swal.fire({
+                title: 'Success!',
+                text: data.message,
+                icon: 'success'
+            }).then(() => {
+                location.reload(); // Reload the page after success
+            });
+        } else {
+            Swal.fire({
+                title: 'Failed!',
+                text: data.message,
+                icon: 'error'
+            });
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        Swal.fire({
+            title: 'Error!',
+            text: 'Something went wrong on the server side.',
+            icon: 'error'
+        });
+    });
+}
+
+
+// Handle product deletion
+
+function confirmDelete(event, productId) {
+    event.preventDefault();
+    Swal.fire({
+        title: "Are you sure?",
+        text: "You are about to delete this product permanently!",
+        icon: "error",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, Delete it"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: "/admin/deleteProduct", // Ensure this route is correct
+                method: 'POST',
+                data: { id: productId }, // Send 'id' instead of 'productId'
+                success: (response) => {
+                    if (response.status) {
+                        Swal.fire("Deleted!", "The product has been deleted", "success").then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire('Error', response.message || 'Failed to delete product', 'error');
+                    }
+                },
+                error: (error) => {
+                    console.error('Error:', error);
+                    Swal.fire('Error', 'An unexpected error occurred', 'error');
+                }
+            });
+        }
+    });
+}
+
 </script>
 
 <%- include("../../views/partials/admin/footer") %>

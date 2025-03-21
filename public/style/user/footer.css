@@ -1,0 +1,11 @@
+.text-reset{
+    text-decoration: none;
+}
+i.fas {
+    font-size: 20px;  /* Adjust to make the icon smaller like a favicon */
+    margin-right: 8px;  /* Space between the icon and the text */
+  }
+.product-icon{
+    height: 20px;
+    width: 20px;
+}  

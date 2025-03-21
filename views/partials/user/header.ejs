@@ -20,17 +20,18 @@
             
             <% if (user ) { %>
                 <a href="/cart" >Cart</a>
+                <a href="/wishlist" >Wishlist</a>
                 <a href="/orders" >orders</a>
                 <li class="dropdown">
                     
                     &nbsp &nbsp
-                    <a href="#" class="dropbtn">Account</a>
-                    <div class="dropdown-content">
+                    <a href="/profile" class="dropbtn">Account</a>
+                    <!-- <div class="dropdown-content">
                         <a href="/address" class="dropbtn">address</a>
                         <a href="/profile">profile</a>
                         <a href="#" onclick="confirmLogout(event)">logout</a>
                     </div>
-                   
+                    -->
                     
                 </li>
                 
@@ -41,13 +42,14 @@
         </div>
         
         <div class="nav-icons">
-            <span>🔍</span>
-            <span>👤</span>
-            
+           
+            <% if (user) { %>
+            <span> <img src="<%= user.image ? user.image : '/uploads/defaultProfileImage.jpg' %>" alt="User Profile" class="profile-image"></span>
+            <% } %>
             <% if (locals.user) { %>
                 <a href="#" class="sign-in-link"><%= locals.user.fullname %></a>
                 <% } %>
-            <span>🛒</span>
+            <!-- <span>🛒</span> -->
         </div>
     </nav>
 </body>

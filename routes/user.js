@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const passport = require('passport');
 // Correct the path here:
+
 const userController = require("../controllers/user/userController");
 const productController=require("../controllers/user/productController")
 const profileController=require("../controllers/user/profileController")
@@ -12,6 +13,10 @@ const aboutController=require("../controllers/user/aboutController")
 
 const wishlistController= require("../controllers/user/wishlistController.js")
 const {adminAuth,userAuth} = require("../middleweres/auth");
+const multer=require("multer");
+
+const upload = require("../helpers/multter"); // Import multer instance
+
 router.get("/", userController.loadHomePage);   
 router.get("/home", userController.loadHomePage);
 router.get("/signin", userController.loadSignin);
@@ -64,15 +69,19 @@ router.get('/addToCart',userAuth, cartController.addToCart)
 router.get("/checkout",userAuth,cartController.loadCheckoutPage)
 router.delete('/removeCartItem', userAuth, cartController.removeCartItem)
 
+//wishlist
+router.get('/wishlist',userAuth,wishlistController.loadWishlist)
+router.post('/addToWishlist',userAuth,wishlistController.addToWishlist)
+// router.delete('/removeFromWishlist',userAuth,wishlistController.removeProduct)
+
 
 // Order Management
 router.post("/placeOrder", userAuth, orderController.placeOrder);
 router.get("/orders", userAuth, orderController.getOrders);
 router.get("/order-details", userAuth, orderController.loadOrderDetails);
-
+router.get("/success",userAuth,orderController.success)
 // New routes for order cancellation and returns
 router.post("/orders/cancel", userAuth, orderController.cancelOrder);
-
 
 //productloader shows all products 
 
@@ -102,6 +111,6 @@ router.get("/change-email",userAuth,profileController.changeEmail)
 router.post("/change-email",userAuth,profileController.changeEmailValid)
 router.post("/verify-email-otp",userAuth,profileController.verifyEmailOtp)
 router.post("/update-email",userAuth,profileController.updateEmail)
-
+router.post('/upload-profile-pic/:id', upload.single('profileImage'),profileController.addProfile)
 router.post("/change-password", userAuth, profileController.changePassword)
 module.exports = router;

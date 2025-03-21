@@ -1,59 +1,22 @@
  
  <%- include('../partials/user/header') %>
 
- 
- <!-- Start Banner Area -->
- <section class="banner-area organic-breadcrumb">
-    <div class="container">
-        <div class="breadcrumb-banner d-flex flex-wrap align-items-center justify-content-end">
-            <div class="col-first">
-                <h1>Checkout</h1>
-                <nav class="d-flex align-items-center">
-                    <a href="/">Home<span class="lnr lnr-arrow-right"></span></a>
-                    <a href="/cart">Cart<span class="lnr lnr-arrow-right"></span></a>
-                    <a href="/checkout">Checkout</a>
-                </nav>
-            </div>
-        </div>
-    </div>
-</section>
-<!-- End Banner Area -->
+ <link rel="stylesheet" href="/style/user/checkout.css">
 
-<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+ <!-- Start Banner Area -->
+
+<main class="hero">
+    <div class="hero-content"   style="background-image: url('/images/banners/banner2.jpg');">
+        <div class="col-first">    
+                <a href="/">Home<span class="lnr lnr-arrow-right"></span></a>
+                <a href="/cart">/Cart<span class="lnr lnr-arrow-right"></span></a>
+                <a href="/checkout">/Checkout</a>            
+        </div>
+    </div>  
+</main>
+<!-- End Banner Area -->
     <style>
-        .order-summary {
-            background-color: white;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .order-summary img {
-            width: 50px;
-            height: 50px;
-        }
-        .order-summary .product-name {
-            font-size: 14px;
-        }
-        .order-summary .product-mn {
-            font-size: 12px;
-            color: gray;
-        }
-        .order-summary .product-price {
-            color: blue;
-            font-weight: bold;
-        }
-        .order-summary .total-price {
-            color: blue;
-            font-weight: bold;
-        }
-        .order-summary .apply-btn {
-            background-color: #ffc107;
-            color: white;
-        }
-        .order-summary .place-order-btn {
-            background-color: #ffc107;
-            color: white;
-        }
+        
     </style>
 </head>
 <body class="bg-light">
@@ -83,7 +46,7 @@
                             <% } %>
                         </select>
                     </div>
-                    <a href="/addAddressCheckout"><button type="button" class="btn btn-primary mt-5" id="addNewAddressBtn">Add New Address</button></a>
+                    <a href="/addAddress"><button type="button" class="btn btn-primary mt-5" id="addNewAddressBtn">Add New Address</button></a>
                     
             
                     <!-- Add New Address Button -->
@@ -199,47 +162,7 @@
 </body>
 
 <script>
-    function placeOrder() {
-        const selectedAddress = document.querySelector('input[name="selectedAddress"]:checked');
-        if (!selectedAddress) {
-            Swal.fire('Error', 'Please select a shipping address', 'error');
-            return;
-        }
-
-        const orderData = {
-            addressId: selectedAddress.value,
-            paymentMethod: 'cod'
-        };
-
-        fetch('/placeOrder', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(orderData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                Swal.fire({
-                    title: 'Order Placed Successfully!',
-                    text: `Order ID: ${data.orderId}`,
-                    icon: 'success',
-                    confirmButtonText: 'View Orders'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.href = '/orders';
-                    }
-                });
-            } else {
-                Swal.fire('Error', data.message || 'An error occurred while placing the order', 'error');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            Swal.fire('Error', 'An error occurred while placing the order', 'error');
-        });
-    }
+    
 
     function showShippingCharge() {
         Swal.fire({
@@ -290,7 +213,11 @@
                     confirmButtonText: 'View Orders'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        window.location.href = '/orders';
+                        window.location.href = `/success?orderId=${data.orderIds.join(", ")}&orderAmount=${data.totalAmount}`;
+
+
+
+
                     }
                 });
             } else {

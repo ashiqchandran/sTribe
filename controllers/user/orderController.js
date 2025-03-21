@@ -7,7 +7,7 @@ const mongoose = require('mongoose');
 
 const placeOrder = async (req, res) => {
     try {
-        console.log("Received placeOrder request");
+       
         const userId = req.session.user._id;
         console.log("user id = ",userId)
         const { addressId } = req.body;
@@ -30,14 +30,17 @@ const placeOrder = async (req, res) => {
                     _id: 0,
                     userId:"$userId",
                     productId: "$productDetails._id",
+                    productImage:"$productDetails.productImage",
+                    size:"$productDetails.size",
+                    color:"$productDetails.color",
                     productName: "$productDetails.productName",
                     salePrice: "$productDetails.salePrice",
                     quantity: "$items.quantity"
                 }
             }
         ]);
-        console.log("placeorder aggregate is working")
-console.log("cart=",cart    )
+       
+
         if (!cart || cart.length === 0) {
             return res.status(400).json({
                 success: false,
@@ -67,6 +70,10 @@ console.log("cart=",cart    )
                 
                 orderItems: [{
                     product: item.productId,
+                    orderProductImage:item.productImage[0],
+                    orderProductName:item.productName,
+                    size:item.size,
+                    color:item.color,
                     quantity: item.quantity,
                     price: item.salePrice,
                     status: 'pending'
@@ -86,12 +93,12 @@ console.log("cart=",cart    )
 
             return order.save();
         }));
-console.log("cart = ",cart)
         // Clear cart after placing the order
         // await Cart.findOneAndUpdate({ userId: userId }, { $set: { items: [] } });
 
         res.json({
             success: true,
+            totalAmount:orders.map(order => order.finalAmount),
             orderIds: orders.map(order => order._id),
             message: 'Orders placed successfully'
         });
@@ -109,6 +116,12 @@ const getOrders = async (req, res) => {
     try {
         const userId = req.session.user._id;
 
+        // Pagination setup
+        const ordersPerPage = 10;  // Number of orders per page
+        const page = parseInt(req.query.page) || 1;  // Default to page 1 if no page query param
+        const skip = (page - 1) * ordersPerPage;  // Calculate the number of orders to skip
+
+        // Get the orders with pagination
         const orders = await Order.aggregate([
             {
                 $match: { userId: new mongoose.Types.ObjectId(userId) }  // Match orders by userId
@@ -142,15 +155,31 @@ const getOrders = async (req, res) => {
             },
             {
                 $sort: { createdOn: -1 }  // Sort by order creation date in descending order
+            },
+            {
+                $skip: skip  // Skip the appropriate number of orders for the current page
+            },
+            {
+                $limit: ordersPerPage  // Limit the number of orders per page
             }
         ]);
 
-        // Get user details
+        // Get the total number of orders for the user (used for pagination)
+        const totalOrders = await Order.countDocuments({ userId: new mongoose.Types.ObjectId(userId) });
+
+        // Calculate total pages
+        const totalPages = Math.ceil(totalOrders / ordersPerPage);
+
+        // Get user details (optional, depending on your UI needs)
         const user = await User.findById(userId);
 
+        // Render the orders page with pagination info
         res.render("orders", {
             orders: orders,
-            user: user
+            user: user,
+            currentPage: page,
+            totalPages: totalPages,
+            totalOrders: totalOrders
         });
 
     } catch (error) {
@@ -291,11 +320,30 @@ const cancelOrder = async (req, res) => {
     }
 };
 
+const success = async (req, res) => {
+    try {
+        const orderId = req.query.orderId;
+        // const orderAmount =req.query.orderAmount
+
+    //   console.log("orderid",orderId)
+    //   console.log("total=",totalAmount)
+           
+            res.render("success");
+   
+
+        // Add any further order-related logic, like fetching order details from DB
+        // Pass orderId to the view
+    } catch (error) {
+        console.error(error); // Log any error that occurs
+        res.render("error");
+    }
+};
 
 
 module.exports = {
     placeOrder,
     getOrders,
     loadOrderDetails,
-    cancelOrder
+    cancelOrder,
+    success
 };

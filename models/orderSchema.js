@@ -19,6 +19,24 @@ const orderSchema = new Schema({
             ref: 'Product',
             required: true
         },
+        OrderProductName:{
+            type:String,
+            
+
+        },
+        orderProductImage:{
+            type: [String]
+
+        },
+        size:{
+            type:String,
+         
+        },
+        color:{
+            type:String,
+
+            
+        },
         quantity: {
             type: Number,
             required: true

@@ -1,272 +1,100 @@
 <%- include('../partials/user/header') %>
 
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="/style/user/orders.css">
 
-<style>
- .card-green {
-   background-color: #ADD8E6;
- }
- .main {
-   padding: 30px 0;
- }
-
- .dashboard-menu {
-   background-color: #cce3e6;
-   border-radius: 10px;
-   padding: 15px;
-   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
- }
-
- .dashboard-menu .nav-link {
-   font-weight: bold;
-   color: #30683c;
-   box-shadow: 0 4px 10px rgba(123, 131, 112, 0.3), 0 4px 20px rgba(0, 191, 255, 0.2);
-   transition: box-shadow 0.3s ease;
- }
-
- .dashboard-menu .nav-link:hover {
-   color: #00bfff;
-   box-shadow: 0 4px 15px rgba(173, 255, 47, 0.5), 0 6px 25px rgba(0, 191, 255, 0.4);
- }
-
- .card {
-   border-radius: 10px;
-   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-   margin-bottom: 20px;
- }
-
- .card-header {
-   background-color: #487379;
-   color: white;
-   border-radius: 10px 10px 0 0;
- }
-
- .profile-image-container {
-   display: flex;
-   align-items: center;
- }
-
- .rounded-circle {
-   border-radius: 50%;
-   border: 2px solid #fff;
-   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
- }
-
- .ml-3 {
-   margin-left: 15px;
- }
-
- @media (max-width: 768px) {
-   .dashboard-menu {
-     padding: 10px;
-   }
-   .card {
-     margin-bottom: 15px;
-   }
- }
- body {
-            background-color: #f7f7f7;
-        }
-        .sidebar {
-            background-color: white;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .sidebar a {
-            color: #333;
-            display: block;
-            padding: 10px 0;
-            text-decoration: none;
-        }
-        .sidebar a.active {
-            color: #ff6600;
-        }
-        .sidebar a:hover {
-            color: #ff6600;
-        }
-        .sidebar a i {
-            margin-right: 10px;
-        }
-        .main-content {
-            background-color: white;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .main-content h2 {
-            margin-bottom: 20px;
-        }
-        .form-group label {
-            font-weight: bold;
-        }
-        .form-group span {
-            color: red;
-        }
-        .btn-orange {
-            background-color: #ff6600;
-            color: white;
-        }
-        .btn-orange:hover {
-            background-color: #e65c00;
-        }
-        .btn-blue {
-            background-color: #0000ff;
-            color: white;
-        }
-        .btn-blue:hover {
-            background-color: #0000cc;
-        }
-        .photo img {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            margin-right: 10px;
-        }
-        .order-header {
-            background-color: #f0f0f0;
-            padding: 10px;
-            border-top-left-radius: 5px;
-            border-top-right-radius: 5px;
-        }
-        .order-body {
-            padding: 20px;
-        }
-        .order-footer {
-            padding: 10px;
-            border-bottom-left-radius: 5px;
-            border-bottom-right-radius: 5px;
-        }
-        .order-card {
-            border: 1px solid #dee2e6;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-        .order-status {
-            color: red;
-        }
-        .order-ship-to {
-            color: green;
-        }
-        .order-link {
-            color: blue;
-            text-decoration: none;
-        }
-        .order-link:hover {
-            text-decoration: underline;
-        }
-        .btn-orange {
-            background-color: orange;
-            color: white;
-        }
-        .order-body .product-image {
-    max-width: 100px;  /* Set a max width */
-    max-height: 100px; /* Set a max height */
-    object-fit: cover; /* Ensures the aspect ratio is maintained and image is cropped to fit the box */
-    width: auto;  /* Allow automatic scaling while maintaining the aspect ratio */
-    height: auto; /* Allow automatic scaling while maintaining the aspect ratio */
-}
-.order-body .product-image {
-    max-width: 100px;  /* Set a max width */
-    max-height: 100px; /* Set a max height */
-    object-fit: cover; /* Ensures the aspect ratio is maintained and image is cropped to fit the box */
-    width: auto;  /* Allow automatic scaling while maintaining the aspect ratio */
-    height: auto; /* Allow automatic scaling while maintaining the aspect ratio */
-}
-.col-md-9{
-    margin-left: auto;
-    margin-right: auto;
-}
-</style>
-
-<section class="banner-area organic-breadcrumb">
+<section class="banner-area organic-breadcrumb "style="background-image: url('/images/shop/bbb.jpeg');">
     <div class="container">
-        <div class="breadcrumb-banner d-flex flex-wrap align-items-center justify-content-between">
-            <div class="col-left d-flex align-items-center">
-                <div class="profile-image-container">
-                    
-                </div>
-                <div class="ml-3">
-                    <h5 id="fullName" style="color: #121311;"><%= user.name || 'John Doe' %></h5>
-                    <p id="email" style="color: #121311;"><%= user.email || 'johndoe@example.com' %></p>
-                </div>
-            </div>
-            
+        <div class="breadcrumbers">
+            <a href="/">Home<span class="lnr lnr-arrow-right"></span></a>
+            <a href="/orders">/orders<span class="lnr lnr-arrow-right"></span></a>
         </div>
     </div>
 </section>
 
+<!-- Main Content -->
+<div class="col-md-9">
+    <h2 class="mb-4">Your Orders</h2>
 
-        <!-- Main Content -->
-        <div class="col-md-9">
-            <h2 class="mb-4">Your Orders</h2>
-            
-            <% if (orders && orders.length > 0) { %>
-                <% orders.forEach(order => { %>
-                    <div class="order-card">
-                        <div class="order-header">
-                            <div class="row align-items-center">
-                                <div class="col-md-3">
-                                    <small class="text-muted">ORDER PLACED</small><br>
-                                    <%= new Date(order.createdOn).toLocaleDateString() %>
-                                </div>
-                                <div class="col-md-3">
-                                    <small class="text-muted">TOTAL</small><br>
-                                    ₹<%= order.finalAmount %>
-                                </div>
-                                <div class="col-md-3">
-                                    <small class="text-muted">ORDER ID</small><br>
-                                    #<%= order.orderId %>
-                                </div>
-                                <div class="col-md-3">
-                                    <span class="status-badge <%= 
-                                        order.status === 'delivered' ? 'bg-success' :
-                                        order.status === 'cancelled' ? 'bg-danger' :
-                                        order.status === 'shipped' ? 'bg-info' :
-                                        'bg-warning'
-                                    %>">
-                                        <%= order.status.toUpperCase() %>
-                                    </span>
-                                </div>
-                            </div>
+    <% if (orders && orders.length > 0) { %>
+        <% orders.forEach(order => { %>
+            <div class="order-card">
+                <div class="order-header">
+                    <div class="row align-items-center">
+                        <div class="col-md-3">
+                            <small class="text-muted">ORDER PLACED</small><br>
+                            <%= new Date(order.createdOn).toLocaleDateString() %>
                         </div>
-                        
-                        <div class="order-body">
-                            <div class="row align-items-center">
-                                <div class="col-md-2">
-                                    <img src="<%= order.productImage[0] %>" 
-                                         alt="<%= order.productName %>"
-                                         class="product-image">
-                                </div>
-                                <div class="col-md-6">
-                                    <h5><%= order.productName %></h5>
-                                    <p class="text-muted mb-0">Quantity: <%= order.quantity %></p>
-                                    <p class="text-muted">Price: ₹<%= order.price %></p>
-                                </div>
-                                <div class="col-md-4 text-end">
-                                    <a href="/order-details?orderId=<%= order.orderId %>" 
-                                       class="btn btn-outline-primary btn-sm">View Details</a>
-                                    
-                                    <% if (order.status !== 'cancelled' && order.status !== 'delivered') { %>
-                                        <button onclick="cancelOrder('<%= order.orderId%>')" 
-                                                class="btn btn-outline-danger btn-sm mt-2">
-                                            Cancel Order
-                                        </button>
-                                    <% } %>
-                                </div>
-                            </div>
+                        <div class="col-md-3">
+                            <small class="text-muted">TOTAL</small><br>
+                            ₹<%= order.finalAmount %>
+                        </div>
+                        <div class="col-md-3">
+                            <small class="text-muted">ORDER ID</small><br>
+                            #<%= order.orderId %>
+                        </div>
+                        <div class="col-md-3">
+                            <span class="status-badge <%= 
+                                order.status === 'delivered' ? 'bg-success' :
+                                order.status === 'cancelled' ? 'bg-danger' :
+                                order.status === 'shipped' ? 'bg-info' :
+                                'bg-warning'
+                            %>">
+                                <%= order.status.toUpperCase() %>
+                            </span>
                         </div>
                     </div>
-                <% }); %>
-            <% } else { %>
-                <div class="text-center py-5">
-                    <div class="mb-4">
-                        <i class="fas fa-shopping-bag fa-3x text-muted"></i>
-                    </div>
-                    <h3>No orders yet</h3>
-                    <p class="text-muted">When you place an order, it will appear here.</p>
-                    <a href="/shop" class="btn btn-primary mt-3">Start Shopping</a>
                 </div>
-            <% } %>
+
+                <div class="order-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-2">
+                            <img src="<%= order.productImage[0] %>" 
+                                 alt="<%= order.productName %>"
+                                 class="product-image">
+                        </div>
+                        <div class="col-md-6">
+                            <h5><%= order.productName %></h5>
+                            <p class="text-muted mb-0">Quantity: <%= order.quantity %></p>
+                            <p class="text-muted">Price: ₹<%= order.price %></p>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <a href="/order-details?orderId=<%= order.orderId %>" 
+                               class="btn btn-outline-primary btn-sm">View Details</a>
+                            
+                            <% if (order.status !== 'cancelled' && order.status !== 'delivered') { %>
+                                <button onclick="cancelOrder('<%= order.orderId%>')" 
+                                        class="btn btn-outline-danger btn-sm mt-2">
+                                    Cancel Order
+                                </button>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <% }); %>
+    <% } else { %>
+        <div class="text-center py-5">
+            <div class="mb-4">
+                <i class="fas fa-shopping-bag fa-3x text-muted"></i>
+            </div>
+            <h3>No orders yet</h3>
+            <p class="text-muted">When you place an order, it will appear here.</p>
+            <a href="/shop" class="btn btn-primary mt-3">Start Shopping</a>
         </div>
+    <% } %>
+
+    <!-- Pagination Controls -->
+    <div class="pagination">
+        <% if (currentPage > 1) { %>
+            <a href="?page=<%= currentPage - 1 %>" class="btn btn-outline-secondary btn-sm">Previous</a>
+        <% } %>
+        <% for (let i = 1; i <= totalPages; i++) { %>
+            <a href="?page=<%= i %>" class="btn btn-outline-secondary btn-sm <%= i === currentPage ? 'active' : '' %>"><%= i %></a>
+        <% } %>
+        <% if (currentPage < totalPages) { %>
+            <a href="?page=<%= currentPage + 1 %>" class="btn btn-outline-secondary btn-sm">Next</a>
+        <% } %>
     </div>
 </div>
 

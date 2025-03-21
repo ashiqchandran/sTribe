@@ -54,7 +54,11 @@ const productSchema = new Schema({
         enum: ['available', 'out of stock', 'discontinued'],
         required: true,
         default: 'available'
-    }
+    },
+    productOffer : {
+        type:Number,
+        default:0
+      },
 }, { timestamps: true });
 
 const Product = mongoose.model('Product', productSchema);

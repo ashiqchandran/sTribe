@@ -12,7 +12,7 @@
             <button class="btn">See Collection</button>
         </div>
         <div class="hero-image">
-            <img src="/images/logo/banner-removebg-preview.png" alt="Fashion model"  >
+            <img src="/images/logo/b1.png" alt="Fashion model"  >
         </div>
     </section>
 
@@ -174,6 +174,7 @@
         </div>
     </div>
     <!-- single product slide -->
+     <hr class="divider">
     <div class="single-product-slider">
         <div class="container">
             <div class="row justify-content-center">
@@ -189,7 +190,7 @@
 
                 <%for(let i=0;i< topSeller.length; i++){%>
 
-                    <div class="col-lg-3 col-md-6">
+                    <div class="col-lg-3 col-md-6 itemBox">
                         <div class="single-product">
                             <a class="hover-light" href="/productDetails?id=<%=products[i]._id%>">
                             <img class="img-fluid" src="<%= topSeller[i].productImage[0] %>" alt="">
@@ -204,9 +205,9 @@
                               </a>
                                 <div class="prd-bottom">
 
-                                    <a href="/product_detail" onclick="addToCart('<%=products[i]._id%>')" class="social-info">
+                                    <a href="#" onclick="addToCart('<%=products[i]._id%>')" class="social-info">
                                         <span class="ti-bag"></span>
-                                        <p class="hover-text">add to cart</p>
+                                        <p class="hover-text">add to cart &#128722</p>
                                     </a>
                                     <a href="#" onclick="addToWishlist('<%=products[i]._id%>')" class="social-info">
                                         <span class="lnr lnr-heart"></span>
