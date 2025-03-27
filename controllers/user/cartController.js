@@ -170,7 +170,7 @@ const addToCart = async (req, res) => {
 
 const loadCheckoutPage = async (req, res) => {
   try {
-    console.log("it camehere")
+    
     const userId = req.session.user;
 
     // Ensure userId exists before proceeding
@@ -281,6 +281,7 @@ const loadCheckoutPage = async (req, res) => {
       shipping,      // Pass shipping to the view
       grandTotal,
       userAddress: addressData,  // Pass user address
+    
     });
   } catch (error) {
     console.error('Error in loadCheckoutPage:', error);

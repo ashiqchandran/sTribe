@@ -10,6 +10,8 @@ const cartController=require("../controllers/user/cartController")
 const contactController=require("../controllers/user/contactController")
 const orderController=require("../controllers/user/orderController")
 const aboutController=require("../controllers/user/aboutController")
+const walletController = require("../controllers/user/walletController");
+const transactionController = require("../controllers/user/transactionController");
 
 const wishlistController= require("../controllers/user/wishlistController.js")
 const {adminAuth,userAuth} = require("../middleweres/auth");
@@ -28,17 +30,13 @@ router.post("/signup", userController.loadRegister);
 router.get("/about",aboutController.getAboutPage);
 router.get("/profile",userAuth,profileController.getprofile)
 router.get("/contact",contactController.getContactPage);
-
 router.post("/verifyotp", userController.loadverifyotp);
 router.post("/resend-otp", userController.loadresendotp);
-
 router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }), (req, res) => {
     req.session.user = req.user; // Store Google user in session
     console.log("Google User saved in session:", req.session.user); // Debugging
     res.redirect('/');
-
 });
-
 router.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/signup' }), (req, res) => {
     req.session.user = req.user; // Store Google user in session
     console.log("Google User saved in session:", req.session.user); // Debugging
@@ -46,6 +44,9 @@ router.get('/auth/google/callback', passport.authenticate('google', { failureRed
 
 router.get("/pageNotFound",userController.pageNotFound)
 });
+router.get("/refferal",userController.getRefferalPage);
+router.get("/wallet",userController.getWalletPage);
+router.get("/mycoupons",userController.getmycouponspage);
 
 router.get("/logout", userController.logout);
 router.get("/forgotpassword", userController.loadforgotpasword);
@@ -72,11 +73,13 @@ router.delete('/removeCartItem', userAuth, cartController.removeCartItem)
 //wishlist
 router.get('/wishlist',userAuth,wishlistController.loadWishlist)
 router.post('/addToWishlist',userAuth,wishlistController.addToWishlist)
+router.get('/addToCartt',userAuth, wishlistController.addToCart)
 // router.delete('/removeFromWishlist',userAuth,wishlistController.removeProduct)
 
 
 // Order Management
 router.post("/placeOrder", userAuth, orderController.placeOrder);
+router.post("/walletPayment",userAuth,transactionController.walletPayment);
 router.get("/orders", userAuth, orderController.getOrders);
 router.get("/order-details", userAuth, orderController.loadOrderDetails);
 router.get("/success",userAuth,orderController.success)
@@ -95,7 +98,7 @@ router.get("/productloader", userController.getProductLoader);
 router.post("/filterproducts",userAuth,productController.filterProducts)
 
 router.get("/productDetails",productController.productDetails);
-
+router.get("/filter",productController.productDetails);
 
 router.get("/address",userAuth,profileController.loadAddressPage);
 router.get("/addAddress",userAuth,profileController.addAddress)
@@ -113,4 +116,12 @@ router.post("/verify-email-otp",userAuth,profileController.verifyEmailOtp)
 router.post("/update-email",userAuth,profileController.updateEmail)
 router.post('/upload-profile-pic/:id', upload.single('profileImage'),profileController.addProfile)
 router.post("/change-password", userAuth, profileController.changePassword)
+
+//wallet management
+router.post("/add",userAuth, walletController.addFunds);
+router.post("/withdraw",userAuth, walletController.withdrawFunds);
+router.post("/purchase", userAuth,walletController.purchaseWithWallet);
+
+
+
 module.exports = router;

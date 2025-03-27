@@ -3,6 +3,7 @@ const User = require("../../models/userSchema");
 const Cart=require("../../models/cartSchema");
 const Product = require("../../models/productSchema");
 const Address = require("../../models/addressSchema");
+const Transaction = require("../../models/transactionSchema");
 const mongoose = require('mongoose');
 
 const placeOrder = async (req, res) => {
@@ -266,7 +267,41 @@ const cancelOrder = async (req, res) => {
         if (order.status !== 'cancelled' && order.status !== 'delivered') {
             console.log("Cancelling order: ", orderId);
 
-            // Update the order status to 'cancelled' and apply the cancellation reason to the items
+            // Step 1: Check if the order has a transactionId
+            if (!order.transactionId) {
+                return res.status(400).json({ success: false, message: 'No transaction found for this order' });
+            }
+
+            // Step 2: Find the transaction from the transaction collection
+            const transaction = await Transaction.findById(order.transactionId);
+
+            if (!transaction || transaction.status !== 'success') {
+                return res.status(400).json({ success: false, message: 'Transaction not found or not successful' });
+            }
+
+            // Step 3: Refund the amount to the user's wallet
+            let user = await User.findById(userId);
+            if (!user) {
+                return res.status(404).json({ success: false, message: 'User not found' });
+            }
+
+            user.wallet += transaction.amount; // Add the refund amount to the user's wallet
+
+            // Step 4: Update the user wallet balance
+            await user.save();
+
+            // Step 5: Create a refund transaction in the transaction collection
+            const refundTransaction = new Transaction({
+                userId: user._id,
+                amount: transaction.amount,
+                transactionType: 'refund',
+                status: 'success', // Assuming the refund is successful
+            });
+
+            await refundTransaction.save();
+            console.log("Refund transaction saved successfully");
+
+            // Step 6: Update the order to 'cancelled' and apply the cancellation reason to the items
             const updateOrder = await Order.updateOne(
                 { orderId: orderId, userId: userId },
                 {
@@ -289,7 +324,7 @@ const cancelOrder = async (req, res) => {
                 return res.status(400).json({ success: false, message: 'No items to cancel' });
             }
 
-            // Loop through each order item and update product stock
+            // Step 7: Loop through each order item and update product stock
             const productUpdates = order.orderItems.map(async (item) => {
                 console.log(`Restocking product: ${item.product}, Quantity: ${item.quantity}`);
 
@@ -309,7 +344,7 @@ const cancelOrder = async (req, res) => {
             // Wait for all product stock updates to complete
             await Promise.all(productUpdates);
 
-            return res.json({ success: true, message: 'Order cancelled successfully' });
+            return res.json({ success: true, message: 'Order cancelled and refund processed successfully' });
         } else {
             return res.status(400).json({ success: false, message: 'Order cannot be cancelled' });
         }
@@ -319,6 +354,7 @@ const cancelOrder = async (req, res) => {
         res.status(500).json({ success: false, message: 'Internal server error' });
     }
 };
+
 
 const success = async (req, res) => {
     try {

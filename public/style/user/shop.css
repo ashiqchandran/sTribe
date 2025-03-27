@@ -240,3 +240,11 @@ a {
     text-decoration: none;  /* Removes underline or any other decoration */
 }
 
+.texts{
+   
+    color: rgb(243, 232, 108);
+
+}
+.cattext {
+    color: black;
+}

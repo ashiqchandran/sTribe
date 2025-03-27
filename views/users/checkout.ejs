@@ -134,13 +134,13 @@
                         <div class="mb-3">
                             <label class="d-flex align-items-center">
                                 <input type="radio" name="payment" class="mr-2">
-                                <img src="./img/icon/razorpay.webp" alt="PayPal">
+                                <img src="./images/icons/razarpay.png" alt="PayPal" style="height: 4vh; width:12vh;">
                             </label>
                         </div>
                         <div class="mb-3">
                             <label class="d-flex align-items-center">
-                                <input type="radio" name="payment" class="mr-2">
-                                <span>Other Methods</span>
+                                <input type="radio" name="payment" >
+                                <span>wallet Payment</span>
                             </label>
                         </div>
                         <div class="mb-3">
@@ -163,75 +163,182 @@
 
 <script>
     
-
-    function showShippingCharge() {
-        Swal.fire({
-            title: 'Free Shipping',
-            text: 'Shipping charge is free at the current moment!',
-            icon: 'info',
-            confirmButtonText: 'OK'
-        });
-    }
-
+    
+ 
+    
     function placeOrder() {
         const selectedAddress = document.getElementById('existingAddress');
         const paymentMethod = document.querySelector('input[name="payment"]:checked');
         
+        // Check if the user has selected an address
         if (!selectedAddress || selectedAddress.value === 'Select an address') {
             Swal.fire('Error', 'Please select a shipping address', 'error');
             return;
         }
 
+        // Check if the user has selected a payment method
         if (!paymentMethod) {
             Swal.fire('Error', 'Please select a payment method', 'error');
             return;
         }
 
-        if (paymentMethod.nextElementSibling.textContent.trim() !== 'Cash on delivery') {
-            Swal.fire('Error', 'Only Cash on Delivery is available at the moment', 'error');
-            return;
+        // Get the payment method text
+        const paymentMethodSelected = paymentMethod.nextElementSibling.textContent.trim();
+
+        if (paymentMethodSelected === 'wallet Payment') {
+            // Wallet payment selected
+            const totalAmount = parseFloat(document.querySelector('.total-price').textContent.replace('₹', '').trim());
+            
+            // Check if the wallet has enough balance
+            fetch('/walletPayment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userId: '<%= user._id %>',  // Pass the logged-in user ID
+                    amount: totalAmount,
+                    addressId: selectedAddress.value,
+                    
+                })
+                
+            })
+            
+
+         
+    .then(data => {
+        window.location.href = `/success`;
+        if (data.success) {
+            // Directly redirect to the success page after successful payment
+            window.location.href = `/success/${data.orderId}`;  // Ensure you use the correct orderId
+        } else {
+            alert(data.message);
         }
+    })
+    .catch(error => {
+        console.error('Fetch Error:', error);
+        Swal.fire('Error', 'An error occurred while placing the order', 'error');
+    });
+        } else if (paymentMethodSelected === 'Cash on delivery') {
+            // Cash on Delivery selected
+            const orderData = {
+                addressId: selectedAddress.value,
+                paymentMethod: 'COD'
+            };
 
-        const orderData = {
-            addressId: selectedAddress.value
-        };
+            fetch('/placeOrder', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(orderData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Order Placed Successfully!',
+                        text: `Order ID: ${data.orderId}`,
+                        icon: 'success',
+                        confirmButtonText: 'View Order'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = `/success`;
+                        }
+                    });
+                } else {
+                    Swal.fire('Error', data.message || 'An error occurred while placing the order', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire('Error', 'An error occurred while placing the order', 'error');
+            });
+        } else if (paymentMethodSelected === 'Razorpay') {
+            // Razorpay selected
+            const totalAmount = parseFloat(document.querySelector('.total-price').textContent.replace('₹', '').trim());
 
-        fetch('/placeOrder', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(orderData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                Swal.fire({
-                    title: 'Order Placed Successfully!',
-                    text: `Order IDs: ${data.orderIds.join(", ")}`,
-                    icon: 'success',
-                    confirmButtonText: 'View Orders'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.href = `/success?orderId=${data.orderIds.join(", ")}&orderAmount=${data.totalAmount}`;
-
-
-
-
-                    }
-                });
-            } else {
-                Swal.fire('Error', data.message || 'An error occurred while placing the order', 'error');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            Swal.fire('Error', 'An error occurred while placing the order', 'error');
-        });
+            fetch('/checkout/razorpay-payment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userId: '<%= user %>',
+                    amount: totalAmount,
+                    addressId: selectedAddress.value,
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const options = {
+                        key: data.razorpayKey, // Razorpay key
+                        amount: totalAmount * 100, // Convert to paise
+                        currency: "INR",
+                        name: "Your Store",
+                        description: "Order Payment",
+                        order_id: data.orderId,
+                        handler: function (response) {
+                            fetch('/checkout/razorpay-payment-success', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                    razorpayPaymentId: response.razorpay_payment_id,
+                                    orderId: data.orderId,
+                                })
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    Swal.fire({
+                                        title: 'Payment Successful!',
+                                        text: `Order ID: ${data.orderId}`,
+                                        icon: 'success',
+                                        confirmButtonText: 'View Order'
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            window.location.href = `/order-details/${data.orderId}`;
+                                        }
+                                    });
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                Swal.fire('Error', 'An error occurred while processing the  Razor ay payment', 'error');
+                            });
+                        },
+                        prefill: {
+                            name: "Customer Name",
+                            email: "customer@example.com",
+                            contact: "+919876543210",
+                        },
+                        theme: {
+                            color: "#F37254",
+                        },
+                    };
+                    const razorpay = new Razorpay(options);
+                    razorpay.open();
+                } else {
+                    Swal.fire('Error', data.message || 'An error occurred while initiating Razorpay payment', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire('Error', 'An error occurred while processing the Razorpay payment', 'error');
+            });
+        } else {
+            // Handle any unsupported payment methods
+            Swal.fire('Error', 'Unsupported payment method selected', 'error');
+        }
     }
 
     // Update the place order button onclick handler
     document.querySelector('.place-order-btn').onclick = placeOrder;
+
+
 </script>
 
 <%- include('../partials/user/footer') %>

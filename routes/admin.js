@@ -7,6 +7,8 @@ const brandController=require("../controllers/admin/brandController")
 const productController=require("../controllers/admin/productController")
 const bannerController=require("../controllers/admin/bannerController")
 const orderController=require("../controllers/admin/orderController")
+const couponController=require("../controllers/admin/couponController")
+
 const {adminAuth,userAuth} = require("../middleweres/auth");
 const multer=require("multer");
 const upload = require("../helpers/multer"); // Import multer instance
@@ -74,5 +76,13 @@ router.get('/orders', adminAuth, orderController.getOrders);
 router.get('/orders/:id', adminAuth, orderController.getOrderDetails);
 router.post('/orders/update-status', adminAuth, orderController.updateOrderStatus);
 router.post('/orders/cancel',adminAuth,orderController.orderCancelled)
+
+//coupon management
+router.get("/coupon",adminAuth,couponController.loadCoupon)
+router.post("/createCoupon",adminAuth,couponController.createCoupon)
+router.get("/editCoupon",adminAuth,couponController.editCoupon)
+router.get("/deleteCoupon", adminAuth, couponController.deleteCoupon);
+
+
 
 module.exports = router;

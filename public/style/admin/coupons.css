@@ -1,0 +1,175 @@
+/* Apply border-box model universally to include padding and borders in element's width/height */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* Ensure body and container styles are set properly */
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+}
+
+/* Main content section */
+.main-contents {
+    padding: 20px;
+    margin: 0 auto;
+}
+
+/* Header styling */
+h1, h2 {
+    text-align: center;
+}
+
+/* Coupon creation section styles */
+.create-coupon-section, .coupon-list-section {
+    margin-bottom: 30px;
+}
+
+/* Form styling for creating a coupon */
+form {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Form label styling */
+form .form-label {
+    font-weight: bold;
+}
+
+/* Input and select field styling */
+form .form-control {
+    padding: 10px;
+    font-size: 1rem;
+}
+
+/* Button styling */
+button {
+    padding: 10px 20px;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    width: 20vw;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Success button styling */
+button.btn-success {
+    background-color: #28a745;
+    color: white;
+}
+
+button.btn-primary {
+    background-color: #007bff;
+    color: white;
+}
+
+button.btn-warning {
+    background-color: #ffc107;
+    color: white;
+}
+
+button.btn-danger {
+    background-color: #dc3545;
+    color: white;
+}
+
+/* Table styles */
+table {
+    width: 80%;
+    border-collapse: collapse;
+    table-layout: fixed; /* Ensures the table fits within its container */
+    float: right;
+}
+
+/* Table header styles */
+table th {
+    padding: 12px;
+    text-align: left;
+    background-color: #007bff;
+    color: white;
+    font-weight: bold;
+}
+
+/* Table data cell styles */
+table td {
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+/* Striped row effect for better readability */
+table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* Button in table cells (Edit/Delete) */
+table td button {
+    margin: 0 5px;
+}
+
+/* Search input for filtering */
+#couponSearch {
+    width: 80%;
+    padding: 10px;
+    font-size: 1rem;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    float: right;
+}
+
+/* Coupon list section styling */
+.coupon-list-section {
+    padding: 10px;
+    overflow-x: auto; /* Allow scrolling if the table overflows */
+}
+
+/* Ensure the create coupon section is centered */
+.create-coupon-section {
+    text-align: center;
+}
+
+/* Modal styles for editing coupon */
+.modal-content {
+    padding: 20px;
+}
+
+.modal-header {
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Styling for modal form inputs */
+.modal-body .form-control {
+    margin-bottom: 10px;
+}
+
+/* Adjust the modal width */
+.modal-dialog {
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .coupon-list-section {
+        padding: 0;
+    }
+
+    table {
+        font-size: 14px;
+    }
+
+    table th, table td {
+        padding: 8px;
+    }
+
+    button {
+        font-size: 0.9rem;
+    }
+}

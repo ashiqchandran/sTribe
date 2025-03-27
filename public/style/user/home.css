@@ -106,7 +106,8 @@ nav {
 .profile-image{
     height: 50px;
     width: 50px;
-    border-radius: 30%;
+    border-radius: 40%;
+   
 }
 .productname{
     text-align: center;
@@ -133,4 +134,9 @@ nav {
 } */
 .ti-bag{
     text-align: center;
+}
+
+.sign-in-link{
+    text-decoration: none;
+    color: black;
 }

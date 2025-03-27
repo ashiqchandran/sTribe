@@ -112,8 +112,70 @@ const deleteFromWishlist= async (req,res)=>{
     }
 }
 
+
+const addToCart = async (req, res) => {
+    try {
+        console.log("hai from addToCart")
+        const userId = req.session.user;
+        if (!userId) return res.status(401).json({ success: false, message: "Please log in to add items to the cart" });
+
+        const productId = req.query.id;
+        const quantity = parseInt(req.query.quantity) || 1;
+        const product = await Product.findById(productId); // check for valid product
+        if (!product) return res.status(404).json({ success: false, message: "Product not found" });
+
+        let cart = await Cart.findOne({ userId }); // check if the user already has a cart
+
+        if (!cart) {
+            cart = new Cart({ userId, items: [] }); // if not present, create a new cart
+        }
+
+        const itemIndex = cart.items.findIndex((item) => item.productId.equals(productId));
+        const productPrice = Number(product.salePrice) || 0;
+
+        // Assuming shipping cost is a fixed value or dynamically calculated.
+        const shippingCost = 10; // Use a fixed value or calculate dynamically based on certain factors
+
+        if (itemIndex > -1) {  // Item is already in the cart, just update the quantity
+            cart.items[itemIndex].quantity += quantity;
+            cart.items[itemIndex].totalPrice = cart.items[itemIndex].quantity * cart.items[itemIndex].price + shippingCost;
+        } else {
+            // New item, add it to the cart
+            cart.items.push({
+                productId,
+                quantity: quantity,
+                price: productPrice,
+                totalPrice: quantity * productPrice + shippingCost,
+                shipping: shippingCost, // Use numeric shipping value
+                status: "placed",
+                cancellationReason: "none"
+            });
+        }
+
+        // Recalculate cart's total price if needed
+        cart.cartTotal = cart.items.reduce((total, item) => total + item.totalPrice, 0);
+
+        await cart.save();
+
+        // Remove the item from the wishlist after adding it to the cart
+        await Wishlist.findOneAndUpdate(
+            { userId }, 
+            { $pull: { products: { productId } } } // Remove the product from the wishlist
+        );
+
+        res.json({ success: true, message: "Product added to cart and removed from wishlist" });
+
+    } catch (error) {
+        console.error("Error adding to cart:", error);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
+};
+
+  
+
 module.exports={
     loadWishlist,
     addToWishlist,
-    deleteFromWishlist
+    deleteFromWishlist,
+    addToCart
 }

@@ -52,12 +52,14 @@ const getOrders = async (req, res) => {
         res.status(500).send("Internal Server Error");
     }
 }
+
 const getOrderDetails = async (req, res) => {
     try {
         const orderId = req.params.id;
+        console.log("Order ID:", orderId);  // Log the orderId to check
         const order = await Order.findById(orderId)
             .populate({
-                path: "orderedItems.product",
+                path: "orderItems.product",
                 select: "productName productImage price quantity",
             });
 
@@ -65,7 +67,7 @@ const getOrderDetails = async (req, res) => {
             return res.status(404).send("Order not found");
         }
 
-        res.render("admin-order-details", {
+        res.render("admin-orders-details", {
             order,
             title: "Order Details",
         });

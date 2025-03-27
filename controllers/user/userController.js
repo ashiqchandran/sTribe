@@ -2,6 +2,7 @@ const User=require('../../models/userSchema')
 const Category=require("../../models/categorySchema")
 const Product=require("../../models/productSchema")
 const Cart = require("../../models/cartSchema")
+
 const nodemailer=require("nodemailer")
 const bcrypt = require("bcrypt")
 const env =require("dotenv").config()
@@ -665,7 +666,34 @@ const filterProduct = async (req, res) => {
     }
 };
 
+const getRefferalPage=async(req,res)=>{
+    try {
+        res.render("reffer")
+    } catch (error) {
+        res.render('error')
+    }
+   
+}
+const getWalletPage=async(req,res)=>{
+    try {
+      
+            res.render("wallet")
 
+    } catch (error) {
+        res.render('error')
+    }
+   
+}
+const getmycouponspage= async (req,res)=>{
+    try {
+        const user = req.session.user;
+        
+        res.render("myCoupons",{user:user})
+    } catch (error) {
+        res.render('error')
+    }
+   
+}
 
 module.exports = { 
     loadHomePage,
@@ -688,6 +716,9 @@ module.exports = {
     getProductLoader,
     getshop,
     loadShoppingPage,
-    filterProduct
+    filterProduct,
+    getRefferalPage,
+    getWalletPage,
+    getmycouponspage
   
 }

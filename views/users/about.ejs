@@ -3,6 +3,124 @@
     <title>About Us - Style Tribe</title>
   
 </head>
+<style>
+     body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+        color: #333;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    h2 {
+        text-align: center;
+        color: #333;
+        font-size: 2rem;
+        margin-bottom: 20px;
+    }
+
+    .about-content {
+        margin-bottom: 40px;
+    }
+
+    .about-content p {
+        font-size: 1rem;
+        line-height: 1.6;
+    }
+
+    .team {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 20px;
+    }
+
+    .team-member {
+        text-align: center;
+        padding: 15px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .team-member:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .team-member img {
+        border-radius: 50%;
+        width: 100px;
+        height: 100px;
+        object-fit: cover; /* Ensures the image covers the area while keeping aspect ratio */
+        margin-top: 10px; /* Adds space above the image, so the face is not cut off */
+    }
+
+    .team-member h3 {
+        font-size: 1.25rem;
+        margin-top: 10px;
+        
+    }
+
+    .team-member p {
+        color: #888;
+        font-size: 1rem;
+    }
+
+    .upcoming-product {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #fff;
+        padding: 40px 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        margin-bottom: 40px;
+        border-radius: 8px;
+    }
+
+    .text-content {
+        flex: 1;
+        padding-right: 20px;
+    }
+
+    .image-content {
+        flex: 1;
+        text-align: center;
+    }
+
+    .image-content img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+    }
+
+    footer {
+        text-align: center;
+        padding: 20px;
+        background-color: #333;
+        color: white;
+    }
+
+    footer p {
+        margin: 0;
+    }
+
+    /* Hover effect for upcoming product section */
+    .upcoming-product:hover .text-content {
+        color: #007BFF;
+    }
+    /* Smooth scroll effect */
+    html {
+        scroll-behavior: smooth;
+    }
+    .container{
+        width: 90%;
+        min-width: 90vw;
+    }
+</style>
 <body>
 
    
@@ -16,45 +134,56 @@
         </div>    
          
     </main>
+    
     <div class="container">
         <div class="about-content">
             <h2>Our Story</h2>
             <p>Welcome to Style Tribe, where fashion meets passion. Our journey began with a simple idea: to create exclusive, hand-picked products that make you shine. Designed and made in India with premium materials from Thirupur, our products are crafted with love and care in our own factory, ensuring export quality at a fraction of the price.</p>
             <p>We believe in offering you the best, and our commitment to quality and affordability is what sets us apart. Join us on this journey and experience the difference with Style Tribe.</p>
         </div>
+
         <div class="about-content">
             <h2>Our Team</h2>
             <div class="team">
-                <div class="team-member">
-                    <img src="https://via.placeholder.com/100" alt="Team Member 1">
+                <div class="team-member" id="team-member-1" onclick="showMemberInfo('John Doe', 'Founder & CEO', 'John is the visionary behind Style Tribe and works tirelessly to ensure our brand thrives.')">
+                    <img src="images/directors/d1.jpeg" alt="Team Member 1">
                     <h3>John Doe</h3>
                     <p>Founder & CEO</p>
                 </div>
-                <div class="team-member">
-                    <img src="https://via.placeholder.com/100" alt="Team Member 2">
+                <div class="team-member" id="team-member-2" onclick="showMemberInfo('Jane Smith', 'Head Designer', 'Jane is the creative genius behind our designs, ensuring every product is both stylish and functional.')">
+                    <img src="images/directors/d2.jpg" alt="Team Member 2">
                     <h3>Jane Smith</h3>
                     <p>Head Designer</p>
                 </div>
-                <div class="team-member">
-                    <img src="https://via.placeholder.com/100" alt="Team Member 3">
+                <div class="team-member" id="team-member-3" onclick="showMemberInfo('Mike Johnson', 'Marketing Director', 'Mike brings Style Tribe to the world, ensuring our products reach fashion enthusiasts globally.')">
+                    <img src="images/directors/d3.jpg" alt="Team Member 3">
                     <h3>Mike Johnson</h3>
                     <p>Marketing Director</p>
                 </div>
             </div>
         </div>
+
         <div class="upcoming-product">
             <div class="text-content">
-                <h2>Upcoming Product</h2>
-                <p>We are excited to announce our upcoming product release! Stay tuned for a new addition to our collection that combines style, comfort, and affordability. This new release is designed to elevate your wardrobe and make you stand out.</p>
+                <h2>Upcoming Product </h2>
+                <p>We are excited to announce our upcoming product <span style="color: black; font-size: 1.1rem;font-weight: 700;">Men's Combo </span>release! Stay tuned for a new addition to our collection that combines style, comfort, and affordability. This new release is designed to elevate your look and make you stand out.</p>
                 <p>Sign up for our newsletter to be the first to know when it's available!</p>
             </div>
             <div class="image-content">
-                <img src="https://via.placeholder.com/400" alt="Upcoming Product">
+                <img src="images/aboutProduct/combo.webp" alt="Upcoming Product">
             </div>
         </div>
+
         <footer>
-            <p>&copy; 2023 Style Tribe. All rights reserved.</p>
+            <p>&copy; 2025 Style Tribe. All rights reserved.</p>
         </footer>
     </div>
+
+    <script>
+        // JavaScript for displaying team member information
+        function showMemberInfo(name, role, description) {
+            alert(`Name: ${name}\nRole: ${role}\n\nDescription: ${description}`);
+        }
+    </script>
 </body>
 </html>

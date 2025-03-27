@@ -324,3 +324,8 @@ a{
   text-decoration: none;
   color:white;
 }
+
+.container {
+  max-width:90%; /* Ensure the container width is full */
+  width: 90%; /* Ensure it spans the full width */
+}

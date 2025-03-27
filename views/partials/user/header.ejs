@@ -19,9 +19,9 @@
             <!-- <a href="/productLoader" onclick="filterProducts('all')">Product</a> -->
             
             <% if (user ) { %>
-                <a href="/cart" >Cart</a>
-                <a href="/wishlist" >Wishlist</a>
-                <a href="/orders" >orders</a>
+                
+                
+               
                 <li class="dropdown">
                     
                     &nbsp &nbsp
@@ -47,7 +47,8 @@
             <span> <img src="<%= user.image ? user.image : '/uploads/defaultProfileImage.jpg' %>" alt="User Profile" class="profile-image"></span>
             <% } %>
             <% if (locals.user) { %>
-                <a href="#" class="sign-in-link"><%= locals.user.fullname %></a>
+                <a href="#" class="sign-in-link"><%= locals.user.fullname.charAt(0).toUpperCase() + locals.user.fullname.slice(1) %></a>
+
                 <% } %>
             <!-- <span>🛒</span> -->
         </div>

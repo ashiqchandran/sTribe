@@ -240,3 +240,11 @@
 .order-card {
     margin-bottom: 20px;
 }
+
+.sidebar{
+    text-align: center;
+}
+.container {
+    max-width:90%; /* Ensure the container width is full */
+    width: 90%; /* Ensure it spans the full width */
+  }

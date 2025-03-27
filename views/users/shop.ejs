@@ -12,8 +12,8 @@
 
     <!-- Breadcrumb Section -->
     <div class="breadcrumb">
-        <a href="/">Home</a> / 
-        <a href="/shop">Shop</a>
+        <a href="/" class="texts">Home</a> 
+        <a href="/shop" class="texts"> /Shop</a>
     </div>
     
     <!-- Banner Section -->
@@ -25,11 +25,11 @@
         
         <!-- Sidebar -->
         <div class="filter-container">
-            <h2 class="text-xl font-semibold mb-4">CATEGORIES</h2>
-            <ul class="mb-8">
+            <h2 class="text-xl font-semibold mb-4 ">CATEGORIES</h2>
+            <ul class="mb-8" >
                 <% for (let i = 0; i < category.length; i++) { %>
-                    <li class="mb-2">
-                        <a class="text-gray-700" href="/filter?category=<%= category[i]._id %>">
+                    <li class="mb-2 cattext">
+                        <a class="text-gray-700 " href="/filter?category=<%= category[i]._id %>" style="color:black">
                             <%= category[i].name %>
                         </a>
                     </li>
@@ -84,15 +84,30 @@
                             </h3>
                             
                         </a>
-                        <p class="text-gray-700 mb-2">Buy now<span style="font-weight: 900;">&nbsp ₹<%= products[i].salePrice.toLocaleString('en-IN') %></span> </p>
-                        <div class="flex justify-between items-center">
-                            <a onclick="addToCart('<%= products[i]._id %>')" class="btn-primary">
-                                Add to Cart
-                            </a>
-                            <button class="wishlist-button" onclick="addToWishlist('<%= products[i]._id %>', this)">
-                                <i class="fas fa-heart text-xl"></i>
-                            </button>
-                        </div>
+                    
+categoryOffer
+
+
+                        <% if (products[i].productOffer) { %>
+                            <p class="text-gray-700 mb-2">Buy now<span style="font-weight: 900;">&nbsp ₹<%= Math.floor(products[i].regularPrice * (1 - (products[i].productOffer / 100))) %></span> </p>
+                            <div class="flex justify-between items-center">
+                                <a onclick="addToCart('<%= products[i]._id %>')" class="btn-primary">
+                                    Add to Cart
+                                </a>
+                                <button class="wishlist-button" onclick="addToWishlist('<%= products[i]._id %>', this)">
+                                    <i class="fas fa-heart text-xl"></i>
+                                </button>
+                                </div>
+                                <% } else { %> <p class="text-gray-700 mb-2">Buy now<span style="font-weight: 900;">&nbsp ₹<%= products[i].regularPrice %></span></p>
+                                <div class="flex justify-between items-center">
+                                    <a onclick="addToCart('<%= products[i]._id %>')" class="btn-primary">
+                                        Add to Cart
+                                    </a>
+                                    <button class="wishlist-button" onclick="addToWishlist('<%= products[i]._id %>', this)">
+                                        <i class="fas fa-heart text-xl"></i>
+                                    </button>
+                                </div>
+                                <% }  %>
                     </div>
                 <% } %>
             </div>
