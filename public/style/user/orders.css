@@ -1,250 +1,407 @@
-.card-green {
-    background-color: #ADD8E6;
-  }
-  .main {
-    padding: 30px 0;
-  }
- 
-  .dashboard-menu {
-    background-color: #cce3e6;
+/* Base Styles */
+body {
+    background-color: #f7f7f7;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 95%;
+    width: 95%;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    background-color: white;
+    padding: 20px;
     border-radius: 10px;
-    padding: 15px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  }
- 
-  .dashboard-menu .nav-link {
-    font-weight: bold;
-    color: #30683c;
-    box-shadow: 0 4px 10px rgba(123, 131, 112, 0.3), 0 4px 20px rgba(0, 191, 255, 0.2);
-    transition: box-shadow 0.3s ease;
-  }
- 
-  .dashboard-menu .nav-link:hover {
-    color: #00bfff;
-    box-shadow: 0 4px 15px rgba(173, 255, 47, 0.5), 0 6px 25px rgba(0, 191, 255, 0.4);
-  }
- 
-  .card {
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.08);
     margin-bottom: 20px;
-  }
- 
-  .card-header {
+    text-align: center;
+}
+
+.sidebar h2 {
+    color: #487379;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+}
+
+.sidebar a {
+    color: #487379;
+    display: block;
+    padding: 12px 15px;
+    text-decoration: none;
+    margin: 5px 0;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.sidebar a.active {
+    color: rgb(41, 202, 251);
+    background-color: #d6f5f9;
+}
+
+.sidebar a:hover:not(.active) {
+    color: #15afe3;
+    background-color: #e9f5ff;
+}
+
+.sidebar a i {
+    margin-right: 10px;
+    width: 20px;
+    text-align: center;
+}
+
+/* Main Content Styles */
+.main-content {
+    background-color: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.08);
+    
+}
+
+.main-content h2 {
+    color: #487379;
+    margin-bottom: 25px;
+    font-size: 1.8rem;
+    font-weight: 600;
+}
+
+/* Order Card Styles */
+.order-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.order-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.order-header {
+    background-color: #f8f9fa;
+    padding: 15px 20px;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.order-body {
+    padding: 20px;
+}
+
+.order-footer {
+    padding: 15px 20px;
+    background-color: #f8f9fa;
+    border-top: 1px solid #e0e0e0;
+}
+
+/* Product Item Styles */
+.product-item {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.product-item:last-child {
+    border-bottom: none;
+}
+
+.product-image {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-right: 15px;
+    border: 1px solid #e0e0e0;
+}
+
+.product-details {
+    flex: 1;
+    min-width: 200px;
+}
+
+.product-name {
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #487379;
+}
+
+.product-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.product-price {
+    font-weight: 600;
+    color: #487379;
+}
+
+.product-actions {
+    margin-left: auto;
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.bg-success {
+    background-color: #28a745;
+    color: white;
+}
+
+.bg-danger {
+    background-color: #dc3545;
+    color: white;
+}
+
+.bg-info {
+    background-color: #17a2b8;
+    color: white;
+}
+
+.bg-warning {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+/* Button Styles */
+.btn {
+    padding: 8px 15px;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-sm {
+    padding: 5px 10px;
+    font-size: 0.85rem;
+}
+
+.btn-outline-primary {
+    background-color: transparent;
+    border: 1px solid #487379;
+    color: #487379;
+}
+
+.btn-outline-primary:hover {
     background-color: #487379;
     color: white;
-    border-radius: 10px 10px 0 0;
-  }
- 
-  .profile-image-container {
-    display: flex;
-    align-items: center;
-  }
- 
-  .rounded-circle {
-    border-radius: 50%;
-    border: 2px solid #fff;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  }
- 
-  .ml-3 {
-    margin-left: 15px;
-  }
- 
-  @media (max-width: 768px) {
-    .dashboard-menu {
-      padding: 10px;
-    }
-    .card {
-      margin-bottom: 15px;
-    }
-  }
-  body {
-             background-color: #f7f7f7;
-         }
-         .sidebar {
-             background-color: white;
-             padding: 20px;
-             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-         }
-         .sidebar a {
-             color: #333;
-             display: block;
-             padding: 10px 0;
-             text-decoration: none;
-         }
-         .sidebar a.active {
-             color: #ff6600;
-         }
-         .sidebar a:hover {
-             color: #ff6600;
-         }
-         .sidebar a i {
-             margin-right: 10px;
-         }
-         .main-content {
-             background-color: white;
-             padding: 20px;
-             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-         }
-         .main-content h2 {
-             margin-bottom: 20px;
-         }
-         .form-group label {
-             font-weight: bold;
-         }
-         .form-group span {
-             color: red;
-         }
-         .btn-orange {
-             background-color: #ff6600;
-             color: white;
-         }
-         .btn-orange:hover {
-             background-color: #e65c00;
-         }
-         .btn-blue {
-             background-color: #0000ff;
-             color: white;
-         }
-         .btn-blue:hover {
-             background-color: #0000cc;
-         }
-         .photo img {
-             width: 40px;
-             height: 40px;
-             border-radius: 50%;
-             margin-right: 10px;
-         }
-         .order-header {
-             background-color: #f0f0f0;
-             padding: 10px;
-             border-top-left-radius: 5px;
-             border-top-right-radius: 5px;
-         }
-         .order-body {
-             padding: 20px;
-         }
-         .order-footer {
-             padding: 10px;
-             border-bottom-left-radius: 5px;
-             border-bottom-right-radius: 5px;
-         }
-         .order-card {
-             border: 1px solid #dee2e6;
-             border-radius: 5px;
-             margin-bottom: 20px;
-         }
-         .order-status {
-             color: red;
-         }
-         .order-ship-to {
-             color: green;
-         }
-         .order-link {
-             color: blue;
-             text-decoration: none;
-         }
-         .order-link:hover {
-             text-decoration: underline;
-         }
-         .btn-orange {
-             background-color: orange;
-             color: white;
-         }
-         .order-body .product-image {
-     max-width: 100px;  /* Set a max width */
-     max-height: 100px; /* Set a max height */
-     object-fit: cover; /* Ensures the aspect ratio is maintained and image is cropped to fit the box */
-     width: auto;  /* Allow automatic scaling while maintaining the aspect ratio */
-     height: auto; /* Allow automatic scaling while maintaining the aspect ratio */
- }
- .order-body .product-image {
-     max-width: 100px;  /* Set a max width */
-     max-height: 100px; /* Set a max height */
-     object-fit: cover; /* Ensures the aspect ratio is maintained and image is cropped to fit the box */
-     width: auto;  /* Allow automatic scaling while maintaining the aspect ratio */
-     height: auto; /* Allow automatic scaling while maintaining the aspect ratio */
- }
- .col-md-9{
-     margin-left: auto;
-     margin-right: auto;
- }
+}
 
- .organic-breadcrumb{
-    height: 35vh;
- }
+.btn-outline-danger {
+    background-color: transparent;
+    border: 1px solid #dc3545;
+    color: #dc3545;
+}
 
- .breadcrumbers a{
-    text-decoration: none;
+.btn-outline-danger:hover {
+    background-color: #dc3545;
     color: white;
-    float: left;
-    text-align: left;
- }
- .breadcrumbers a:hover{
-    color: gold;
- }
- /* Style for Pagination */
+}
+
+.btn-orange {
+    background-color: #ff6600;
+    color: white;
+}
+
+.btn-orange:hover {
+    background-color: #e65c00;
+}
+
+.btn-blue {
+    background-color: #0000ff;
+    color: white;
+}
+
+.btn-blue:hover {
+    background-color: #0000cc;
+}
+
+/* Pagination Styles */
 .pagination {
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
-    align-items: center;
-    margin-top: 20px;
+    margin-top: 30px;
+    gap: 5px;
 }
 
 .pagination a {
-    color: #007bff;
+    color: #487379;
     text-decoration: none;
     padding: 8px 15px;
-    margin: 0 5px;
-    border: 1px solid #007bff;
-    border-radius: 5px;
-    font-size: 14px;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+    transition: all 0.3s ease;
 }
 
 .pagination a:hover {
-    background-color: #007bff;
+    background-color: #487379;
     color: white;
-}
-
-.pagination span {
-    font-size: 14px;
-    margin: 0 10px;
-    color: #555;
-}
-
-.pagination .btn-sm {
-    font-size: 14px;
-    padding: 5px 10px;
-}
-
-.pagination .disabled {
-    color: #ccc;
-    cursor: not-allowed;
-    pointer-events: none;
-}
-
-.pagination .disabled a {
-    background-color: #f1f1f1;
-    border-color: #f1f1f1;
+    border-color: #487379;
 }
 
 .pagination .active a {
-    background-color: #007bff;
+    background-color: #487379;
     color: white;
-    border-color: #007bff;
+    border-color: #487379;
 }
 
-/* Ensure there's space between the order cards and the pagination */
-.order-card {
+/* Responsive Adjustments */
+@media (max-width: 992px) {
+    .container {
+        max-width: 100%;
+    }
+    
+    .sidebar {
+        margin-bottom: 30px;
+    }
+}
+
+@media (max-width: 768px) {
+    .order-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .product-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .product-image {
+        margin-bottom: 10px;
+        margin-right: 0;
+    }
+    
+    .product-actions {
+        margin-left: 0;
+        margin-top: 10px;
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+    }
+    
+    .main-content {
+        padding: 15px;
+    }
+}
+
+@media (max-width: 576px) {
+    .product-meta {
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .pagination a {
+        padding: 6px 10px;
+        font-size: 0.85rem;
+    }
+    
+    .sidebar a {
+        padding: 10px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Special Card Styles */
+.card-green {
+    background-color: #ADD8E6;
+    border-radius: 10px;
+    padding: 20px;
     margin-bottom: 20px;
 }
 
-.sidebar{
+.dashboard-menu {
+    background-color: #e9f5ff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-menu .nav-link {
+    font-weight: 600;
+    color: #487379;
+    padding: 12px 15px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+}
+
+.dashboard-menu .nav-link:hover {
+    color: #00bfff;
+    background-color: rgba(0, 191, 255, 0.1);
+}
+
+/* Breadcrumb Styles */
+.organic-breadcrumb {
+    height: 35vh;
+    background-color: #487379;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
     text-align: center;
 }
-.container {
-    max-width:90%; /* Ensure the container width is full */
-    width: 90%; /* Ensure it spans the full width */
-  }
+
+.breadcrumbers a {
+    color: white;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.breadcrumbers a:hover {
+    color: gold;
+}
+
+/* Profile Image Styles */
+.profile-image-container {
+    display: flex;
+    align-items: center;
+}
+
+.rounded-circle {
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+}
+
+.ml-3 {
+    margin-left: 15px;
+}
+
+/* Form Styles */
+.form-group label {
+    font-weight: 600;
+    color: #487379;
+    margin-bottom: 5px;
+}
+
+.form-group span {
+    color: #dc3545;
+    font-size: 0.9rem;
+}

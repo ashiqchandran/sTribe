@@ -1,186 +1,526 @@
 <%- include("../../views/partials/user/header") %>
 
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <link rel="stylesheet" href="/style/user/address.css">
 
+<style>
+   body {
+  background-color: #f8f9fa;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+}
 
+
+
+    /* Desktop Styles */
+   .ultra-sidebar-container {
+       width: 18vw;
+       min-width: 250px;
+       background-color: #f8f9fa;
+       border-right: 2px solid #e0e0e0;
+       padding: 20px;
+       min-height: 100vh;
+       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+   }
+   
+   .ultra-sidebar-header h2 {
+       font-size: 22px;
+       margin-bottom: 20px;
+       color: #333;
+       display: flex;
+       align-items: center;
+       gap: 10px;
+   }
+   
+   .ultra-sidebar-menu a {
+       display: flex;
+       align-items: center;
+       gap: 10px;
+       padding: 12px 15px;
+       margin-bottom: 10px;
+       color: #555;
+       text-decoration: none;
+       background-color: #fff;
+       border-radius: 6px;
+       transition: all 0.3s ease;
+       font-size: 16px;
+   }
+   
+   .ultra-sidebar-menu a:hover,
+   .ultra-sidebar-menu a.ultra-active {
+       background-color: #007bff;
+       color: #fff;
+   }
+   
+   .ultra-sidebar-menu a i {
+       font-size: 18px;
+   }
+   
+   .ultra-sidebar-menu .ultra-logout-btn {
+       color: #dc3545;
+   }
+   
+   .ultra-sidebar-menu .ultra-logout-btn:hover {
+       background-color: #dc3545;
+       color: white;
+   }
+   
+   /* Tablet Screens */
+   @media (max-width: 991px) {
+       .ultra-sidebar-container {
+           width: 100%;
+           min-width: 100%;
+           border-right: none;
+           border-bottom: 1px solid #ddd;
+           padding: 15px;
+           display: flex;
+           flex-direction: row;
+           overflow-x: auto;
+           white-space: nowrap;
+           gap: 10px;
+       }
+   
+       .ultra-sidebar-header {
+           display: none;
+       }
+   
+       .ultra-sidebar-menu {
+           display: flex;
+           flex-direction: row;
+           gap: 10px;
+           width: 100%;
+       }
+   
+       .ultra-sidebar-menu a {
+           display: flex;
+           flex-direction: column;
+           align-items: center;
+           justify-content: center;
+           font-size: 13px;
+           padding: 8px;
+           min-width: 80px;
+           border-radius: 10px;
+       }
+   
+       .ultra-sidebar-menu a i {
+           font-size: 18px;
+       }
+   }
+   
+   /* Small Mobile Screens */
+   @media (max-width: 576px) {
+       .ultra-sidebar-menu a {
+           padding: 6px;
+           min-width: 65px;
+           font-size: 12px;
+       }
+   
+       .ultra-sidebar-menu a i {
+           font-size: 16px;
+       }
+   }
+   
 
    
+
+.main-container {
+  padding: 2rem 0;
+  max-width:90vw;
+}
+
+.hero-banner {
+  background-color: #e9f2ff;
+  padding: 1.5rem 0;
+  margin-bottom: 2rem;
+}
+
+.breadcrumb-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding:20px 15px;
+}
+
+.breadcrumb {
+  padding: 0;
+  background-color: transparent;
+  font-size: 0.9rem;
+}
+
+.breadcrumb-item a {
+  
+  color: #4a6baf;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.breadcrumb-item a:hover {
+  color: #2c4b8b;
+}
+
+.breadcrumb-item.active {
+  color: #6c757d;
+}
+
+/* Sidebar Styles */
+.sidebar {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.sidebar-header {
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 1rem;
+}
+
+.sidebar-header h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0;
+}
+
+.sidebar-menu {
+  display: flex;
+  flex-direction: column;
+
+}
+
+.sidebar-menu a {
+  padding: 0.75rem 0;
+  color: #4a5568;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  margin-left: 6vw;
+  
+  transition: all 0.3s;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+.sidebar-menu a:hover {
+  color: #3b82f6;
+  transform: translateX(5px);
+}
+
+.sidebar-menu a.active {
+  color: #3b82f6;
+  font-weight: 500;
+}
+
+.sidebar-menu a i {
+  margin-right: 0.75rem;
+  width: 20px;
+  text-align: center;
+}
+
+.logout-btn {
+  color: #e53e3e !important;
+  margin-top: 1rem;
+}
+
+    /* Address Card Styles */
+    .address-card {
+        background-color: white;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e0e0e0;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .address-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .address-header {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 10px;
+        margin-bottom: 10px;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .address-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #487379;
+        margin-right: 15px;
+    }
+    
+    .address-type {
+        display: inline-block;
+        padding: 3px 8px;
+        background-color: #e9f5ff;
+        color: #00bfff;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+    
+    .address-actions {
+        display: flex;
+        gap: 15px;
+    }
+    
+    .address-actions a {
+        color: #487379;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+    
+    .address-actions a:hover {
+        color: #00bfff;
+    }
+    
+    .address-actions .edit-link {
+        color: #28a745;
+    }
+    
+    .address-actions .delete-link {
+        color: #dc3545;
+    }
+    
+    .address-body {
+        line-height: 1.6;
+    }
+    
+    .address-body p {
+        margin-bottom: 5px;
+    }
+    
+    /* Button Styles */
+    .btn-orange {
+        background-color: #ff6600;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-weight: 500;
+        transition: background-color 0.3s ease;
+    }
+    
+    .btn-orange:hover {
+        background-color: #e65c00;
+        color: white;
+    }
+    
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 40px 0;
+    }
+    
+    .empty-state i {
+        font-size: 3rem;
+        color: #ccc;
+        margin-bottom: 20px;
+    }
+    
+    .empty-state h3 {
+        color: #666;
+        margin-bottom: 15px;
+    }
+    
+    /* Responsive Adjustments */
+    @media (max-width: 992px) {
+        .sidebar {
+            margin-bottom: 30px;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .address-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .address-title {
+            margin-bottom: 10px;
+        }
+        
+        .address-actions {
+            width: 100%;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+        
+        .main-content {
+            padding: 15px;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .sidebar a {
+            padding: 8px 10px;
+            font-size: 0.9rem;
+        }
+        
+        .address-card {
+            padding: 15px;
+        }
+        
+        .address-actions {
+            gap: 10px;
+        }
+    }
+  
+
+</style>
+
 <body>
-    <!-- <section class="banner-area organic-breadcrumb">
-        <div class="container">
-            <div class="breadcrumb-banner d-flex flex-wrap align-items-center justify-content-between">
-                
-                <div class="col-first">
-                    <h1>Address Management</h1>
-                    <nav class="d-flex align-items-center">
-                        <a href="/">Home<span class="lnr lnr-arrow-right"></span></a>
-                        <a href="/userProfile">User Profile<span class="lnr lnr-arrow-right"></span></a>
-                        <a href="#">Address</a>
-                    </nav>
-                </div>
-            </div>
-        </div>
-        <input type="file" id="imageUpload" accept="image/*" style="display: none;" onchange="previewImage(event)">
-    </section> -->
-    <div class="container mt-5">
-        <div class="row">
-            <!-- Sidebar -->
-            <div class="col-md-3 sidebar">
-                <h2>My Account</h2>
-                <a href="/Profile" ><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
-                    <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10s-3.516.68-4.168 1.332c-.678.678-.83 1.418-.832 1.664z"/>
-                  </svg> Account Details</a>
-                <a href="/address" class="active"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-geo-alt" viewBox="0 0 16 16">
-                    <path d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A32 32 0 0 1 8 14.58a32 32 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10"/>
-                    <path d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4m0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
-                  </svg> Address</a>
-                  <a href="/orders"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart2" viewBox="0 0 16 16">
-                    <path d="M0 2.5A.5.5 0 0 1 .5 2H2a.5.5 0 0 1 .485.379L2.89 4H14.5a.5.5 0 0 1 .485.621l-1.5 6A.5.5 0 0 1 13 11H4a.5.5 0 0 1-.485-.379L1.61 3H.5a.5.5 0 0 1-.5-.5M3.14 5l1.25 5h8.22l1.25-5zM5 13a1 1 0 1 0 0 2 1 1 0 0 0 0-2m-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0m9-1a1 1 0 1 0 0 2 1 1 0 0 0 0-2m-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0"/>
-                  </svg> Orders</a>
-                  <a href="/wishlist"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
-                    <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
-                  </svg> Wishlist</a> 
-                  <a href="/cart"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
-                    <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
-                  </svg> Cart</a> 
+    <main>
+        <div class="breadcrumb-container" style="">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Address</li>
+                </ol>
+            </nav>
+        </div>  
+      </main>
+        <div class="container mt-4 mt-md-5">
+            <div class="row">
+                <!-- Sidebar -->
+                      
+<div class="col-lg-3 col-md-4 ultra-sidebar-container">
+    <div class="ultra-sidebar-header">
+        <h2><i class="fas fa-user-circle me-2"></i>My Account</h2>
+    </div>
+    <div class="ultra-sidebar-menu">
+        <a href="/Profile">
+            <i class="fas fa-user"></i>Account Details
+        </a>
+        <a href="/address" class="ultra-active">
+            <i class="fas fa-map-marker-alt"></i>Address
+        </a>
+        <a href="/orders">
+            <i class="fas fa-box-open"></i>Orders
+        </a>
+        <a href="/wishlist">
+            <i class="fas fa-heart"></i>Wishlist
+        </a>
+        <a href="/cart">
+            <i class="fas fa-shopping-cart"></i>Cart
+        </a>
+        <a href="/wallet">
+            <i class="fas fa-wallet"></i>Wallet
+        </a>
+        <a href="/mycoupons">
+            <i class="fas fa-tag"></i>My Coupons
+        </a>
+        <a href="#" onclick="confirmLogout(event)" class="ultra-logout-btn">
+            <i class="fas fa-sign-out-alt me-2"></i>Logout
+        </a>
+    </div>
+</div>
 
-                <a href="/wallet"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-wallet-fill" viewBox="0 0 16 16">
-                    <path d="M1.5 2A1.5 1.5 0 0 0 0 3.5v2h6a.5.5 0 0 1 .5.5c0 .253.08.644.306.958.207.288.557.542 1.194.542s.987-.254 1.194-.542C9.42 6.644 9.5 6.253 9.5 6a.5.5 0 0 1 .5-.5h6v-2A1.5 1.5 0 0 0 14.5 2z"/>
-                    <path d="M16 6.5h-5.551a2.7 2.7 0 0 1-.443 1.042C9.613 8.088 8.963 8.5 8 8.5s-1.613-.412-2.006-.958A2.7 2.7 0 0 1 5.551 6.5H0v6A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5z"/>
-                  </svg> Wallet</a>
-                <a href="mycoupons"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cash" viewBox="0 0 16 16">
-                    <path d="M8 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4"/>
-                    <path d="M0 4a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1zm3 0a2 2 0 0 1-2 2v4a2 2 0 0 1 2 2h10a2 2 0 0 1 2-2V6a2 2 0 0 1-2-2z"/>
-                  </svg> My Coupons</a>
-                  <a href="/refferal" ><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-geo-alt" viewBox="0 0 16 16">
-                    <path d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A32 32 0 0 1 8 14.58a32 32 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10"/>
-                    <path d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4m0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
-                  </svg> refferal</a>
-                <a href="#" onclick="confirmLogout(event)" class="text-danger mt-4"><i class="fas fa-sign-out-alt"></i> Logout</a>
-            </div>
+            
             <!-- Main Content -->
-            <div class="col-md-9 main-content">
-                <%if(userAddress){%>
-                    <%userAddress.address.forEach((address) => {%>
-                <div class="bg-white p-4 shadow-sm mb-4">
-                    <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
-                        <h3 class="font-weight-bold">Shipping Address: <%=address.addressType%></h3>
-                        <div class="text-muted">
-                            <span>Name:  <%=address.name%></span><br>
-                            <span class="ml-4">Ph No: +91  <%=address.phone%></span>
-                        </div>
-                    </div>
-                    <p> <%=address.streetAddress%><br>
-                        <%=address.landMark%><br>
-                  
-                    <%=address.city%>,  <%=address.pincode%><br>
-                    <%=address.state%>,  <%=address.country%></p>
-                    <div class="mt-2">
-                        <a href="/editAddress?id=<%=address._id%>" class="text-primary mr-4">Edit</a>
-                        <a href="/deleteAddress?id=<%=address._id%>" class="text-danger" onclick="return confirm('Are you sure you want to delete this address')">Delete</a>
-                    </div>
-                </div>
-                <%})%><%} else{%>
-                    <h1>Add New Address</h1>
-
-                    <%}%>
-                <!-- <div class="bg-white p-4 shadow-sm mb-4">
-                    <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
-                        <h3 class="font-weight-bold">Shipping Address: Home Address</h3>
-                        <div class="text-muted">
-                            <span>Name: Shamveel P</span><br>
-                            <span class="ml-4">Ph No: +91 0000000000</span>
-                        </div>
-                    </div>
-                    <p>NH 66, Kinfra, Kakkanchery<br>
-                    3rd Floor, Brototype<br>
-                    Near university<br>
-                    Malappuram, 670000<br>
-                    Kerala, India</p>
-                    <div class="mt-2">
-                        <a href="#" class="text-primary mr-4">Edit</a>
-                        <a href="#" class="text-danger">Remove</a>
-                    </div>
-                </div> -->
-                <a href="/addAddress"><button class="btn btn-orange">Add New Address</button></a>
+            <div class="col-lg-9 col-md-8 main-content">
+                <h2 class="mb-4">My Addresses</h2>
                 
+                <% if (userAddress && userAddress.address.length > 0) { %>
+                    <% userAddress.address.forEach((address) => { %>
+                        <div class="address-card">
+                            <div class="address-header">
+                                <div>
+                                    <span class="address-title">Shipping Address</span>
+                                    <span class="address-type"><%= address.addressType %></span>
+                                </div>
+                                <div class="text-muted">
+                                    <span><%= address.name %></span>
+                                    <span class="ms-2">+91 <%= address.phone %></span>
+                                </div>
+                            </div>
+                            
+                            <div class="address-body">
+                                <p><%= address.streetAddress %></p>
+                                <p><%= address.landMark %></p>
+                                <p><%= address.city %>, <%= address.pincode %></p>
+                                <p><%= address.state %>, <%= address.country %></p>
+                            </div>
+                            
+                            <div class="address-actions mt-3">
+                                <a href="/editAddress?id=<%= address._id %>" class="edit-link">
+                                    <i class="fas fa-edit me-1"></i> Edit
+                                </a>
+                                <a href="#" class="delete-link" onclick="confirmDeleteAddress('<%= address._id %>')">
+                                    <i class="fas fa-trash-alt me-1"></i> Delete
+                                </a>
+                            </div>
+                        </div>
+                    <% }) %>
+                    
+                    <div class="text-end mt-4">
+                        <a href="/addAddress" class="btn btn-orange">
+                            <i class="fas fa-plus me-2"></i> Add New Address
+                        </a>
+                    </div>
+                <% } else { %>
+                    <div class="empty-state">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <h3>No Addresses Saved</h3>
+                        <p class="text-muted">You haven't added any addresses yet.</p>
+                        <a href="/addAddress" class="btn btn-orange mt-3">
+                            <i class="fas fa-plus me-2"></i> Add Your First Address
+                        </a>
+                    </div>
+                <% } %>
             </div>
         </div>
     </div>
-    </body>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<script>
-    // function previewImage(event) {
-    //     const imagePreview = document.getElementById('imagePreview');
-    //     const file = event.target.files[0];
-    //     const reader = new FileReader();
-
-    //     reader.onload = function(e) {
-    //         imagePreview.src = e.target.result;
-    //         imagePreview.style.display = 'block';
-    //     }
-
-    //     if (file) {
-    //         reader.readAsDataURL(file);
-    //     } else {
-    //         imagePreview.src = '';
-    //         imagePreview.style.display = 'none';
-    //     }
-    // }
-
-    function previewImage(event) {
-        const file = event.target.files[0];
-        const reader = new FileReader();
-
-        reader.onload = function(e) {
-            document.getElementById('profileImage').src = e.target.result;
+    <script>
+        function confirmDeleteAddress(addressId) {
+            event.preventDefault();
+            
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = `/deleteAddress?id=${addressId}`;
+                }
+            });
         }
 
-        if (file) {
-            reader.readAsDataURL(file);
+        function confirmLogout(event) {
+            event.preventDefault();
+            
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You will be logged out!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, Logout"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "/logout";
+                }
+            });
         }
-    }
-
-    function resetPassword() {
-        // Logic for resetting the password
-        alert("Password reset functionality to be implemented.");
-    }
-
-    function confirmLogout(event) {
-        event.preventDefault(); // Prevent default link behavior
-
-        Swal.fire({
-            title: "Are you sure?",
-            text: "You will be logged out!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Yes, Logout"
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = "/logout"; // Redirect only if confirmed
-            }
-        });
-    }
-
-    
-</script>
-
-<!-- Bootstrap JS and dependencies -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
-
-
-<br><br>
+    </script>
+</body>
 
 <%- include("../../views/partials/user/footer") %>
-
-
-
-
-

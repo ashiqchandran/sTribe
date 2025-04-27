@@ -1,6 +1,9 @@
 /* Global styling */
 body {
     font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
 }
 
 .container {
@@ -9,7 +12,7 @@ body {
     padding: 20px;
 }
 
-/* Flexbox layout for the main content */
+/* Content layout */
 .content-main {
     display: flex;
     flex-direction: column;
@@ -19,37 +22,47 @@ body {
     margin-bottom: 20px;
 }
 
-/* Form layout */
+/* Form styling */
 form {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 20px; /* Adds space between form fields */
+    gap: 20px;
 }
 
-/* Form fields styling */
-input.form-control, select.form-select, textarea.form-control {
+input.form-control,
+select.form-select,
+textarea.form-control {
     width: 95%;
     padding: 10px;
     margin: 5px 0;
     border: 1px solid #ccc;
     border-radius: 5px;
+    font-size: 14px;
 }
 
-/* Card and header for images */
+/* Card styling */
+.card {
+    margin-bottom: 20px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
 .card-header h4 {
     font-size: 18px;
     margin-bottom: 10px;
+    padding: 15px 20px 0;
 }
 
 .card-body {
     padding: 20px;
 }
 
-/* Image thumbnails container */
+/* Image thumbnails */
 .thumbnails-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px; /* Adds space between thumbnail images */
+    gap: 10px;
 }
 
 .thumbnails-container img {
@@ -59,14 +72,94 @@ input.form-control, select.form-select, textarea.form-control {
     border-radius: 5px;
 }
 
-/* Spacing for card sections */
-.card {
-    margin-bottom: 20px; /* Adds space between cards */
+.card-img-top {
+    height: 80px;
+    width: 60px;
+    border-radius: 10px;
+    object-fit: cover;
 }
 
-/* Responsive Styles for Tablets and Mobiles */
+/* Cropper-specific styles */
+.img-container {
+    width: 100%;
+    height: 300px;
+    margin: 15px 0;
+    background: #f8f9fa;
+    border: 1px dashed #dee2e6;
+    overflow: hidden;
+    position: relative;
+}
+
+.cropper-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.cropper-view-box {
+    outline: 2px solid #007bff;
+    outline-color: rgba(0, 123, 255, 0.75);
+}
+
+.cropper-bg {
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAAA3NCSVQICAjb4U/gAAAABlBMVEXMzMz////TjRV2AAAACXBIWXMAAArrAAAK6wGCiw1aAAAAHHRFWHRTb2Z0d2FyZQBBZG9iZSBGaXJld29ya3MgQ1M26LyyjAAAABFJREFUCJlj+M/AgBVhF/0PAH6/D/HkDxOGAAAAAElFTkSuQmCC");
+}
+
+.cropper-controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.crop-button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.crop-button:hover {
+    background-color: #0069d9;
+}
+
+.reset-button {
+    padding: 10px 20px;
+    background-color: #ff5733;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.reset-button:hover {
+    background-color: #e04a2d;
+}
+
+/* Preview image */
+#preview {
+    width: 100%;
+    max-width: 200px;
+    height: auto;
+    border: 1px solid #ccc;
+    margin-top: 20px;
+    display: none;
+}
+
+/* Responsive styles */
 @media (max-width: 768px) {
-    /* Stack form fields vertically on small screens */
     form {
         grid-template-columns: 1fr;
     }
@@ -80,15 +173,12 @@ input.form-control, select.form-select, textarea.form-control {
         height: 100px;
     }
 
-    /* Make image cropper larger on mobile */
-    .image-cropper img {
-        max-width: 100%;
-        height: auto;
+    .img-container {
+        height: 250px;
     }
 }
 
 @media (max-width: 576px) {
-    /* Reduce padding on smaller screens */
     .container {
         padding: 10px;
     }
@@ -100,41 +190,17 @@ input.form-control, select.form-select, textarea.form-control {
     .content-title {
         font-size: 20px;
     }
-}
-.card-img-top{
-    height: 80px;
-    width: 60px;
-    border-radius: 10px;
-}
 
-#preview {
-    width: 200px;
-    height: 200px;
-    overflow: hidden;
-    border: 1px solid #ccc;
-    margin-top: 20px;
-}
+    .img-container {
+        height: 200px;
+    }
 
-#cropper-container {
-    width: 500px;
-    margin: 20px 0;
+    .crop-button, 
+    .reset-button {
+        padding: 8px 15px;
+        font-size: 14px;
+    }
 }
-
-.crop-button {
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-}
-
-.reset-button {
-    padding: 10px 20px;
-    background-color: #ff5733;
-    color: white;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-    margin-left: 10px;
-}
+.sidebar{
+    width: 16vw;
+  }

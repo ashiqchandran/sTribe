@@ -1,90 +1,326 @@
-// server/controllers/walletController.js
-const User = require("../../models/userSchema"); // Import the User model
-const Cart=require("../../models/cartSchema");
-// Add funds to wallet
-const addFunds = async (req, res) => {
-  const { amount } = req.body;
-  const userId = req.session.user._id;
-  // Ensure the amount is positive
-  if (amount <= 0) return res.status(400).send("Amount must be positive.");
+const Razorpay = require('razorpay');
+const crypto = require('crypto');
+const Transaction = require("../../models/transactionSchema");
+const User = require("../../models/userSchema");
+const mongoose = require('mongoose');
 
+const dCoupon =require("../../models/dcouponSchema");
+const razorpay = new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret: process.env.RAZORPAY_KEY_SECRET
+});
+
+exports.createRazorpayOrder = async (req, res) => {
+    try {
+        const { amount } = req.body;
+        
+        // Validate amount (minimum ₹1 = 100 paise)
+        if (!amount || isNaN(amount) || amount < 100) {
+            return res.status(400).json({
+                success: false,
+                message: 'Amount must be at least ₹1 (100 paise)'
+            });
+        }
+
+        const receiptId = `wlt${Date.now().toString().slice(-9)}`;
+
+        const options = {
+            amount: Math.round(amount),
+            currency: "INR",
+            receipt: receiptId,
+            payment_capture: 1,
+            notes: {
+                userId: req.session.user._id.toString(),
+                purpose: "wallet_topup"
+            }
+        };
+        
+        const order = await razorpay.orders.create(options);
+        
+        // Create transaction record using your exact schema
+        const transaction = new Transaction({
+            userId: req.session.user._id,
+            amount: amount , // Store in rupees
+            transactionType: 'Razorpay', // Using your enum value
+            status: 'pending', // As per your schema which only allows Success/Failed
+            description: `Wallet top-up initiated. Order ID: ${order.id}`,
+            date: new Date() // Explicitly setting date as per your schema
+        });
+
+        await transaction.save();
+
+        res.json({
+            success: true,
+            order: {
+                id: order.id,
+                amount: order.amount,
+                currency: order.currency,
+                receipt: order.receipt
+            },
+            transactionId: transaction._id
+        });
+
+    } catch (error) {
+        console.error('Razorpay order creation error:', error.error || error);
+        res.status(500).json({
+            success: false,
+            message: error.error?.description || 'Payment initialization failed'
+        });
+    }
+};
+
+
+exports.verifyPayment = async (req, res) => {
+  const { razorpay_payment_id, razorpay_order_id, razorpay_signature, amount, transactionId } = req.body;
   try {
-    // Find user by userId
-    let user = await User.findById(userId);
+    const userId = req.session.user._id;
 
+    if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature || !amount || !transactionId) {
+      throw new Error('Missing required verification data');
+    }
+
+    // Verify signature
+    const generatedSignature = crypto
+      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+      .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+      .digest('hex');
+
+    if (generatedSignature !== razorpay_signature) {
+      throw new Error('Payment verification failed: Invalid signature');
+    }
+    
+    // Update transaction
+    const updatedTransaction = await Transaction.findByIdAndUpdate(
+      transactionId,
+      {
+        status: 'Success',
+        description: `Wallet top-up completed. Payment ID: ${razorpay_payment_id}`,
+        date: new Date()
+      },
+      { new: true }
+    );
+
+    if (!updatedTransaction) {
+      throw new Error('Transaction record not found');
+    }
+
+    const userObjectId = new mongoose.Types.ObjectId(userId);
+    // 3. Find user with proper ID type
+    const user = await User.findOne({ _id: userObjectId });
     if (!user) {
-      return res.status(404).send("User not found.");
+      throw new Error('User not found');
     }
 
-    // Add funds to the user's wallet
+    // Update user wallet
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { $inc: { wallet: parseFloat(amount) } },
+      { new: true }
+    );
 
-    user.wallet = Number(user.wallet) + Number(amount);
-    await user.save();
+    res.json({
+      success: true,
+      message: 'Payment verified and wallet updated',
+      walletBalance: updatedUser.wallet,
+      transaction: updatedTransaction
+    });
 
-    res.redirect("/wallet");  // Redirect after adding funds
   } catch (error) {
-    res.status(500).send("Server error.");
+    console.error('Payment verification error:', error);
+    
+    // Update transaction as failed if verification fails
+    if (transactionId) {
+      await Transaction.findByIdAndUpdate(transactionId, {
+        status: 'Failed',
+        description: `Payment verification failed: ${error.message}`,
+        date: new Date()
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Payment verification failed'
+    });
   }
 };
 
-// Withdraw funds from wallet
-const withdrawFunds = async (req, res) => {
-  const { amount } = req.body;
-  const userId = req.session.user._id;
-  // Ensure the amount is positive
-  if (amount <= 0) return res.status(400).send("Amount must be positive.");
 
+// walletController.js
+
+exports.createWithdrawalOrder = async (req, res) => {
   try {
-    // Find user by userId
-    let user = await User.findById(userId);
+    const { amount } = req.body; // in paise
+    const userId = req.session.user._id;
 
-    if (!user) return res.status(404).send("User not found.");
-
-    // Check if user has enough funds
-    if (user.wallet < amount) {
-      return res.status(400).send("Insufficient funds.");
+    // Validate amount (minimum ₹1 = 100 paise)
+    if (!amount || amount < 100) {
+      return res.status(400).json({
+        success: false,
+        message: 'Minimum withdrawal amount is ₹1 (100 paise)'
+      });
     }
 
-    // Withdraw funds from the user's wallet
-    user.wallet -= Number(amount);  // Ensure amount is treated as a number
-    await user.save();
+    // Check user balance
+    const user = await User.findById(userId);
+    if (user.wallet < (amount / 100)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Insufficient wallet balance'
+      });
+    }
 
-    res.redirect("/wallet");  // Redirect after withdrawal
+    // Create Razorpay order for withdrawal
+    const receiptId = `wdrw-${Date.now().toString().slice(-6)}`;
+    const order = await razorpay.orders.create({
+      amount: Math.round(amount),
+      currency: "INR",
+      receipt: receiptId,
+      payment_capture: 1,
+      notes: {
+        userId: userId.toString(),
+        purpose: "wallet_withdrawal"
+      }
+    });
+
+    // Create transaction record
+    const transaction = new Transaction({
+      userId:userId,
+      amount: amount / 100, // Store in rupees
+      transactionType: 'Debit',
+      status: 'pending',
+ 
+    
+      description: 'Withdrawal initialization'
+    });
+    await transaction.save();
+
+    res.json({
+      success: true,
+      order: {
+        id: order.id,
+        amount: order.amount,
+        currency: order.currency,
+        receipt: order.receipt
+      },
+      transactionId: transaction._id
+    });
+
   } catch (error) {
-    res.status(500).send("Server error.");
+    console.error('Withdrawal order error:', error);
+    res.status(500).json({
+      success: false,
+      message: error.error?.description || 'Withdrawal initialization failed'
+    });
   }
 };
 
-// Purchase with wallet funds
-const purchaseWithWallet = async (req, res) => {
-  const {  amount } = req.body;
+exports.verifyWithdrawal = async (req, res) => {
+  const { razorpay_payment_id, razorpay_order_id, razorpay_signature, amount, transactionId } = req.body;
   const userId = req.session.user._id;
-  // Ensure the amount is positive
-  if (amount <= 0) return res.status(400).send("Amount must be positive.");
-
   try {
-    // Find user by userId
-    let user = await User.findById(userId);
+   
 
-    if (!user) return res.status(404).send("User not found.");
+    // Verify signature
+    const generatedSignature = crypto
+      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+      .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+      .digest('hex');
 
-    // Check if user has enough funds
-    if (user.wallet < amount) {
-      return res.status(400).send("Insufficient funds.");
+    if (generatedSignature !== razorpay_signature) {
+      throw new Error('Withdrawal verification failed: Invalid signature');
     }
 
-    // Deduct the purchase amount from the user's wallet
-    user.wallet -= Number(amount);  // Ensure amount is treated as a number
-    await user.save();
+    // Update transaction
+    const transaction = await Transaction.findByIdAndUpdate(
+      transactionId,
+      {
+        status: 'Success',
+        razorpayPaymentId: razorpay_payment_id,
+        razorpaySignature: razorpay_signature,
+        description: 'Withdrawal completed'
+      },
+      { new: true }
+    );
 
-    res.redirect("/wallet");  // Redirect after purchase
+    // Deduct from wallet
+    await User.findByIdAndUpdate(
+      userId,
+      { $inc: { wallet: -parseFloat(amount) } }
+    );
+
+    res.json({
+      success: true,
+      message: 'Withdrawal verified and processed',
+      amount: amount
+    });
+
   } catch (error) {
-    res.status(500).send("Server error.");
+    console.error('Withdrawal verification error:', error);
+    
+    // Mark transaction as failed if verification fails
+    if (transactionId) {
+      await Transaction.findByIdAndUpdate(transactionId, {
+        status: 'Failed',
+        description: `Withdrawal failed: ${error.message}`
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Withdrawal verification failed'
+    });
   }
 };
 
-module.exports = {
-  addFunds,
-  withdrawFunds,
-  purchaseWithWallet
+exports.addPromoCode = async (req, res) => {
+  try {
+    const { promoCode } = req.body;
+    const code = promoCode?.toString().trim(); // Clean the promo code
+    console.log("Referral Code =", code);
+
+    // Find the coupon by its code
+    const validCoupon = await dCoupon.findOne({ code });
+
+    if (!validCoupon) {
+      return res.status(404).json({ success: false, message: "Invalid or expired promo code" });
+    }
+
+    if (validCoupon.isUsed) {
+      return res.status(400).json({ success: false, message: "This promo code has already been used" });
+    }
+
+    // Find the owner of the coupon
+    const userDetail = await User.findById(validCoupon.owner);
+
+    if (!userDetail) {
+      return res.status(404).json({ success: false, message: "User not found for this promo code" });
+    }
+
+    // Add discount to user's wallet
+    userDetail.wallet += validCoupon.discountAmount;
+    await userDetail.save();
+
+    // Mark the coupon as used
+    validCoupon.isUsed = true;
+    await validCoupon.save();
+
+    const transaction = new Transaction({
+      userId: userDetail._id,
+      amount: validCoupon.discountAmount,
+      transactionType: 'Credit',
+      status: 'Success',
+      description: `Wallet payment of ₹${validCoupon.discountAmount} for order placement`
+    });
+    await transaction.save();
+
+    return res.render('walletAmount',{
+      success: true,
+      message: `₹${validCoupon.discountAmount} added to ${userDetail.fullname}'s wallet`,
+      walletBalance: userDetail.wallet,
+    });
+
+  } catch (error) {
+    console.error("Error checking referral code:", error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
+  }
 };

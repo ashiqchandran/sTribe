@@ -1,12 +1,16 @@
 const User=require('../../models/userSchema')
 const Category=require("../../models/categorySchema")
 const Product=require("../../models/productSchema")
+const Order=require("../../models/orderSchema")
 const Cart = require("../../models/cartSchema")
-
+const Coupon =require("../../models/couponSchema");
+const ReferralCoupon =require("../../models/dcouponSchema");
+const Transaction = require("../../models/transactionSchema");
 const nodemailer=require("nodemailer")
 const bcrypt = require("bcrypt")
 const env =require("dotenv").config()
 const saltround = 10
+const { ObjectId } = require('mongodb');
 
 const loadHomePage = async (req, res) => {
     try {
@@ -42,12 +46,83 @@ const loadHomePage = async (req, res) => {
         }
         
 
+        const topProducts = await Order.aggregate([
+            {
+                $match: { status: 'delivered' } // Only consider delivered orders
+            },
+            {
+                $unwind: '$orderItems' // Flatten the orderItems array
+            },
+            {
+                $group: {
+                    _id: '$orderItems.product', // Group by product ID
+                    totalSold: { $sum: '$orderItems.quantity' },
+                    revenue: {
+                        $sum: {
+                            $multiply: ['$orderItems.quantity', '$orderItems.price']
+                        }
+                    }
+                }
+            },
+            {
+                $lookup: {
+                    from: 'products', // Join with Product collection
+                    localField: '_id',
+                    foreignField: '_id',
+                    as: 'productDetails'
+                }
+            },
+            {
+                $unwind: {
+                    path: '$productDetails',
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $lookup: {
+                    from: 'categories', // Join with Category collection
+                    localField: 'productDetails.category',
+                    foreignField: '_id',
+                    as: 'categoryDetails'
+                }
+            },
+            {
+                $unwind: {
+                    path: '$categoryDetails',
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $project: {
+                    productImg: {
+                        $cond: [
+                            { $gt: [{ $size: '$productDetails.productImage' }, 0] },
+                            { $arrayElemAt: ['$productDetails.productImage', 0] },
+                            '/images/default-product.jpg' // Fallback if no image
+                        ]
+                    },
+                    productName: '$productDetails.productName',
+                    categoryName: '$categoryDetails.name',
+                    brand: '$productDetails.brand',
+                    price: '$productDetails.salePrice',
+                    stock: '$productDetails.quantity',
+                    rprice:'$productDetails.regularPrice',
+                   
+                    totalSold: 1,
+                    revenue: 1
+                }
+            },
+            { $sort: { totalSold: -1 } }, // Sort by total sold
+            { $limit:4 } // Top 10 products
+        ]);
+    	// console.log("top selling = ",topProducts)
         // Render the home page and pass the user details, products, and top sellers to the view
         
         res.render('home', {
             user: userData,               // Passing the user details (if logged in)
             products: productData,        // Passing the latest products
-            topSeller: mostsellingProduct // Passing the most selling products
+            topSeller: mostsellingProduct, // Passing the most selling products
+            topProducts
         });
 
     } catch (error) {
@@ -170,7 +245,7 @@ const loadEnter = async (req, res) => {
 const loadRegister=async(req,res)=>{
 
     try{
-        const {fullname,email,phone,password}=req.body
+        const {fullname,email,phone,password,referralCode }=req.body
 
         const findUser = await User.findOne({email})
 
@@ -185,8 +260,8 @@ const loadRegister=async(req,res)=>{
             return res.json("email-error")
         }
         req.session.userotp=otp
-        req.session.userData={fullname,phone,email,password}        
-        console.log("otp send",otp)
+        req.session.userData={fullname,phone,email,password,referralCode}        
+        console.log("otp send org ",otp)
         res.render('verify')
        
         } catch(error) {
@@ -204,55 +279,124 @@ const securePassword=async(password)=>{
         
     }
 }
+
+
+const generateReferralCode = () => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let result = '';
+    for (let i = 0; i < 8; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+};
+
 const loadverifyotp = async (req, res) => {
     console.log("Verify OTP");
 
     try {
         const { otp } = req.body;
+        console.log("otp = ", otp);
 
         if (!otp) {
             return res.status(400).json({ success: false, message: "OTP is required" });
         }
 
+        // Validate OTP format and session
+        if (typeof req.session.userotp === 'undefined') {
+            return res.status(400).json({ success: false, message: "OTP expired or not generated" });
+        }
+
         const np = parseInt(otp);
-        console.log('OTP received');
+        if (isNaN(np)) {
+            return res.status(400).json({ success: false, message: "Invalid OTP format" });
+        }
 
-        if (np === req.session.userotp) {
-            const user = req.session.userData;
-            if (!user) {
-                return res.status(400).json({ success: false, message: "User data not found in session" });
-            }
-
-            const passwordHashed = await securePassword(user.password);
-
-            const saveUserData = new User({
-                fullname: user.fullname,
-                phone: user.phone,
-                email: user.email,
-                googleId: user.googleId ||  Math.floor(Math.random() * 100000),
-                password: passwordHashed,
-            });
-
-            await saveUserData.save();
-            req.session.user = saveUserData._id;
-            console.log("User data saved");
-
-            // Send response back to the client before rendering
-            return res.status(200).json({
-                success: true,
-                message: "User registered successfully",
-                redirectUrl: '/', // You can send a URL or just render the page on client-side
-            });
-        } else {
+        if (np !== req.session.userotp) {
             console.log("Wrong OTP");
             return res.status(400).json({ success: false, message: "Invalid OTP" });
         }
 
+        const user = req.session.userData;
+        if (!user) {
+            return res.status(400).json({ success: false, message: "User data not found in session" });
+        }
+
+        const passwordHashed = await securePassword(user.password);
+        const referralCode = generateReferralCode(); // Generate here to ensure freshness
+        console.log("New user's referralCode = ", referralCode);
+
+        let referrer = null;  // Initialize the referrer variable
+        
+        // Handle referral if exists (for referrer)
+        if (user.referralCode) { // Note: Fix spelling if your field is 'referralCode'
+            try {
+                const referrer = await User.findOne({ referralCode: user.referralCode });
+                if (referrer) {
+                    await User.updateOne(
+                        { referralCode: user.referralCode },
+                        { $inc: { referalPoint: 10 } }
+                    );
+                
+                    const refCode = generateReferralCode();
+                    const dcoupon = new ReferralCoupon({
+                        code: refCode,
+                        discountAmount: 50,
+                        owner: referrer._id
+                    });
+                    const refercode = await dcoupon.save();
+                
+                    // Ensure coupons array exists
+                    if (!Array.isArray(referrer.coupons)) {
+                        referrer.coupons = [];
+                    }
+                
+                    referrer.coupons.push(refercode._id);
+                    await referrer.save();
+                }
+                
+            } catch (error) {
+                console.error("Referral processing error:", error);
+                return res.status(400).json({ message: 'Invalid referral code' });
+                // Continue with registration even if referral fails
+            }
+        }
+        referrer = await User.findOne({ referralCode: user.referralCode });
+        // Create new user with their own referral code
+        const userData = {
+            fullname: user.fullname,
+            phone: user.phone,
+            email: user.email,
+            googleId: user.googleId || Math.floor(Math.random() * 100000),
+            password: passwordHashed,
+            referralCode: referralCode, // Always assign new referral code,
+            referredBy: referrer ? referrer._id : null // Set referrer if exists
+        };
+
+        const saveUserData = new User(userData);
+        await saveUserData.save();
+
+        // Update session and clean up
+        req.session.user = saveUserData._id;
+        delete req.session.userotp;
+        delete req.session.userData;
+
+        console.log("User registered successfully with referral code:", referralCode);
+        return res.status(200).json({
+            success: true,
+            message: "User registered successfully",
+            redirectUrl: '/'
+        });
+
     } catch (error) {
-        console.log("Error during OTP verification:", error);
-        return res.status(500).json({ success: false, message: "Internal Server Error" });
+        console.error("Error during OTP verification:", error);
+        return res.status(500).json({ 
+            success: false, 
+            message: "Internal Server Error",
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
     }
 };
+
 
 const loadresendotp = async (req, res) => {
     try {
@@ -319,6 +463,8 @@ const changePassword = async (req, res) => {
         return res.status(500).json({ success: false, message: "Internal Server Error, please try again" });
     }
 };
+
+
 
 const loadforgopasswordOtp = (req, res) => {
     // Renders the page where OTP is entered (ensure this page exists)
@@ -441,7 +587,6 @@ const getProductLoader = async (req, res) => {
         .sort({ createdOn: -1 }) // Sort by newest
         .limit(4); // Get only the latest 4
 
-         
 
         if (user) {
             const userData = await User.findById(user);
@@ -472,7 +617,10 @@ const loadShoppingPage = async (req, res) => {
     try {
         // Get user data if authenticated
         const user = req.session.user;
+        const categoryid =req.query.category?req.query.category:new ObjectId('67c547d22b720e19dfc14bf3')
+        
         const userData = user ? await User.findOne({ _id: user }) : null;
+        // const selectedCategory = user ? await User.findOne({ _id: user }) : null;
 
         // Pagination setup
         const page = parseInt(req.query.page) || 1;
@@ -496,7 +644,7 @@ const loadShoppingPage = async (req, res) => {
         query.salePrice = { $gte: priceFrom, $lte: priceTo }; // Apply price range filter
 
         // Get categories and ensure they're listed
-        const categories = await Category.find({ isListed: true });
+        const categories = await Category.find({ _id:categoryid});
         const categoryIds = categories.map(category => category._id);
         query.category = { $in: categoryIds };
 
@@ -560,21 +708,71 @@ const loadShoppingPage = async (req, res) => {
                 $project: {
                     _id: 1,
                     name: 1,
-                    productCount: { $size: '$products' }
+                    productCount: { $size: '$products' },
+                    categoryOffer:1
                 }
             }
         ]);
 
         // Fetch products with applied filters
-        const products = await Product.find(query)
-            .sort(sort)
-            .skip(skip)
-            .limit(limit);
-
+        const products = await Product.aggregate([
+            {
+                $match: query // Match products based on the provided query (filters like `isBlocked`, `quantity`, `salePrice`, etc.)
+            },
+            {
+                $lookup: {
+                    from: 'categories', // The collection name for Category (should be lowercase 'categories')
+                    localField: 'category', // The 'category' field in the Product schema (ObjectId)
+                    foreignField: '_id', // The '_id' field in the Category schema
+                    as: 'categoryDetails' // Alias for the resulting category data
+                }
+            },
+            {
+                $unwind: {
+                    path: '$categoryDetails', // Flatten the 'categoryDetails' array into an object
+                    preserveNullAndEmptyArrays: true // Ensure products without a category are still included
+                }
+            },
+            {
+                $project: {
+                    productName: 1, // Include product name
+                    description: 1, // Include product description
+                    category: 1, // Include category reference (ObjectId)
+                    categoryName: '$categoryDetails.name', // Include category name
+                    categoryDescription: '$categoryDetails.description', // Include category description
+                    categoryOffer: '$categoryDetails.categoryOffer', // Include category offer
+                    regularPrice: 1, // Include product regular price
+                    salePrice: 1, // Include sale price
+                    quantity: 1, // Include quantity
+                    size: 1, // Include size
+                    color: 1, // Include color
+                    productImage: 1, // Include product image
+                    isBlocked: 1, // Include blocked status
+                    brand: 1, // Include brand
+                    status: 1, // Include product status
+                    productOffer: 1, // Include product offer
+                    bestOffer: 1, // Include best offer
+                    ratings:1,
+                    createdAt: 1 // Include created date
+                }
+            },
+            {
+                $sort: sort // Sort products based on the selected sort order
+            },
+            {
+                $skip: skip // Skip the appropriate number of products for pagination
+            },
+            {
+                $limit: limit // Limit the number of products to the specified page size
+            }
+        ]);
+        
+        
+// console.log("products from the shop page =",products)
         // Get total products and pages
         const totalProducts = await Product.countDocuments(query);
         const totalPages = Math.ceil(totalProducts / limit);
-
+// console.log("cate with count = ",categoriesWithCounts)
         // Render the shop page with necessary data
         res.render("shop", {
             user: userData,
@@ -603,7 +801,7 @@ const filterProduct = async (req, res) => {
         const priceFrom = req.query["price-from"] || 1;  // Set default value for priceFrom
         const priceTo = req.query["price-to"] || 2000;  // Set default value for priceTo
 
-        console.log("Received Filters:", { category, priceFrom, priceTo }); // Debugging
+        // console.log("Received Filters:", { category, priceFrom, priceTo }); // Debugging
 
         const findCategory = category ? await Category.findOne({ _id: category }) : null;
         
@@ -620,10 +818,10 @@ const filterProduct = async (req, res) => {
             query.price = { $gte: Number(priceFrom), $lte: Number(priceTo) };
         }
 
-        console.log("Final Query to DB:", query); // Debugging
+        // console.log("Final Query to DB:", query); // Debugging
 
         let findProducts = await Product.find(query).lean();
-        console.log("Found Products:", findProducts); // Debugging
+        // console.log("Found Products:", findProducts); // Debugging
 
         findProducts.sort((a, b) => new Date(b.createdOn) - new Date(a.createdOn));
 
@@ -648,7 +846,7 @@ const filterProduct = async (req, res) => {
         if (user) {
             userData = await User.findOne({ _id: user });
         }
-
+       
         res.render("shop", {
             user: userData,
             products: currentProduct,
@@ -668,7 +866,9 @@ const filterProduct = async (req, res) => {
 
 const getRefferalPage=async(req,res)=>{
     try {
-        res.render("reffer")
+        const user=req.session.user
+        
+        res.render("reffer",{userDetails:user,user:user})
     } catch (error) {
         res.render('error')
     }
@@ -676,24 +876,70 @@ const getRefferalPage=async(req,res)=>{
 }
 const getWalletPage=async(req,res)=>{
     try {
-      
-            res.render("wallet")
+        const user = req.session.user;
+        const bal = await User.findOne({ _id: user._id });
+        
+        // Pagination settings
+        const page = parseInt(req.query.page) || 1;  // Get the page number from query params (default is page 1)
+        const limit = 10;  // Number of transactions per page
+        
+        // Fetch transactions with pagination
+        const transactions = await Transaction.find({userId:user._id    })
+        .sort({ date: -1 }) // Sort in reverse order based on 'createdAt' (most recent first)
+        .skip((page - 1) * limit) // Skip the transactions from previous pages
+        .limit(limit); // Limit the number of transactions per page
+    
+        // Count total transactions for pagination
+        const totalTransactions = await Transaction.countDocuments();
+
+        // Calculate total number of pages
+        const totalPages = Math.ceil(totalTransactions / limit);
+
+        // Send the data to the front-end, including pagination data
+        res.render("wallet", {
+            bal: bal.wallet,
+            transactions,  // Transaction data for the current page
+            user,
+            totalPages,    // Total number of pages
+            currentPage: page,  // Current page number
+        });
 
     } catch (error) {
-        res.render('error')
+        res.render('error');
     }
    
 }
-const getmycouponspage= async (req,res)=>{
+
+const getmycouponspage = async (req, res) => {
     try {
-        const user = req.session.user;
+        const { ObjectId } = require('mongodb'); // Import ObjectId
+        // Fetch coupons and referral coupons from the database
+        const coupons = await Coupon.find({});
+        const refCoupons = await ReferralCoupon.find({});
         
-        res.render("myCoupons",{user:user})
+        const user = req.session.user;  // Assume this comes from session
+        const userId = user._id;  
+        const userObjectId = new ObjectId(userId);
+
+        console.log("id = ",userObjectId)
+        // Now you can compare ObjectId with ObjectId
+if (userObjectId.equals(refCoupons[0].owner)) {
+    console.log('Match found!');
+  } else {
+    console.log('No match');
+  }
+        // Render the myCoupons page, passing the filtered referral coupons and the other data
+        res.render("myCoupons", { coupon: coupons, refCoupons: refCoupons, user: user,userId:userObjectId});
     } catch (error) {
-        res.render('error')
+        // Log the error for debugging purposes
+        console.error(error);
+        
+        // Render an error page and pass a custom error message to the view
+        res.render('error', { message: 'An error occurred while fetching your coupons. Please try again later.' });
     }
-   
 }
+
+
 
 module.exports = { 
     loadHomePage,

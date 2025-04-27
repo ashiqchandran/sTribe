@@ -17,6 +17,14 @@ const cartSchema = new Schema({
             type: Number,
             default: 1
         },
+        color:{
+            type: String,
+            default: 'blue'
+        },
+        size:{
+            type: String,
+            default: 'small'
+        },
         price:{
             type: Number,
             required: true

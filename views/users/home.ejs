@@ -9,7 +9,8 @@
             <div class="new-arrival">New Arrivals</div>
             <h1>Create your dream shop instantly.</h1>
             <p>Keep your everyday style chic and on-trend with our selection 20+ styles to choose from.</p>
-            <button class="btn">See Collection</button>
+            <button class="btn" onclick="window.location.href='/shop'">See Collection</button>
+
         </div>
         <div class="hero-image">
             <img src="/images/logo/b1.png" alt="Fashion model"  >
@@ -146,7 +147,7 @@
                         <div class="product-details">
                             <h6 class="productname"><%=products[i].productName%></h6>
                             <div class="price">
-                                <h6 class="pricecommon"> <span class="saleprice"> ₹MRP: <%=products[i].regularPrice%> </span>&nbsp&nbsp <span  class="reg_price">  ₹Price: <%=products[i].salePrice%></span></h6>
+                                <h6 class="pricecommon"> <span class="saleprice"> ₹MRP: <%=products[i].regularPrice %> </span>&nbsp&nbsp <span  class="reg_price">  ₹Price: <%= Math.floor(products[i].salePrice)  %></span></h6>
                                
                             </div>
                           </a>
@@ -188,32 +189,32 @@
             <div class="row">
                 <!-- single product -->
 
-                <%for(let i=0;i< topSeller.length; i++){%>
+                <%for(let i=0;i< topProducts.length; i++){%>
 
                     <div class="col-lg-3 col-md-6 itemBox">
                         <div class="single-product">
-                            <a class="hover-light" href="/productDetails?id=<%=products[i]._id%>">
-                            <img class="img-fluid" src="<%= topSeller[i].productImage[0] %>" alt="">
+                            <a class="hover-light" href="/productDetails?id=<%=topProducts[i]._id%>">
+                            <img class="img-fluid" src="<%= topProducts[i].productImg %>" alt="">
                             <div class="product-details">
-                                <h6 class="productname"><%=topSeller[i].productName%></h6>
+                                <h6 class="productname"><%=topProducts[i].productName%></h6>
                                 <div class="price">
                                    
                                
-                                    <h6 class="pricecommon"> <span class="saleprice"> ₹MRP:  <%=topSeller[i].salePrice%>.00</span>&nbsp&nbsp <span  class="reg_price">  ₹Price:<%=topSeller[i].regularPrice%>.00</span></h6>
+                                    <h6 class="pricecommon"> <span class="saleprice"> ₹MRP:  <%=topProducts[i].rprice%>.00</span>&nbsp&nbsp <span  class="reg_price">  ₹Price:<%=Math.floor(topProducts[i].price)%>.00</span></h6>
                                
                                 </div>
                               </a>
                                 <div class="prd-bottom">
 
-                                    <a href="#" onclick="addToCart('<%=products[i]._id%>')" class="social-info">
+                                    <a href="#" onclick="addToCart('<%=topProducts[i]._id%>')" class="social-info">
                                         <span class="ti-bag"></span>
                                         <p class="hover-text">add to cart &#128722</p>
                                     </a>
-                                    <a href="#" onclick="addToWishlist('<%=products[i]._id%>')" class="social-info">
+                                    <a href="#" onclick="addToWishlist('<%=topProducts[i]._id%>')" class="social-info">
                                         <span class="lnr lnr-heart"></span>
                                         <p class="hover-text">Wishlist</p>
                                     </a>
-                                    <a href="/productDetails?id=<%=products[i]._id%>" class="social-info">
+                                    <a href="/productDetails?id=<%=topProducts[i]._id%>" class="social-info">
                                         <span class="lnr lnr-move"></span>
                                         <button class="hover-text view-btn">view more</button>
                                     </a>

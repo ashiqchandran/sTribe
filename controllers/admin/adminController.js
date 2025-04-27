@@ -1,7 +1,11 @@
 const User =require("../../models/userSchema")
 const mongoose =require("mongoose");
 const bcrypt=require("bcrypt");
-
+const Order = require('../../models/orderSchema');
+const Product = require('../../models/productSchema');
+const Category = require('../../models/categorySchema');
+const moment = require('moment');
+const Chart = require('chart.js'); // For charting
 
 const adminLogin = (req,res)=>{    
   try {
@@ -42,7 +46,7 @@ const adminsignin = async (req, res) => {
                 console.log("Admin logged in");
                 console.log("Admin name: ", user.fullname); // Log to check the admin's name
                 req.session.admin = user._id;
-                res.render('dashboard', { adminName: user.fullname });
+return res.redirect("/admin/dashboard")                
                 // Correct rendering path
             } else {
                 console.log("User is not an admin");
@@ -60,20 +64,319 @@ const adminsignin = async (req, res) => {
 };
 
 
-
-
-
-const adminDashboard=(req,res)=>{
-    if(req.session.admin)
-    {
-        try {
-            res.render("dashboard",) // no need to pass here admin name just for login (get) if admiin is already logged in
-        } catch (error) {
-            console.log("dashboard error")
-        }
-    }
+const adminDashboard = async (req, res) => {
+    try {
     
-}
+        let { startDate, endDate ,period} = req.body;
+
+// Convert them to Date objects
+startDate =  new Date(startDate) ;
+endDate = new Date(endDate);
+
+        
+        console.log('startDate =',startDate)
+        console.log("endDate",endDate)
+        console.log("time period = ",period)
+        const totalOrders = await Order.countDocuments() || 0;
+        const productSold = await Order.countDocuments({ status: 'delivered' }) || 0;
+
+        const revenueResult = await Order.aggregate([
+            { $match: { status: 'delivered' } },
+            { $group: { _id: null, totalRevenue: { $sum: '$finalAmount' } } }
+        ]);
+        const totalRevenue = revenueResult.length > 0 ? revenueResult[0].totalRevenue : 0;
+        const totalUsers = await User.countDocuments() || 0;
+
+        const topProducts = await Order.aggregate([
+            {
+                $match: { status: 'delivered' } // Only consider delivered orders
+            },
+            {
+                $unwind: '$orderItems' // Flatten the orderItems array
+            },
+            {
+                $group: {
+                    _id: '$orderItems.product', // Group by product ID
+                    totalSold: { $sum: '$orderItems.quantity' },
+                    revenue: {
+                        $sum: {
+                            $multiply: ['$orderItems.quantity', '$orderItems.price']
+                        }
+                    }
+                }
+            },
+            {
+                $lookup: {
+                    from: 'products', // Join with Product collection
+                    localField: '_id',
+                    foreignField: '_id',
+                    as: 'productDetails'
+                }
+            },
+            {
+                $unwind: {
+                    path: '$productDetails',
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $lookup: {
+                    from: 'categories', // Join with Category collection
+                    localField: 'productDetails.category',
+                    foreignField: '_id',
+                    as: 'categoryDetails'
+                }
+            },
+            {
+                $unwind: {
+                    path: '$categoryDetails',
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $project: {
+                    productImg: {
+                        $cond: [
+                            { $gt: [{ $size: '$productDetails.productImage' }, 0] },
+                            { $arrayElemAt: ['$productDetails.productImage', 0] },
+                            '/images/default-product.jpg' // Fallback if no image
+                        ]
+                    },
+                    productName: '$productDetails.productName',
+                    categoryName: '$categoryDetails.name',
+                    brand: '$productDetails.brand',
+                    price: '$productDetails.salePrice',
+                    stock: '$productDetails.quantity',
+                    totalSold: 1,
+                    revenue: 1
+                }
+            },
+            { $sort: { totalSold: -1 } }, // Sort by total sold
+            { $limit: 10 } // Top 10 products
+        ]);
+        
+        console.log("product details : ",topProducts)
+
+        const categorySales = await Order.aggregate([
+            { $match: { status: 'delivered' } },
+            { $unwind: '$orderItems' },
+            {
+                $lookup: {
+                    from: 'products',
+                    localField: 'orderItems.product',
+                    foreignField: '_id',
+                    as: 'productDetails'
+                }
+            },
+            { $unwind: { path: '$productDetails', preserveNullAndEmptyArrays: true } },
+            {
+                $lookup: {
+                    from: 'categories',
+                    localField: 'productDetails.category',
+                    foreignField: '_id',
+                    as: 'categoryDetails'
+                }
+            },
+            { $unwind: { path: '$categoryDetails', preserveNullAndEmptyArrays: true } },
+            {
+                $group: {
+                    _id: '$categoryDetails._id',
+                    categoryName: { $first: '$categoryDetails.name' },
+                    totalSold: { $sum: '$orderItems.quantity' },
+                    revenue: { $sum: { $multiply: ['$orderItems.quantity', '$orderItems.price'] } }
+                }
+            },
+            { $sort: { revenue: -1 } }
+        ]) || [];
+
+        
+        const brandSales = await Order.aggregate([
+            { $match: { status: 'delivered' } },
+            { $unwind: '$orderItems' },
+            {
+                $lookup: {
+                    from: 'products',
+                    localField: 'orderItems.product',
+                    foreignField: '_id',
+                    as: 'productDetails'
+                }
+            },
+            { $unwind: { path: '$productDetails', preserveNullAndEmptyArrays: true } },
+            {
+                $group: {
+                    _id: '$productDetails.brand',
+                    brand: { $first: '$productDetails.brand' },
+                    totalSold: { $sum: '$orderItems.quantity' },
+                    revenue: { $sum: { $multiply: ['$orderItems.quantity', '$orderItems.price'] } }
+                }
+            },
+            { $sort: { revenue: -1 } }
+        ]) || [];
+
+        console.log("category items :",categorySales)
+
+
+            const revenueData = {
+                day: await Order.aggregate([
+                    { $match: { status: 'delivered' } },
+                    {
+                        $group: {
+                            _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdOn' } },
+                            revenue: { $sum: '$finalAmount' }
+                        }
+                    },
+                    { $sort: { '_id': -1 } },
+                    { $limit: 30 }
+                ]).then(result => ({
+                    labels: result.map(r => r._id).reverse(),
+                    revenues: result.map(r => r.revenue).reverse()
+                })),
+                month: await Order.aggregate([
+                    { $match: { status: 'delivered' } },
+                    {
+                        $group: {
+                            _id: { $dateToString: { format: '%Y-%m', date: '$createdOn' } },
+                            revenue: { $sum: '$finalAmount' }
+                        }
+                    },
+                    { $sort: { '_id': -1 } },
+                    { $limit: 12 }
+                ]).then(result => ({
+                    labels: result.map(r => r._id).reverse(),
+                    revenues: result.map(r => r.revenue).reverse()
+                })),
+                year: await Order.aggregate([
+                    { $match: { status: 'delivered' } },
+                    {
+                        $group: {
+                            _id: { $year: '$createdOn' },
+                            revenue: { $sum: '$finalAmount' }
+                        }
+                    },
+                    { $sort: { '_id': -1 } },
+                    { $limit: 5 }
+                ]).then(result => ({
+                    labels: result.map(r => r._id.toString()).reverse(),
+                    revenues: result.map(r => r.revenue).reverse()
+                }))
+            };
+
+         // 4. Time-based Sales Data (for charts)
+         const getSalesData = async (timePeriod) => {
+            let groupBy = {};
+            let limit = 0;
+            
+            switch(timePeriod) {
+                case 'day':
+                    groupBy = { $dateToString: { format: '%Y-%m-%d', date: '$createdOn' } };
+                    limit = 30;
+                    break;
+                case 'week':
+                    groupBy = { $week: '$createdOn' };
+                    limit = 12;
+                    break;
+                case 'month':
+                    groupBy = { $dateToString: { format: '%Y-%m', date: '$createdOn' } };
+                    limit = 12;
+                    break;
+                case 'year':
+                    groupBy = { $year: '$createdOn' };
+                    limit = 5;
+                    break;
+            }
+            
+            return await Order.aggregate([
+                { $match: { status: 'delivered' } },
+                {
+                    $group: {
+                        _id: groupBy,
+                        revenue: { $sum: '$finalAmount' },
+                        orderCount: { $sum: 1 }
+                    }
+                },
+                { $sort: { '_id': 1 } },
+                { $limit: limit }
+            ]);
+        };
+
+
+  
+        const salesData = {
+            day: await getSalesData('day'),
+            week: await getSalesData('week'),
+            month: await getSalesData('month'),
+            year: await getSalesData('year')
+        };
+        
+        
+      
+
+        // 6. NEW: Comprehensive Sales Report with Date Filter
+        const parsedStartDate = startDate;
+
+        const salesReport = await Order.aggregate([
+            {
+                $match: {
+                    createdOn: { $gte: parsedStartDate },
+                    status: "delivered"
+                }
+            },
+            { $unwind: "$orderItems" },
+            {
+                $group: {
+                    _id: null,
+                    totalrevenue: { $sum: "$orderItems.price" }
+                }
+            },
+            { $addFields: { defaultRevenue: 0 } }
+        ]);
+        
+        const salesitems = await Order.aggregate([
+            {
+                $match: {
+                    createdOn: { $gte: startDate },
+                    status: "delivered"
+                }
+            },
+            { $unwind: "$orderItems" }
+        ]);
+        
+  
+console.log('Sales report:', salesReport);
+  console.log('Sales item:', salesitems);
+console.log("salesData = ",salesData)
+
+        res.render('dashboard', {
+            totalOrders,
+            totalRevenue,
+            totalUsers,
+            topProducts,
+            categorySales,
+            brandSales,
+            productSold,
+            revenueData,
+            salesData,
+            salesReport,
+            salesitems
+            
+        });
+    } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+        res.status(500).render('admins/dashboard', {
+            totalOrders: 0,
+            totalRevenue: 0,
+            totalUsers: 0,
+            productSold:0,
+            topProducts: [],
+            categorySales: [],
+            brandSales: [],
+            revenueData: { day: { labels: [], revenues: [] }, month: { labels: [], revenues: [] }, year: { labels: [], revenues: [] } },
+            error: 'Failed to load dashboard data'
+        });
+    }
+};
+
+
 
 const adminLogout=async(req,res)=>{
     try{

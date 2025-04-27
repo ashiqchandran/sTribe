@@ -2,6 +2,7 @@ const User = require("../../models/userSchema");
 const Product = require("../../models/productSchema");
 const Cart = require("../../models/cartSchema");
 const Address=require("../../models/addressSchema")
+const Coupon=require("../../models/couponSchema")
 const Category = require("../../models/categorySchema")
 const { ObjectId } = require('mongodb');  // Ensure ObjectId is imported
 const mongoose = require('mongoose');
@@ -21,17 +22,14 @@ const removeBlockedOrUnlistedItems = async (user) => {
 
 const getCartPage = async (req, res) => {
   try {
-    const user = req.session.user; // Entire user object
-    console.log("User object from session:", user);
+    const user = req.session.user;
 
     if (!user || !user._id) {
       console.error("User ID not found in session");
       return res.status(400).send("User not logged in");
     }
 
-    const userId = user._id.toString(); // Extract and convert _id to string
-    console.log("Extracted User ID:", userId);
-
+    const userId = user._id.toString();
     if (!ObjectId.isValid(userId)) {
       console.error("Invalid userId:", userId);
       return res.status(400).send("Invalid User ID");
@@ -67,7 +65,20 @@ const getCartPage = async (req, res) => {
       {
         $project: {
           _id: 0,
-          product: "$productDetails",
+          product: {
+            $mergeObjects: [
+              "$productDetails",
+              {
+                category: {
+                  $mergeObjects: [
+                    "$categoryDetails",
+                    { offer: "$categoryDetails.offer" }
+                  ]
+                }
+              }
+            ]
+          },
+       
           quantity: "$items.quantity",
           totalPrice: { $multiply: ["$items.quantity", "$productDetails.salePrice"] }
         }
@@ -75,89 +86,124 @@ const getCartPage = async (req, res) => {
       {
         $group: {
           _id: null,
-          cartItems: { $push: { product: "$product", quantity: "$quantity", totalPrice: "$totalPrice" } },
+          cartItems: {
+            $push: {
+              product: "$product",
+              quantity: "$quantity",
+              totalPrice: "$totalPrice"
+            }
+          },
           grandTotal: { $sum: "$totalPrice" }
         }
       }
     ]);
 
-    console.log("Aggregated cart data:", cart);
-
+    // Empty cart case
     if (!cart || cart.length === 0 || !cart[0].cartItems || cart[0].cartItems.length === 0) {
-      console.log("Cart is empty");
       return res.render("cart", {
         cartItems: [],
         subtotal: 0,
-        shipping: 100,
-        grandTotal: 100,
+        shipping: 0,
+        preSubtotal: 0,
+        grandTotal: 0,
         user: req.session.user
       });
     }
 
-const { cartItems, grandTotal } = cart[0];
+    // When items exist
+    const { cartItems } = cart[0];
 
-    const subtotal = cartItems.reduce((acc, item) => acc + item.totalPrice, 0);
-    const shipping = subtotal >= 5000 ? 0 : 100;
+    let preSubtotal = cartItems.reduce((acc, item) => {
+   
+      return acc + Math.floor(item.product.salePrice * item.quantity);
+    }, 0);
+
+    const shipping = preSubtotal >= 5000 ? 0 : 100;
+    const subtotal = preSubtotal + shipping;
 
     res.render("cart", {
       cartItems,
       subtotal,
       shipping,
-      grandTotal: subtotal + shipping,
+      preSubtotal,
+      grandTotal: subtotal,
       user: req.session.user
     });
 
   } catch (error) {
     console.error("Error in getCartPage:", error);
-    res.status(500).send("An error occurred while loading the cart");
+    res.render("cartdup"); // Optional: show error page
   }
 };
-
 
 
 
 const addToCart = async (req, res) => {
   try {
       const userId = req.session.user;
-      if (!userId) return res.status(401).json({ success: false, message: "Please log in to add items to the cart" });
+      if (!userId) {
+          return res.status(401).json({ success: false, message: "Please log in to add items to the cart" });
+      }
 
       const productId = req.query.id;
       const quantity = parseInt(req.query.quantity) || 1;
-      const product = await Product.findById(productId); // check for valid product (rare case if not present then it will not show in UI)
-      if (!product) return res.status(404).json({ success: false, message: "Product not found" });
+      const product = await Product.findById(productId); // Fetch the product
 
-      let cart = await Cart.findOne({ userId }); // check if the user already has a cart
+      if (!product) {
+          return res.status(404).json({ success: false, message: "Product not found" });
+      }
+
+      // Check if the product is available
+      if (product.quantity <= 0 || product.status === 'out of stock' || product.status === 'discontinued') {
+          return res.status(400).json({ success: false, message: "Product is not available" });
+      }
+
+      if (product.quantity < quantity) {
+        return res.status(400).json({ success: false, message:"no items" });
+    }
+
+      let cart = await Cart.findOne({ userId }); // Find existing cart for user
 
       if (!cart) {
-          cart = new Cart({ userId, items: [] }); // if not present, create a new cart
+          cart = new Cart({ userId, items: [] }); // Create new cart if none exists
       }
 
       const itemIndex = cart.items.findIndex((item) => item.productId.equals(productId));
       const productPrice = Number(product.salePrice) || 0;
 
-      // Assuming shipping cost is a fixed value or dynamically calculated.
-      const shippingCost = 10; // Use a fixed value or calculate dynamically based on certain factors
+      // Assuming shipping cost is a fixed value or dynamically calculated
+      const shippingCost = 10; // You can adjust this or make it dynamic
 
-      if (itemIndex > -1) {  // Item is already in the cart, just update the quantity
+      if (itemIndex > -1) { // If the item is already in the cart, update quantity
           cart.items[itemIndex].quantity += quantity;
           cart.items[itemIndex].totalPrice = cart.items[itemIndex].quantity * cart.items[itemIndex].price + shippingCost;
-      } else {
-          // New item, add it to the cart
-          cart.items.push({
-              productId,
-              quantity: quantity,
-              price: productPrice,
-              totalPrice: quantity * productPrice + shippingCost,
-              shipping: shippingCost, // Use numeric shipping value
-              status: "placed",
-              cancellationReason: "none"
-          });
+      } else { // If it's a new item, add it to the cart
+          if (product.quantity > 0) {
+              cart.items.push({
+                  productId,
+                  quantity,
+                  price: productPrice,
+                  totalPrice: quantity * productPrice + shippingCost,
+                  shipping: shippingCost, // Numeric shipping value
+                  status: "placed",
+                  cancellationReason: "none"
+              });
+          } else {
+              return res.status(404).send("Product is out of stock");
+          }
       }
 
-      // Recalculate cart's total price if needed
+      // Recalculate total cart price
       cart.cartTotal = cart.items.reduce((total, item) => total + item.totalPrice, 0);
 
-      await cart.save();
+      let currentCartQuantity = cart.items.find(item => item.productId == productId)?.quantity || 0;
+      if (currentCartQuantity  > product.quantity) {
+        return res.render('page-404')
+      }
+      // Save the product's updated stock
+      await product.save();
+
+      await cart.save(); // Save the updated cart
 
       res.json({ success: true, message: "Product added to cart" });
 
@@ -168,11 +214,41 @@ const addToCart = async (req, res) => {
 };
 
 
+
+const updateCartItem = async (req, res) => {
+  const { productId, quantity } = req.body;
+
+  // Assuming you have a Cart model and user is logged in
+  const userId = req.session.user._id;  // Get the user ID (assuming you're using sessions or JWT)
+  console.log("user id session = ", userId);
+  console.log("product id = ", productId);
+
+  try {
+      // Find the cart for the user and update the quantity
+      const updatedCart = await Cart.findOneAndUpdate(
+          { userId: userId, "items.productId": productId },  // Find the cart item
+          { $set: { "items.$.quantity": quantity } },       // Update the quantity
+          { new: true }  // Return the updated document
+      );
+
+      // Check if the cart was updated
+      if (!updatedCart) {
+          return res.status(404).json({ success: false, message: 'Cart item not found.' });
+      }
+
+      // Send the updated cart back in the response
+      res.json({ success: true, cart: updatedCart });
+  } catch (err) {
+      console.error("Error updating cart: ", err);
+      res.status(500).json({ success: false, message: 'Failed to update cart.' });
+  }
+};
+
 const loadCheckoutPage = async (req, res) => {
   try {
-    
     const userId = req.session.user;
-
+  
+  
     // Ensure userId exists before proceeding
     if (!userId) {
       return res.status(400).send('User not logged in');
@@ -231,7 +307,8 @@ const loadCheckoutPage = async (req, res) => {
           quantity: "$items.quantity",  // Corrected reference to quantity
           totalPrice: {
             $multiply: ["$items.quantity", "$productDetails.salePrice"]  // Corrected reference to quantity
-          }
+          },
+          categoryOffer: "$categoryDetails.categoryOffer"  // Include the category offer
         }
       },
       {
@@ -241,14 +318,16 @@ const loadCheckoutPage = async (req, res) => {
             $push: {  // Push each cart item into an array
               product: "$product", 
               quantity: "$quantity", 
-              totalPrice: "$totalPrice"
+              totalPrice: "$totalPrice",
+              categoryOffer: "$categoryOffer"  // Include the category offer for each product
             } 
           },
           grandTotal: { $sum: "$totalPrice" }  // Calculate the grand total
         }
       }
-    ])
-    console.log("aggrigate is working")
+    ]);
+
+    console.log("Aggregation is working");
 
     // If no cart found or the cartItems array is empty, handle it gracefully
     if (!cart || cart.length === 0 || !cart[0].cartItems || cart[0].cartItems.length === 0) {
@@ -259,19 +338,42 @@ const loadCheckoutPage = async (req, res) => {
     const { cartItems, grandTotal } = cart[0];
 
     // Calculate the subtotal (sum of totalPrice of all items)
-    const subtotal = cartItems.reduce((acc, item) => acc + item.totalPrice, 0);
+    let subtotal = cartItems.reduce((acc, item) => acc + item.totalPrice, 0);
+
+    // Apply category offer to the subtotal (if an offer exists)
+    let preSubtotal = subtotal;
+    // cartItems.forEach(item => {
+    //   if (item.categoryOffer > 0) {
+    //     preSubtotal -= (preSubtotal * item.categoryOffer) / 100;  // Apply discount percentage to the subtotal
+    //   }
+    // });
 
     // Define shipping cost: free shipping for orders over ₹5000, ₹100 for orders below
-    const shipping = subtotal >= 5000 ? 0 : 100;
+    const shipping = preSubtotal >= 5000 ? 0 : 100;
+    subtotal = preSubtotal + shipping;  // Add shipping to the final subtotal
 
     // Get address data
     const addressData = await Address.findOne({ userId: userId });
-
+const user=await User.findOne({_id:userId})
     // If address is not found, you could handle this case too
     if (!addressData) {
-      return res.status(400).send("Address not found");
+      user.address= {
+        name: "John Doe",
+        phone: "+1 9876543210",
+        addressLine1: "123 Main Street",
+        addressLine2: "Apt 4B",
+        city: "New York",
+        state: "NY",
+        postalCode: "10001",
+        country: "USA",
+        isDefault: true
+      };
+      
     }
 
+    const allCoupons = await Coupon.find({ isList: true });
+    console.log("allCoupons = ", allCoupons);
+    const coupon = await Coupon.find({});
 
     // Render the checkout page with the populated cart items, subtotal, shipping, and grand total
     res.render("checkout", {
@@ -280,16 +382,18 @@ const loadCheckoutPage = async (req, res) => {
       subtotal,      // Pass subtotal to the view
       shipping,      // Pass shipping to the view
       grandTotal,
+      preSubtotal,
       userAddress: addressData,  // Pass user address
+      couponDetails: coupon,
+      allCoupons: allCoupons,
     
     });
+
   } catch (error) {
     console.error('Error in loadCheckoutPage:', error);
     res.redirect("/pageNotFound");
   }
 };
-
-
 
 
 const changeQuantity = async (req, res) => {
@@ -375,10 +479,43 @@ const removeCartItem = async (req, res) => {
   }
 }
 
+const applyCoupon=async(req,res)=>{
+  const { couponCode } = req.body;
+
+  if (!couponCode) {
+      return res.status(400).json({ success: false, message: 'Coupon code is required' });
+  }
+
+
+  const coupon =await Coupon.findOne({name:couponCode});
+
+  if (!coupon) {
+      return res.status(400).json({ success: false, message: 'Invalid coupon code' });
+  }
+
+  // Validate if the coupon can be applied based on minimum price
+  // const subtotal = req.body.subtotal; // Subtotal sent from the client
+  // console.log("sub total = ",subtotal)
+  // if (subtotal < coupon.offerPrice) {
+  //     return res.status(400).json({
+  //         success: false,
+  //         message: `Coupon cannot be applied. Minimum purchase is ₹ ${coupon.minimumPrice}.`
+  //     });
+  // }
+console.log("minimumprice = ",coupon.offerPrice)
+//   // Return the discount amount and the minimum price for the coupon
+  return res.json({
+      success: true,
+      
+      minimumPrice: coupon.offerPrice,
+  });
+}
 module.exports = {
   getCartPage,
   addToCart,
   changeQuantity,
   removeCartItem,
-  loadCheckoutPage
+  loadCheckoutPage,
+  updateCartItem,
+  applyCoupon
 };

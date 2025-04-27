@@ -1,1 +1,1092 @@
-<%- include("../../views/partials/admin/header", { adminName: adminName }) %>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Commerce Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.0.2/dist/chart.min.js"></script>
+
+    <style>
+        /* Variables */
+:root {
+  --primary: #4361ee;
+  --secondary: #3a0ca3;
+  --light: #f8f9fa;
+  --dark: #212529;
+  --gray: #6c757d;
+  --sidebar-bg: #343a40;
+  --sidebar-text: #fff;
+  --sidebar-hover: #495057;
+  --white: #ffffff;
+  --black: #212529;
+  --success: #28a745;
+  --danger: #dc3545;
+  --warning: #ffc107;
+  --info: #17a2b8;
+}
+
+/* Base Styles */
+body {
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: var(--light);
+  color: var(--dark);
+}
+
+/* Dashboard Layout */
+.dashboard {
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Sidebar Styles */
+.sidebar {
+  
+  background-color: #333;
+  color: var(--sidebar-text);
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1000;
+}
+
+.sidebar-header {
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: var(--white);
+}
+
+.sidebar-toggle {
+  display: none;
+  background: transparent;
+  border: none;
+  color: var(--white);
+  padding: 15px 20px;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.sidebar-toggle:hover {
+  background-color: var(--sidebar-hover);
+}
+
+.sidebar-toggle i {
+  margin-right: 10px;
+}
+
+.sidebar-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  padding: 10px;
+  
+}
+
+.sidebar-menu li {
+  margin: 0;
+  margin-top: 10px;
+  
+}
+
+.sidebar-menu li a {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  color: var(--sidebar-text);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.sidebar-menu li a:hover,
+.sidebar-menu li a.active {
+  background-color: var(--sidebar-hover);
+}
+
+.sidebar-menu li a i {
+  margin-right: 10px;
+  width: 20px;
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+/* Main Content Styles */
+.main-content {
+  flex: 1;
+  padding: 20px;
+  background-color: var(--white);
+  margin-left: 250px;
+  transition: all 0.3s ease;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.header h2 {
+  color: var(--black);
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+/* Metrics Grid */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.metric-card {
+  background-color: var(--white);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  transition: all 0.3s ease;
+}
+
+.metric-card:hover {
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  transform: translateY(-3px);
+}
+
+.metric-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.metric-title {
+  font-size: 0.9rem;
+  color: var(--gray);
+  font-weight: 500;
+}
+
+.metric-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white);
+  font-size: 1.2rem;
+}
+
+.metric-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 5px;
+  color: var(--black);
+}
+
+.metric-change {
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+}
+
+.metric-change.positive {
+  color: var(--success);
+}
+
+.metric-change.negative {
+  color: var(--danger);
+}
+
+/* Charts Section */
+.charts-section {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.chart-card {
+  background-color: var(--white);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.chart-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--black);
+  margin: 0;
+}
+
+.chart-period {
+  display: flex;
+  gap: 10px;
+}
+
+.period-btn {
+  padding: 5px 15px;
+  border-radius: 20px;
+  background-color: rgba(23, 162, 184, 0.3);
+  color: var(--black);
+  border: none;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.period-btn:hover,
+.period-btn.active {
+  background-color: var(--info);
+  color: var(--white);
+}
+
+.chart-container {
+  height: 300px;
+  position: relative;
+}
+
+/* Products Section */
+.products-section {
+  background-color: var(--white);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.section-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--black);
+  margin: 0;
+}
+
+.view-toggle {
+  display: flex;
+  gap: 10px;
+}
+
+.toggle-btn {
+  padding: 5px 15px;
+  border-radius: 20px;
+  background-color: rgba(67, 97, 238, 0.4);
+  color: var(--black);
+  border: none;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.toggle-btn:hover,
+.toggle-btn.active {
+  background-color: var(--primary);
+  color: var(--white);
+}
+
+/* Tables */
+.products-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.products-table th {
+  text-align: left;
+  padding: 12px 15px;
+  background-color: rgba(67, 97, 238, 0.45);
+  color: var(--primary);
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.products-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  font-size: 0.9rem;
+}
+
+.product-info {
+  display: flex;
+  align-items: center;
+}
+
+.product-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 5px;
+  margin-right: 10px;
+  object-fit: cover;
+}
+
+.stock-status {
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.stock-status.in-stock {
+  background-color: rgba(40, 167, 69, 0.45);
+  color: var(--success);
+}
+
+.stock-status.low-stock {
+  background-color: rgba(255, 193, 7, 0.35);
+  color: #d39e00;
+}
+
+.stock-status.out-of-stock {
+  background-color: rgba(220, 53, 69, 0.4);
+  color: var(--danger);
+}
+
+/* Responsive Styles */
+@media (max-width: 1200px) {
+  .dashboard {
+    flex-direction: column;
+  }
+  
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .sidebar-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .sidebar-menu {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+  
+  .sidebar-menu.show {
+    max-height: 500px;
+  }
+  
+  .sidebar-menu li a {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+  
+  .sidebar-menu li a i {
+    font-size: 1rem;
+  }
+  
+  .main-content {
+    margin-left: 0;
+    margin-top: 60px;
+    padding: 15px;
+  }
+  
+  .metric-value {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 992px) {
+  .charts-section {
+    grid-template-columns: 1fr;
+  }
+  
+  .metric-card {
+    padding: 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  .metrics-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .period-btn {
+    padding: 5px 8px;
+    font-size: 0.8rem;
+  }
+  
+  .chart-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .chart-period {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .products-table th,
+  .products-table td {
+    padding: 8px 10px;
+    font-size: 0.8rem;
+  }
+  
+  .product-img {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+@media (max-width: 576px) {
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+  
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .view-toggle {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .toggle-btn {
+    padding: 5px 10px;
+    font-size: 0.7rem;
+    flex: 1;
+    text-align: center;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-in;
+}
+
+/* Utility Classes */
+.text-success {
+  color: var(--success);
+}
+
+.text-danger {
+  color: var(--danger);
+}
+    </style>
+</head>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+<body>
+    <div class="dashboard">
+        <div class="sidebar" style="width: 15vw;">
+     
+            <ul class="sidebar-menu">
+                <li><a href="/admin/dashboard"><i class="fas fa-tachometer-alt " class="active"></i> <span>Dashboard</span></a></li>
+                <li><a href="/admin/users"><i class="fas fa-users"></i> <span>Customers</span></a></li>
+                <li><a href="/admin/category"><i class="fas fa-list"></i> <span>Categories</span></a></li>
+                <li><a href="/admin/orders"><i class="fas fa-shopping-bag"></i> <span>Orders</span></a></li>
+                <li><a href="/admin/products"><i class="fas fa-plus-circle"></i> <span>Add Products</span></a></li>
+                <li><a href="/admin/allProducts"><i class="fas fa-box"></i> <span>Products</span></a></li>
+                <li><a href="/admin/coupon"><i class="fas fa-tags"></i> <span>Coupons</span></a></li>
+                <li><a href="/admin/transaction"><i class="fas fa-money-bill-wave"></i> <span>Transactions</span></a></li>
+                <li><a href="/admin/complaints"><i class="fas fa-exclamation-circle"></i> <span>Complaints</span></a></li>
+                <li><a href="/admin/report"><i class="fas fa-chart-bar"></i> <span>Report</span></a></li>
+            </ul>
+          </div>
+        <!-- Main Content -->
+        <div class="main-content"style="margin-left:5vw"  >
+            <div class="header">
+                <h2>Dashboard Overview</h2>
+                
+            </div>
+
+            <!-- Metrics Grid -->
+            <div class="metrics-grid">
+                <div class="metric-card" >
+                    <div class="metric-header">
+                        <span class="metric-title">Total Revenue</span>
+                        <div class="metric-icon" style="background-color: #4285f4;">
+                            <span style="font-weight: bold;">₹</span>
+
+                        </div>
+                    </div>
+                    <div class="metric-value">  <% if (salesReport && salesReport[0] && salesReport[0].totalrevenue !== undefined) { %>
+                        <%= salesReport[0].totalrevenue.toFixed() %>
+                    <% } else { %>
+                        0
+                    <% } %></div>
+                    <div class="metric-change positive">
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-title">Total Orders</span>
+                        <div class="metric-icon" style="background-color: #ea4335;">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                    </div>
+                    <div class="metric-value"><%=totalOrders %></div>
+                    <div class="metric-change positive">
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-title">Products Sold</span>
+                        <div class="metric-icon" style="background-color: #34a853;">
+                            <i class="fas fa-box-open"></i>
+                        </div>
+                    </div>
+                    <div class="metric-value"><%=productSold %></div>
+                    <div class="metric-change positive">
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-title">Avg. Order Value</span>
+                        <div class="metric-icon" style="background-color: #f9ab00;">
+                            <span style="font-weight: bold;">₹</span>
+                        </div>
+                    </div>
+                    <div class="metric-value"> <%= (salesReport[0].totalrevenue.toFixed()/productSold ).toFixed() %></div>
+                    <div class="metric-change negative">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="charts-section">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Sales Overview</h3>
+                        <div class="chart-period">
+                            <button class="period-btns" data-period="day" onclick="updateChart('day')">Day</button>
+                             <button class="period-btns" data-period="week" onclick="updateChart('week')">Week</button>
+                            <button class="period-btns" data-period="month" onclick="updateChart('month')">Month</button>
+                            <button class="period-btns" data-period="year" onclick="updateChart('year')">Year</button>
+                          </div>
+                    </div>
+                    <br>
+                    <div>
+                        total revenue generated :
+                        <span style="color: red;">
+                            <% if (salesReport && salesReport[0] && salesReport[0].totalrevenue !== undefined) { %>
+                                <%= salesReport[0].totalrevenue.toFixed() %>
+                            <% } else { %>
+                                0
+                            <% } %>
+                        </span>
+                    </div>
+                                        <div class="chart-container">
+                        <canvas id="salesChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Profit by Category</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="profitChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="products-section">
+                <div class="section-header">
+                    <h3 class="section-title">Top Selling</h3>
+                    <div class="view-toggle">
+                        <button class="toggle-btn active" onclick="toggleView('products')">Products</button>
+                        <button class="toggle-btn" onclick="toggleView('categories')">Categories</button>
+                    </div>
+                </div>
+            <!-- Products Section -->
+            <div class="table-container">
+                <table class="products-table" id="productsTable">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Price</th>
+                            <th>Sold</th>
+                            <th>Revenue</th>
+                            <th>Stock</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if(topProducts.length > 0) { %>
+                            <% for(let product of topProducts) { %>
+                                <tr>
+                                    <td>
+                                        <div class="product-info d-flex align-items-center">
+                                            <img src="<%= product.productImg %>" alt="Product" class="product-img me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                                            <span><%= product.productName %></span>
+                                        </div>
+                                    </td>
+                                    <td>₹<%= product.price.toFixed(0) %></td>
+                                    <td><%= product.totalSold %></td>
+                                    <td>₹<%= product.revenue.toFixed(0) %></td>
+                                    <td>
+                                        <span class="stock-status">
+                                            <% if (product.stock > 0) { %>
+                                                <p class="text-success">In Stock</p>
+                                            <% } else { %>
+                                                <p class="text-danger">Out Of Stock</p>
+                                            <% } %>
+                                        </span>
+                                    </td>
+                                </tr>
+                            <% } %>
+                        <% } %>
+                        
+                    </tbody>
+                </table>
+        
+                <!-- Categories Table -->
+                <table class="products-table" id="categoriesTable" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th>Category ID</th>
+                            <th>Category Name</th>
+                            <th>Total Sold</th>
+                            <th>Revenue</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if(categorySales.length>0) { %>
+                            <% for(let category of categorySales) { %>
+                                <tr>
+                                    <td><%= category._id %></td>
+                                    <td><%= category.categoryName %></td>
+                                    <td><%= category.totalSold %></td>
+                                    <td><%= category.revenue.toFixed() %></td>
+                                </tr>
+                            <% } %>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        </div>
+    </div>
+
+    <!-- Hidden div to store server-side data -->
+    <div id="serverData" 
+         data-category-sales='<%- JSON.stringify(categorySales || []) %>'
+         style="display: none;"></div>
+    <div id="serversData" 
+         data-product-sales='<%- JSON.stringify(salesitems || []) %>'
+         style="display: none;"></div>
+       
+              <!-- Only the script section needs to be modified - everything else stays the same -->
+               
+<script>
+    function toggleView(viewType) {
+        const productsTable = document.getElementById('productsTable');
+        const categoriesTable = document.getElementById('categoriesTable');
+        const buttons = document.querySelectorAll('.toggle-btn');
+
+        buttons.forEach(btn => btn.classList.remove('active'));
+        
+        if(viewType === 'products') {
+            productsTable.style.display = 'table';
+            categoriesTable.style.display = 'none';
+            document.querySelector('[onclick="toggleView(\'products\')"]').classList.add('active');
+        } else {
+            productsTable.style.display = 'none';
+            categoriesTable.style.display = 'table';
+            document.querySelector('[onclick="toggleView(\'categories\')"]').classList.add('active');
+        }
+    }
+
+    // Initialize with products view
+    toggleView('products');
+</script>
+  <script>
+    // Initialize charts with enhanced features
+    document.addEventListener('DOMContentLoaded', function () {
+    const serverData = document.getElementById('serverData');
+    const categorySales = JSON.parse(serverData.dataset.categorySales || '[]');
+
+    const serversData = document.getElementById('serversData');
+    const salesitems = JSON.parse(serversData.dataset.productSales || '[]');
+
+    const durationMap = {
+        'day': 1,
+        'week': 7,
+        'month': 30,
+        'year': 365
+    };
+
+    // Corrected: Accept duration as argument
+    const processSalesData = (items, duration = 30) => {
+        const dailyData = {};
+
+        items.forEach(order => {
+            const date = new Date(order.createdOn).toLocaleDateString('en-CA');
+            if (!dailyData[date]) {
+                dailyData[date] = {
+                    revenue: 0,
+                    orderCount: 0
+                };
+            }
+            dailyData[date].revenue += order.orderItems.price;
+            dailyData[date].orderCount += 1;
+        });
+
+        const start = new Date();
+        start.setDate(start.getDate() - duration);
+        const end = new Date();
+
+        const fullDates = [];
+        for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+            const dateStr = d.toLocaleDateString('en-CA');
+            fullDates.push(dateStr);
+            if (!dailyData[dateStr]) {
+                dailyData[dateStr] = { revenue: 0, orderCount: 0 };
+            }
+        }
+
+        const labels = fullDates;
+        const revenues = labels.map(date => dailyData[date].revenue);
+        const orderCounts = labels.map(date => dailyData[date].orderCount);
+
+        return { labels, revenues, orderCounts };
+    };
+
+    // Define updateChartWithData
+    const updateChartWithData = (chartData) => {
+        window.salesChart.data.labels = chartData.labels;
+        window.salesChart.data.datasets[0].data = chartData.revenues;
+        window.salesChart.data.datasets[1].data = chartData.orderCounts;
+        window.salesChart.update();
+    };
+
+    // Attach listeners to buttons
+    const buttons = document.querySelectorAll('.period-btns');
+    buttons.forEach(button => {
+        button.addEventListener('click', () => {
+            const period = button.dataset.period;
+            const duration = durationMap[period] || 30;
+            const chartData = processSalesData(salesitems, duration);
+            updateChartWithData(chartData);
+        });
+    });
+
+    // Initial Sales Chart setup
+    const initialData = processSalesData(salesitems, 7); // Default to week
+    const salesCtx = document.getElementById('salesChart').getContext('2d');
+    window.salesChart = new Chart(salesCtx, {
+        type: 'line',
+        data: {
+            labels: initialData.labels,
+            datasets: [
+                {
+                    label: 'Sales Revenue (₹)',
+                    data: initialData.revenues,
+                    backgroundColor: 'rgba(26, 115, 232, 0.1)',
+                    borderColor: 'rgba(26, 115, 232, 1)',
+                    borderWidth: 2,
+                    tension: 0.2,
+                    fill: true,
+                    yAxisID: 'y'
+                },
+                {
+                    label: 'Order Count',
+                    data: initialData.orderCounts,
+                    backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 2,
+                    tension: 0.2,
+                    yAxisID: 'y1'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 20
+                    }
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                    callbacks: {
+                        label: function (context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.datasetIndex === 0) {
+                                label += '₹' + context.parsed.y.toLocaleString('en-IN');
+                            } else {
+                                label += context.parsed.y.toLocaleString('en-IN');
+                            }
+                            return label;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Date',
+                        font: {
+                            weight: 'bold'
+                        }
+                    },
+                    grid: {
+                        display: false
+                    }
+                },
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    title: {
+                        display: true,
+                        text: 'Revenue (₹)',
+                        font: {
+                            weight: 'bold'
+                        }
+                    },
+                    ticks: {
+                        callback: function (value) {
+                            return '₹' + value.toLocaleString('en-IN');
+                        }
+                    }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    title: {
+                        display: true,
+                        text: 'Order Count',
+                        font: {
+                            weight: 'bold'
+                        }
+                    },
+                    grid: {
+                        drawOnChartArea: false
+                    }
+                }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'nearest'
+            }
+        }
+    });
+
+    // Initialize Profit Chart (your existing doughnut chart code)
+    const profitCtx = document.getElementById('profitChart').getContext('2d');
+    window.profitChart = new Chart(profitCtx, {
+        type: 'doughnut',
+        data: {
+            labels: categorySales.map(c => c.categoryName || 'N/A'),
+            datasets: [{
+                label: 'Revenue (₹)',
+                data: categorySales.map(c => c.revenue || 0),
+                backgroundColor: [
+                    'rgba(66, 133, 244, 0.7)',
+                    'rgba(234, 67, 53, 0.7)',
+                    'rgba(251, 188, 5, 0.7)',
+                    'rgba(52, 168, 83, 0.7)',
+                    'rgba(171, 71, 188, 0.7)'
+                ],
+                borderColor: [
+                    'rgba(66, 133, 244, 1)',
+                    'rgba(234, 67, 53, 1)',
+                    'rgba(251, 188, 5, 1)',
+                    'rgba(52, 168, 83, 1)',
+                    'rgba(171, 71, 188, 1)'
+                ],
+                borderWidth: 1,
+                hoverOffset: 20
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        generateLabels: function (chart) {
+                            const data = chart.data;
+                            if (data.labels.length && data.datasets.length) {
+                                return data.labels.map(function (label, i) {
+                                    const meta = chart.getDatasetMeta(0);
+                                    const value = data.datasets[0].data[i];
+                                    const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                    const percentage = Math.round((value / total) * 100);
+                                    return {
+                                        text: `${label} (${percentage}%)`,
+                                        fillStyle: data.datasets[0].backgroundColor[i],
+                                        strokeStyle: data.datasets[0].borderColor[i],
+                                        lineWidth: data.datasets[0].borderWidth[i],
+                                        hidden: isNaN(value) || meta.data[i].hidden,
+                                        index: i
+                                    };
+                                });
+                            }
+                            return [];
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            const label = context.label || '';
+                            const value = context.raw || 0;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = Math.round((value / total) * 100);
+                            return `${label}: ₹${value.toLocaleString('en-IN')} (${percentage}%)`;
+                        }
+                    }
+                },
+                title: {
+                    display: true,
+                    text: 'Revenue Distribution by Category',
+                    font: {
+                        size: 16
+                    }
+                }
+            },
+            cutout: '65%',
+            animation: {
+                animateScale: true,
+                animateRotate: true
+            },
+            onClick: function (evt, elements) {
+                if (elements.length > 0) {
+                    const index = elements[0].index;
+                    const category = this.data.labels[index];
+                    window.location.href = `/admin/products?category=${encodeURIComponent(category)}`;
+                }
+            }
+        }
+    });
+});
+
+
+    // 4. Add export functionality
+    function exportChartData(format) {
+        const chart = window.salesChart;
+
+
+        if (format === 'image') {
+            const link = document.createElement('a');
+            link.download = 'sales-chart.png';
+            link.href = chart.toBase64Image();
+            link.click();
+        } else if (format === 'csv') {
+            let csv = 'Period,Revenue,Orders\n';
+            chart.data.labels.forEach((label, i) => {
+                csv += `"${label}",${chart.data.datasets[0].data[i] || 0},${chart.data.datasets[1].data[i] || 0}\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.download = 'sales-data.csv';
+            link.href = url;
+            link.click();
+        }
+    }
+
+    let resizeTimer;
+window.addEventListener('resize', function() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function() {
+        location.reload();
+    }, 250); // Wait 250ms after last resize event
+});
+
+
+// Sidebar toggle functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const sidebarToggle = document.createElement('button');
+  sidebarToggle.className = 'sidebar-toggle';
+  sidebarToggle.innerHTML = '<i class="fas fa-bars"></i> Menu';
+  
+  const sidebar = document.querySelector('.sidebar');
+  sidebar.insertBefore(sidebarToggle, sidebar.firstChild);
+  
+  const sidebarMenu = document.querySelector('.sidebar-menu');
+  
+  sidebarToggle.addEventListener('click', function(e) {
+    e.stopPropagation();
+    sidebarMenu.classList.toggle('show');
+  });
+  
+  // Close sidebar when clicking outside
+  document.addEventListener('click', function(e) {
+    if (!sidebar.contains(e.target)) {
+      sidebarMenu.classList.remove('show');
+    }
+  });
+  
+  // Make sure menu is visible on larger screens
+  function handleResize() {
+    if (window.innerWidth > 1200) {
+      sidebarMenu.classList.add('show');
+    }
+  }
+  
+  // Initial check
+  handleResize();
+  
+  // Add resize listener
+  window.addEventListener('resize', handleResize);
+});
+</script>
+
+</body>
+</html>

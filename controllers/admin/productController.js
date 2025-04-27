@@ -26,66 +26,101 @@ const getProductAddPage = async (req, res) => {
 
 // POST: Add Product
 // POST: Add Product
+
+
 const addProduct = async (req, res) => {
   try {
-      if (!req.files || req.files.length === 0) {
-          return res.status(400).json({ success: false, message: "No images uploaded." });
+    // 1. First handle file uploads
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ success: false, message: "No images uploaded." });
+    }
+
+    console.log("Received fields:", Object.keys(req.body));
+    
+    // 2. Process images
+    let imagePaths = [];
+    const uploadDir = path.join(__dirname, "../../public/uploads");
+
+    // Create upload directory if it doesn't exist
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+
+    for (let file of req.files) {
+      try {
+        const fileName = `product_${Date.now()}_${Math.random().toString(36).substring(2, 10)}.jpg`;
+        const filePath = path.join(uploadDir, fileName);
+
+        await sharp(file.buffer)
+          .resize(500, 500)
+          .toFormat('jpeg')
+          .jpeg({ quality: 80 })
+          .toFile(filePath);
+
+        imagePaths.push(`/uploads/${fileName}`);
+      } catch (sharpError) {
+        console.error("Error processing image:", sharpError);
+        return res.status(500).json({ success: false, message: "Error processing image." });
       }
+    }
 
-      let imagePaths = [];
-      const uploadDir = path.join(__dirname, "../../public/uploads");
-
-      // Ensure the upload directory exists
-      if (!fs.existsSync(uploadDir)) {
-          fs.mkdirSync(uploadDir, { recursive: true });
+    // 3. Parse variants from JSON string
+    let variants = [];
+    if (req.body.variants) {
+      try {
+        variants = JSON.parse(req.body.variants);
+        
+        // Validate variants
+        if (!Array.isArray(variants)) {
+          return res.status(400).json({ 
+            success: false, 
+            message: "Variants must be an array." 
+          });
+        }
+        
+        // Log variants for debugging
+        variants.forEach((variant, index) => {
+          console.log(`Variant ${index + 1}:`, variant);
+        });
+      } catch (e) {
+        console.error("Error parsing variants:", e);
+        return res.status(400).json({ 
+          success: false, 
+          message: "Invalid variants data format." 
+        });
       }
+    }
 
-      for (let file of req.files) {
-          try {
-              // Generate a unique filename
-              const fileName = `product_${Date.now()}_${Math.random().toString(36).substring(2, 10)}.jpg`;
-const filePath = path.join(uploadDir, fileName);
+    // 4. Create the product with variants
+    const newProduct = new Product({
+      productName: req.body.productName,
+      description: req.body.description,
+      category: req.body.category,
+      regularPrice: req.body.regularPrice,
+      salePrice: req.body.salePrice,
+      size: req.body.size || "M", // Default size
+      color: req.body.color || "blue", // Default color
+      quantity: req.body.quantity,
+      productImage: imagePaths,
+      variants: variants // This now contains all variants
+    });
 
-
-              // Process image with sharp
-              await sharp(file.buffer)
-                  .resize(500, 500) // Resize before saving
-                  .toFormat("jpeg")
-                  .jpeg({ quality: 80 })
-                  .toFile(filePath);
-
-              imagePaths.push(`/uploads/${fileName}`);
-          } catch (sharpError) {
-              console.error("Error processing image:", sharpError);
-              return res.status(500).json({ success: false, message: "Error processing image." });
-          }
-      }
-
-      // Validate required fields
-      if (!req.body.productName || !req.body.category) {
-          return res.status(400).json({ success: false, message: "Product Name and Category are required." });
-      }
-
-      // Save product with multiple image paths
-      const newProduct = new Product({
-          productName: req.body.productName,
-          description: req.body.description,
-          category: req.body.category,
-          regularPrice: req.body.regularPrice,
-          salePrice: req.body.salePrice,
-          size:req.body.size,
-          color:req.body.color,
-          quantity: req.body.quantity,
-          productImage: imagePaths,
-      });
-
-      await newProduct.save();
-      res.json({ success: true, message: "Product added successfully!" });
+    await newProduct.save();
+    
+    res.json({ success: true, message: "Product added successfully!" });
+    
   } catch (error) {
-      console.error("Error adding product:", error);
-      res.status(500).json({ success: false, message: "Server Error" });
+    console.error("Error adding product:", error);
+    res.status(500).json({ 
+      success: false, 
+      message: "Server Error",
+      error: error.message 
+    });
   }
 };
+
+
+
 const getAllProducts = async (req, res) => {
   try {
     const search = req.query.search || "";
@@ -98,8 +133,8 @@ const getAllProducts = async (req, res) => {
       productName: { $regex: new RegExp(".*" + search + ".*", "i") },
     };
 
-  
     const productData = await Product.find(query, "productName category isBlocked salePrice regularPrice quantity productImage productOffer color brand")
+
       .limit(limit)
       .skip((page - 1) * limit)
       .populate("category")
@@ -109,7 +144,7 @@ const getAllProducts = async (req, res) => {
 
     const count = await Product.countDocuments(query);
     const category = await Category.find({ isListed: true });
-
+console.log("productData = ",productData)
     if (category.length > 0) {
       res.render("product_all", {
         data: productData,
@@ -125,36 +160,54 @@ const getAllProducts = async (req, res) => {
     res.render("pageError");
   }
 };
-
 const updateProductOffer = async (req, res) => {
   try {
-      const { productId, percentage } = req.body;
-      console.log("Received data:", { productId, percentage }); // Debugging line
+    const { productId, percentage } = req.body;
+    console.log("Received data:", { productId, percentage });
 
-      if (!productId || !percentage) {
-          return res.status(400).json({ status: false, message: "Product ID and offer percentage are required" });
-      }
+    // Validate inputs
+    const offerPercentage = parseFloat(percentage);
+    if (!productId || isNaN(offerPercentage)) {
+      return res.status(400).json({
+        status: false,
+        message: "Product ID and a valid numeric offer percentage are required",
+      });
+    }
 
-      // Assuming 'productOffer' is the field to update
-      const product = await Product.findById(productId);
-      if (!product) {
-          return res.status(404).json({ status: false, message: "Product not found" });
-      }
+    // Get the product
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ status: false, message: "Product not found" });
+    }
 
-      product.productOffer = percentage;  // Update the product offer
-      await product.save();
+    // Get the category associated with the product
+    const category = await Category.findById(product.category);
+    const categoryOffer = category?.categoryOffer || 0;
 
-      res.json({ status: true, message: "Offer updated successfully" });
+    // Choose the maximum of product offer and category offer
+    const maxOffer = Math.max(offerPercentage, categoryOffer);
+
+    // Update offer and sale price (based on original price to avoid double-discounting)
+    product.productOffer = offerPercentage;
+    product.salePrice = product.regularPrice - ((maxOffer / 100) * product.regularPrice);
+
+    await product.save();
+
+    res.json({ status: true, message: "Offer updated successfully" });
   } catch (error) {
-      console.error("Error updating offer:", error);
-      res.status(500).json({ status: false, message: "An error occurred while updating the offer" });
+    console.error("Error updating offer:", error);
+    res.status(500).json({ status: false, message: "An error occurred while updating the offer" });
   }
 };
-
 
 const removeProductOffer = async (req, res) => {
   try {
     const { productId } = req.body;
+
+    if (!productId) {
+      return res.status(400).json({ status: false, message: "Product ID is required" });
+    }
+
     const product = await Product.findById(productId);
 
     if (!product) {
@@ -163,6 +216,7 @@ const removeProductOffer = async (req, res) => {
 
     product.productOffer = 0;
     product.salePrice = product.regularPrice;
+
     await product.save();
 
     res.json({ status: true, message: "Offer removed successfully" });
@@ -171,9 +225,11 @@ const removeProductOffer = async (req, res) => {
     res.status(500).json({ status: false, message: "Internal server error" });
   }
 };
+
 const getEditProduct = async (req, res) => {
   try {
     const id = req.query.id;
+    console.log("the id = ",id)
     const product = await Product.findOne({ _id: id }).populate("category");
     const categories = await Category.find({});
 
@@ -196,9 +252,10 @@ const getEditProduct = async (req, res) => {
 
 const editProduct = async (req, res) => {
   try {
-    const id = req.params.id;
-    const { productName, description, regularPrice, salePrice, quantity, category } = req.body;
 
+    const id = req.params.id;
+    const { productName, description, regularPrice, salePrice, quantity, category,brand,size,color } = req.body;
+console.log("the eode was working for the updation")
     // Check if a product with the same name exists (excluding the current one)
     const existingProduct = await Product.findOne({ productName, _id: { $ne: id } });
     if (existingProduct) {
@@ -207,7 +264,8 @@ const editProduct = async (req, res) => {
         message: "Product with this name already exists. Please try another name.",
       });
     }
-
+    
+    
     // Find the existing product
     const product = await Product.findById(id);
     if (!product) {
@@ -253,7 +311,9 @@ const editProduct = async (req, res) => {
     product.salePrice = salePrice;
     product.quantity = quantity;
     product.category = category;
-
+    product.color = color;
+    product.size = size;
+    product.brand = brand;
     await product.save();
 
     res.redirect("/admin/allProducts")

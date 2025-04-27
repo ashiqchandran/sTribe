@@ -31,6 +31,14 @@
                     <button type="button" class="password-toggle">Show</button>
                     <span class="error-message" id="confirmPasswordError"></span>
                 </div>
+                <div class="form-group">
+                    <label for="referralCode">Referral Code (Optional)</label>
+                    <div class="input-with-button">
+                        <input type="text" placeholder="Enter referral code if you have one" name="referralCode" id="referralCode">
+                        <button type="button" id="checkReferralBtn" class="check-referral-btn">Check</button>
+                    </div>
+                    <span class="error-message" id="referralError"></span>
+                </div>
                 <div class="terms">
                     <input type="checkbox" id="terms">
                     <label for="terms">I agree with <a href="#">Privacy Policy</a> and <a href="#">Terms of Use</a></label>
@@ -83,12 +91,15 @@ document.addEventListener("DOMContentLoaded", function () {
         const phone = document.getElementById("phone").value.trim();
         const password = document.getElementById("password").value;
         const confirmPassword = document.getElementById("confirm-password").value;
+        const refrerralCode = document.getElementById("referralCode").value;
+        
         const terms = document.getElementById("terms").checked;
 
         const emailError = document.getElementById("emailError");
         const phoneError = document.getElementById("phoneError");
         const passwordError = document.getElementById("passwordError");
         const confirmPasswordError = document.getElementById("confirmPasswordError");
+
         const termsError = document.getElementById("termsError");
 
         // Clear previous errors

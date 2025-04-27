@@ -2,7 +2,7 @@ const EventEmitter = require("events")
 const userBlockedEmitter = new EventEmitter()
 
 const User = require("../../models/userSchema");
-
+const Contact = require("../../models/contactSchema");
 
 const customerInfo = async (req, res) => {
     try {
@@ -74,10 +74,63 @@ const customerUnblocked = async (req,res) => {
 }
 
 
+const complaints=async(req,res)=>{
+    try {
+        const adminname=req.session.admin.fullname
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+        const searchQuery = req.query.search || '';
+    
+        const filter = {};
+        if (searchQuery) {
+          filter.$or = [
+            { name: { $regex: searchQuery, $options: 'i' } },
+            { email: { $regex: searchQuery, $options: 'i' } },
+            { message: { $regex: searchQuery, $options: 'i' } }
+          ];
+        }
+    
+        const complaints = await Contact.find(filter)
+          .sort({ submittedAt: -1 })
+          .skip(skip)
+          .limit(limit)
+          .lean();
+    
+        const total = await Contact.countDocuments(filter);
+    
+        res.render('complaints', {
+          complaints,
+          adminname,
+          pagination: {
+            total,
+            page,
+            limit,
+            totalPages: Math.ceil(total / limit),
+        
+          },
+          searchQuery
+        });
+      } catch (error) {
+        console.error('Error fetching complaints:', error);
+        res.status(500).render('error', { message: 'Failed to load complaints' });
+      }
+    };
+
+
+
+
+
+
+
+
+
+
 
 module.exports = {
     customerInfo,
     customerBlocked,
-    customerUnblocked
+    customerUnblocked,
+    complaints
 
 }

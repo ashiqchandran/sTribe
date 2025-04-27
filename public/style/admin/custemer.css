@@ -22,10 +22,11 @@
         font-family: 'Arial', sans-serif;
         background-color: var(--primary-bg-color);
         margin: 0;
-        padding: 0;
+        padding:1vh;
         color: var(--primary-text-color);
     }
-
+    
+    
     /* Header styling */
     .content-header {
         background-color: var(--primary-text-color);

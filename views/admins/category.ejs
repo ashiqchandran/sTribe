@@ -1,182 +1,655 @@
-<%- include("../../views/partials/admin/header") %>
-<link rel="stylesheet" href="/style/admin/category.css">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Category Management</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+  :root {
+  --sidebar-width: 250px;
+  --sidebar-bg: #343a40;
+  --sidebar-text: #fff;
+  --sidebar-hover: #495057;
+  --primary-color: #4e73df;
+  --secondary-color: #858796;
+  --success-color: #1cc88a;
+  --info-color: #36b9cc;
+  --warning-color: #f6c23e;
+  --danger-color: #e74a3b;
+  --light-color: #f8f9fc;
+  --dark-color: #5a5c69;
+  --border-radius: 0.35rem;
+  --box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+  --transition: all 0.3s ease;
+}
 
+body {
+  font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: var(--light-color);
+  color: var(--dark-color);
+  overflow-x: hidden;
+}
 
-<section class="content-main">
-  <div class="content-header">
-    
-  <section class="content-main">
-    <div class="content-header">
-      <h2 class="content-title">Category Management</h2>
+/* Card Styles */
+.card {
+  border: none;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  margin-bottom: 20px;
+  background-color: white;
+}
+
+.card-header {
+  background-color: #f8f9fc;
+  border-bottom: 1px solid #e3e6f0;
+  padding: 1rem 1.35rem;
+  border-radius: calc(var(--border-radius) - 1px) calc(var(--border-radius) - 1px) 0 0;
+}
+
+.card-title {
+  font-weight: 600;
+  color: var(--dark-color);
+  margin-bottom: 0;
+}
+
+/* Form Styles */
+.form-control, .form-select {
+  border: 1px solid #d1d3e2;
+  border-radius: var(--border-radius);
+  padding: 0.75rem 1rem;
+  font-size: 0.85rem;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: #bac8f3;
+  box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+}
+
+/* Button Styles */
+.btn {
+  border-radius: var(--border-radius);
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+  background-color: #2e59d9;
+  border-color: #2653d4;
+}
+
+.btn-success {
+  background-color: var(--success-color);
+  border-color: var(--success-color);
+}
+
+.btn-danger {
+  background-color: var(--danger-color);
+  border-color: var(--danger-color);
+}
+
+.btn-warning {
+  background-color: var(--warning-color);
+  border-color: var(--warning-color);
+  color: #000;
+}
+
+.btn-info {
+  background-color: var(--info-color);
+  border-color: var(--info-color);
+}
+
+/* Table Styles */
+.table {
+  color: var(--dark-color);
+  margin-bottom: 0;
+}
+
+.table th {
+  background-color: #f8f9fc;
+  color: var(--dark-color);
+  font-weight: 600;
+  padding: 1rem;
+  border-bottom-width: 1px;
+  border-top: none;
+}
+
+.table td {
+  padding: 1rem;
+  vertical-align: middle;
+  border-top: 1px solid #e3e6f0;
+}
+
+/* Badge Styles */
+.badge {
+  font-weight: 600;
+  padding: 0.35em 0.65em;
+  font-size: 0.75em;
+}
+
+.badge-success {
+  background-color: var(--success-color);
+}
+
+.badge-danger {
+  background-color: var(--danger-color);
+}
+
+/* Sidebar Styles */
+.sidebar {
+  width: 15vw;
+  height: 100vh;
+  background-color: #333;
+  color: #fff;
+  padding: 2vh;
+  transition: var(--transition);
+}
+
+.sidebar-toggle {
+  display: none;
+  background: var(--sidebar-bg);
+  color: white;
+  border: none;
+  
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font-size: 1.1em;
+  margin-bottom: 0;
+}
+
+.sidebar-toggle i {
+  margin-right: 10px;
+}
+
+.sidebar-menu {
+  list-style: none;
+  padding: 0;
+  margin-top: 2vh;
+}
+
+.sidebar-menu li {
+  margin: 1.9vh 0;
+}
+
+.sidebar-menu li a {
+  color: #fff;
+  text-decoration: none;
+  display: block;
+  padding: .66vh;
+  margin-left: 1.1vh;
+  transition: background-color 0.3s;
+  font-size:.99rem;padding: 0.55rem;
+}
+
+.sidebar-menu li a:hover,
+.sidebar-menu li a.active {
+  background-color: #555;
+}
+
+.main-content {
+  flex: 1;
+  padding: 1vh;
+}
+
+/* Container Styles */
+.container {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 1vw;
+  box-shadow: 0 0.4vh 0.6vh rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive Styles */
+@media (max-width: 1200px) {
+  .sidebar {
+    width: 100%;
+    padding: 0;
+    height: auto;
+    display: block;
+  }
+  
+  .sidebar-toggle {
+    display: block;
+  }
+  
+  .sidebar-menu {
+    display: none;
+    margin-top: 0;
+  }
+  
+  .sidebar-menu.show {
+    display: block;
+  }
+  
+  .sidebar-menu li {
+    margin: 0;
+  }
+  
+  .sidebar-menu li a {
+    padding: 12px 15px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  
+  /* Adjust text and field sizes */
+  .form-control, .form-select, .btn {
+    font-size: 0.85rem;
+    padding: 0.6rem 0.8rem;
+  }
+  
+  .card-header h6, .card-title {
+    font-size: 1rem;
+  }
+  
+  .table td, .table th {
+    padding: 0.75rem;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 992px) {
+  .row {
+    flex-direction: column-reverse;
+  }
+  
+  .col-lg-4, .col-lg-8 {
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .input-group {
+    flex-wrap: wrap;
+  }
+  
+  .input-group > * {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  
+  .input-group > .btn {
+    width: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .table-responsive {
+    border: 0;
+  }
+  
+  .table {
+    display: block;
+    width: 100%;
+  }
+  
+  .table thead {
+    display: none;
+  }
+  
+  .table tbody {
+    display: block;
+    width: 100%;
+  }
+  
+  .table tr {
+    display: block;
+    margin-bottom: 1rem;
+    border: 1px solid #e3e6f0;
+    border-radius: var(--border-radius);
+  }
+  
+  .table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    border: none;
+    border-bottom: 1px solid #e3e6f0;
+    font-size: 0.8rem;
+  }
+  
+  .table td:before {
+    content: attr(data-label);
+    font-weight: bold;
+    margin-right: 1rem;
+  }
+  
+  .table td:last-child {
+    border-bottom: 0;
+  }
+  
+  /* Add data-label attributes for mobile view */
+  .table td:nth-child(1):before { content: "Name: "; }
+  .table td:nth-child(2):before { content: "Description: "; }
+  .table td:nth-child(3):before { content: "Offer: "; }
+  .table td:nth-child(4):before { content: "Status: "; }
+  .table td:nth-child(5):before { content: "Actions: "; }
+  
+  /* Further reduce sizes for small screens */
+  .form-control, .form-select, .btn {
+    font-size: 0.8rem;
+    padding: 0.5rem 0.7rem;
+  }
+  
+  .card-header, .card-body {
+    padding: 0.75rem;
+  }
+  
+  .sidebar-menu li a {
+    font-size: 0.85rem;
+  }
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-in;
+}
+
+/* Admin Info Box Styles */
+.admin-info-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #fff;
+  padding: 2vh;
+  margin-bottom: 2vh;
+  border-radius: 1vw;
+  box-shadow: 0 0.4vh 0.6vh rgba(0, 0, 0, 0.1);
+}
+
+.logout-btn {
+  background-color: #d33;
+  color: white;
+  border: none;
+  padding: 1vh 2vw;
+  cursor: pointer;
+}
+
+h1 {
+  color: var(--primary);
+}
+
+.email-link {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.email-link:hover {
+  text-decoration: underline;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+  gap: 1rem;
+}
+
+.pagination button {
+  background-color: var(--primary);
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.pagination button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem;
+}
+  </style>
+</head>
+<body>
+  <div class="d-flex">
+    <!-- Sidebar -->
+    <div class="sidebar"  >
+      <button class="sidebar-toggle">
+        <i class="fas fa-bars"></i> Menu
+      </button>
+      <div class="sidebar-header"></div>  
+     
+      <ul class="sidebar-menu">
+        <li ><a href="/admin/dashboard"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+                <li><a href="/admin/users"><i class="fas fa-users"></i> <span>Customers</span></a></li>
+                <li><a href="/admin/category"><i class="fas fa-list"></i> <span>Categories</span></a></li>
+                <li><a href="/admin/orders"><i class="fas fa-shopping-bag"></i> <span>Orders</span></a></li>
+                <li><a href="/admin/products"><i class="fas fa-plus-circle"></i> <span>Add Products</span></a></li>
+                <li><a href="/admin/allProducts"><i class="fas fa-box"></i> <span>Products</span></a></li>
+                <li><a href="/admin/coupon"><i class="fas fa-tags"></i> <span>Coupons</span></a></li>
+                <li><a href="/admin/transaction"><i class="fas fa-money-bill-wave"></i> <span>Transactions</span></a></li>
+                <li><a href="/admin/complaints"><i class="fas fa-exclamation-circle"></i> <span>Complaints</span></a></li>
+                <li><a href="/admin/report"><i class="fas fa-chart-bar"></i> <span>Report</span></a></li>
+      </ul>
     </div>
 
-    <div class="card mb-4">
-      <div class="card-header">
-        <h4 class="card-title mb-0">Search Categories</h4>
+    <!-- Main Content -->
+    <div class="main-content">
+      <div class="mobile-header">
+      
+        <h2 class="mb-0">Category Management</h2>
       </div>
-      <div class="card-body">
-        <form action="/admin/category/" method="get" class="mb-0">
-          <div class="input-group">
-            <input type="text" class="form-control" placeholder="Search categories" name="search"/>
-            <input type="number" class="form-control" placeholder="Min offer %" name="minOffer" min="0" max="99"/>
-            <input type="number" class="form-control" placeholder="Max offer %" name="maxOffer" min="0" max="99"/>
-            <button class="btn btn-primary" type="submit">Search</button>
-          </div>
-        </form>
-      </div>
-    </div>
 
-    <div class="row">
-      <div class="col-lg-4">
-        <div class="card mb-4">
-          <div class="card-header">
-            <h4 class="card-title mb-0">Add New Category</h4>
+      <div class="container-fluid">
+      
+        <!-- Search Card -->
+        <div class="card shadow mb-4">
+          <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Search Categories</h6>
           </div>
           <div class="card-body">
-            <form id="addCategoryForm">
-              <div class="mb-3">
-                <label for="category_name" class="form-label">Name</label>
-                <input type="text" name="name" placeholder="Category name" class="form-control" id="category_name" required/>
+            <form action="/admin/category/" method="get" class="mb-0">
+              <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search categories" name="search">
+                <input type="number" class="form-control" placeholder="Min offer %" name="minOffer" min="0" max="99">
+                <input type="number" class="form-control" placeholder="Max offer %" name="maxOffer" min="0" max="99">
+                <button class="btn btn-primary" type="submit">
+                  <i class="fas fa-search"></i> Search
+                </button>
               </div>
-              <div class="mb-3">
-                <label for="category_description" class="form-label">Description</label>
-                <textarea name="description" placeholder="Category description" class="form-control" id="category_description" required></textarea>
-              </div>
-              <button class="btn btn-primary w-100" type="submit">Create Category</button>
             </form>
           </div>
         </div>
-      </div>
 
-      <div class="col-lg-8">
-        <div class="card mb-4">
-          <div class="card-header">
-            <h4 class="card-title mb-0">Category List</h4>
+        <div class="row">
+          <!-- Add Category Card -->
+          <div class="col-lg-4">
+            <div class="card shadow mb-4">
+              <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Add New Category</h6>
+              </div>
+              <div class="card-body">
+                <form id="addCategoryForm">
+                  <div class="form-group mb-3">
+                    <label for="category_name">Name</label>
+                    <input type="text" name="name" class="form-control" id="category_name" required>
+                  </div>
+                  <div class="form-group mb-3">
+                    <label for="category_description">Description</label>
+                    <textarea name="description" class="form-control" id="category_description" rows="3" required></textarea>
+                  </div>
+                  <button type="submit" class="btn btn-primary btn-block">
+                    <i class="fas fa-plus-circle"></i> Create Category
+                  </button>
+                </form>
+              </div>
+            </div>
           </div>
-          <div class="card-body">
-            <div class="table-responsive">
-              <table class="table table-hover">
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th>Description</th>
-                    <th>Offer</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <% categories.forEach((category) => { %>
-                    <tr>
-                      <td><%= category.name %></td>
-                      <td><%= category.description %></td>
-                      <td>
-                        <%= category.categoryOffer ? `${category.categoryOffer}%` : '0%' %>
-                        <% if (category.categoryOffer === 0) { %>
-                          <button class="btn btn-sm btn-info" onclick="addOffer('<%= category._id %>')">Add Offer</button>
-                        <% } else { %>
-                          <button class="btn btn-sm btn-warning" onclick="editOffer('<%= category._id %>', '<%= category.categoryOffer %>')">Edit Offer</button>
-                          <button class="btn btn-sm btn-danger" onclick="deleteOffer('<%= category._id %>')">Remove Offer</button>
-                        <% } %>
-                      </td>
-                      <td>
-                        <% if (category.isListed) { %>
-                          <span class="badge bg-success">Listed</span>
-                        <% } else { %>
-                          <span class="badge bg-danger">Unlisted</span>
-                        <% } %>
-                      </td>
-                      <td>
-                        <button class="btn btn-sm btn-info" onclick="editCategory('<%= category._id %>', '<%= category.name %>', '<%= category.description %>')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
-                          <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"/>
-                        </svg></button>
-                        <% if (category.isListed) { %>
-                          <button class="btn btn-sm btn-danger" onclick="unlistCategory('<%= category._id %>')">Unlist</button>
-                        <% } else { %>
-                          <button class="btn btn-sm btn-success" onclick="listCategory('<%= category._id %>')">List</button>
-                        <% } %>
-                        <button class="btn btn-sm btn-danger" onclick="deleteCategory('<%= category._id %>')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
-                          <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
-                          <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
-                        </svg></button>
-                      </td>
-                    </tr>
-                  <% }) %>
-                </tbody>
-              </table>
+
+          <!-- Category List Card -->
+          <div class="col-lg-8">
+            <div class="card shadow mb-4">
+              <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">Category List</h6>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-bordered" width="100%" cellspacing="0">
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Offer</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% categories.forEach((category) => { %>
+                        <tr class="fade-in">
+                          <td data-label="Name"><%= category.name %></td>
+                          <td data-label="Description"><%= category.description %></td>
+                          <td data-label="Offer">
+                            <span class="font-weight-bold"><%= category.categoryOffer ? `${category.categoryOffer}%` : '0%' %></span>
+                            <% if (category.categoryOffer === 0) { %>
+                              <button class="btn btn-xs btn-info p-0 px-1 ml-1" onclick="addOffer('<%= category._id %>')">
+                                <i class="fas fa-percentage"></i> Add Offer
+                              </button>
+                            <% } else { %>
+                              <button class="btn btn-xs btn-warning p-0 px-1 ml-1" onclick="editOffer('<%= category._id %>', '<%= category.categoryOffer %>')">
+                                <i class="fas fa-edit"></i> Edit
+                              </button>
+                              <button class="btn btn-xs btn-danger p-0 px-1 ml-1" onclick="deleteOffer('<%= category._id %>')">
+                                <i class="fas fa-trash"></i> Remove
+                              </button>
+                            <% } %>
+                          </td>
+                          <td data-label="Status">
+                            <% if (category.isListed) { %>
+                              <span class="badge badge-success">Listed</span>
+                            <% } else { %>
+                              <span class="badge badge-danger">Unlisted</span>
+                            <% } %>
+                          </td>
+                          <td data-label="Actions">
+                            <button class="btn btn-xs btn-info p-0 px-1" onclick="editCategory('<%= category._id %>', '<%= category.name %>', '<%= category.description %>')">
+                              <i class="fas fa-edit"></i>
+                            </button>
+                            <% if (category.isListed) { %>
+                              <button class="btn btn-xs btn-danger p-0 px-1 ml-1" onclick="unlistCategory('<%= category._id %>')">
+                                <i class="fas fa-eye-slash"></i> Unlist
+                              </button>
+                            <% } else { %>
+                              <button class="btn btn-xs btn-success p-0 px-1 ml-1" onclick="listCategory('<%= category._id %>')">
+                                <i class="fas fa-eye"></i> List
+                              </button>
+                            <% } %>
+                            <button class="btn btn-xs btn-danger p-0 px-1 ml-1" onclick="deleteCategory('<%= category._id %>')">
+                              <i class="fas fa-trash"></i>
+                            </button>
+                          </td>
+                        </tr>
+                      <% }) %>
+                    </tbody>
+                  </table>
+                </div>
+                
+                <!-- Pagination -->
+                <nav aria-label="Page navigation" class="mt-4">
+                  <ul class="pagination justify-content-center">
+                    <% if (currentPage > 1) { %>
+                      <li class="page-item">
+                        <a class="page-link" href="?page=<%= currentPage - 1 %>" aria-label="Previous">
+                          <span aria-hidden="true">&laquo;</span>
+                        </a>
+                      </li>
+                    <% } %>
+                    
+                    <% for (let i = 1; i <= totalPages; i++) { %>
+                      <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                        <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                      </li>
+                    <% } %>
+                    
+                    <% if (currentPage < totalPages) { %>
+                      <li class="page-item">
+                        <a class="page-link" href="?page=<%= currentPage + 1 %>" aria-label="Next">
+                          <span aria-hidden="true">&raquo;</span>
+                        </a>
+                      </li>
+                    <% } %>
+                  </ul>
+                </nav>
+              </div>
             </div>
           </div>
         </div>
-
-        <nav aria-label="Page navigation">
-          <ul class="pagination">
-            <% if (currentPage > 1) { %>
-              <li class="page-item">
-                <a class="page-link" href="?page=<%= currentPage - 1 %>" aria-label="Previous">
-                  <span aria-hidden="true">&laquo;</span>
-                </a>
-              </li>
-            <% } %>
-            
-            <% for (let i = 1; i <= totalPages; i++) { %>
-              <li class="page-item <%= i === currentPage ? 'active' : '' %>">
-                <a class="page-link" href="?page=<%= i %>"><%= i %></a>
-              </li>
-            <% } %>
-            
-            <% if (currentPage < totalPages) { %>
-              <li class="page-item">
-                <a class="page-link" href="?page=<%= currentPage + 1 %>" aria-label="Next">
-                  <span aria-hidden="true">&raquo;</span>
-                </a>
-              </li>
-            <% } %>
-          </ul>
-        </nav>
       </div>
     </div>
-  </section>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    // Add Category Form Submission
-    document.getElementById('addCategoryForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const formData = new FormData(this);
+    // Toggle sidebar on mobile
+    function toggleSidebar() {
+      document.querySelector('.sidebar').classList.toggle('active');
+    }
 
-      fetch('/admin/addCategory', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(Object.fromEntries(formData))
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          Swal.fire({
-            title: 'Success!',
-            text: data.message,
-            icon: 'success'
-          }).then(() => {
-            location.reload();
-          });
-        } else {
-          Swal.fire({
-            title: 'Error!',
-            text: data.message,
-            icon: 'error'
-          });
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        Swal.fire({
-          title: 'Error!',
-          text: 'An error occurred while adding the category',
-          icon: 'error'
+    // Close sidebar when clicking outside
+    document.addEventListener('click', function(event) {
+      const sidebar = document.querySelector('.sidebar');
+      if (!event.target.closest('.sidebar') && !event.target.closest('.sidebar-toggle')) {
+        sidebar.classList.remove('active');
+      }
+    });
+
+    // Add Category Form Submission
+    $(document).ready(function() {
+      $('#addCategoryForm').submit(function(e) {
+        e.preventDefault();
+        const formData = $(this).serialize();
+
+        $.ajax({
+          url: '/admin/addCategory',
+          type: 'POST',
+          data: formData,
+          success: function(response) {
+            if (response.success) {
+              Swal.fire({
+                title: 'Success!',
+                text: response.message,
+                icon: 'success',
+                confirmButtonText: 'OK'
+              }).then(() => {
+                location.reload();
+              });
+            } else {
+              Swal.fire({
+                title: 'Error!',
+                text: response.message,
+                icon: 'error',
+                confirmButtonText: 'OK'
+              });
+            }
+          },
+          error: function(xhr) {
+            Swal.fire({
+              title: 'Error!',
+              text: 'An error occurred while adding the category',
+              icon: 'error',
+              confirmButtonText: 'OK'
+            });
+          }
         });
       });
     });
@@ -186,290 +659,225 @@
       Swal.fire({
         title: 'Edit Category',
         html:
-          `<input id="swal-input1" class="swal2-input" value="${name}" placeholder="Category Name">` +
-          `<textarea id="swal-input2" class="swal2-textarea" placeholder="Category Description">${description}</textarea>`,
+          `<div class="form-group">
+            <label for="swal-input1" class="form-label">Name</label>
+            <input id="swal-input1" class="form-control" value="${name}" placeholder="Category Name">
+          </div>
+          <div class="form-group mt-3">
+            <label for="swal-input2" class="form-label">Description</label>
+            <textarea id="swal-input2" class="form-control" placeholder="Category Description">${description}</textarea>
+          </div>`,
         focusConfirm: false,
+        showCancelButton: true,
+        confirmButtonText: 'Update',
+        cancelButtonText: 'Cancel',
         preConfirm: () => {
           return {
-            name: document.getElementById('swal-input1').value,
-            description: document.getElementById('swal-input2').value
+            name: $('#swal-input1').val(),
+            description: $('#swal-input2').val()
           }
         }
       }).then((result) => {
         if (result.isConfirmed) {
-          fetch(`/admin/editCategory/${id}`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
+          $.ajax({
+            url: `/admin/editCategory/${id}`,
+            type: 'POST',
+            data: result.value,
+            success: function(response) {
+              if (response.success) {
+                Swal.fire({
+                  title: 'Updated!',
+                  text: 'Category has been updated.',
+                  icon: 'success',
+                  confirmButtonText: 'OK'
+                }).then(() => {
+                  location.reload();
+                });
+              } else {
+                Swal.fire({
+                  title: 'Error!',
+                  text: response.message || 'Failed to update category',
+                  icon: 'error',
+                  confirmButtonText: 'OK'
+                });
+              }
             },
-            body: JSON.stringify(result.value)
-          })
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              Swal.fire('Updated!', 'Category has been updated.', 'success').then(() => {
-                location.reload();
+            error: function() {
+              Swal.fire({
+                title: 'Error!',
+                text: 'An error occurred while updating the category',
+                icon: 'error',
+                confirmButtonText: 'OK'
               });
-            } else {
-              Swal.fire('Error', data.message || 'Failed to update category', 'error');
             }
-          })
-          .catch(error => {
-            console.error('Error:', error);
-            Swal.fire('Error', 'An error occurred while updating the category', 'error');
           });
         }
       });
     }
 
-    // Unlist Category Function
+    // List/Unlist Functions
+    function confirmAction(url, title, text, successText, icon) {
+      Swal.fire({
+        title: title,
+        text: text,
+        icon: icon,
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          $.ajax({
+            url: url,
+            type: 'GET',
+            success: function(response) {
+              if (response.success) {
+                Swal.fire({
+                  title: 'Success!',
+                  text: successText,
+                  icon: 'success',
+                  confirmButtonText: 'OK'
+                }).then(() => {
+                  location.reload();
+                });
+              } else {
+                Swal.fire({
+                  title: 'Error!',
+                  text: response.message,
+                  icon: 'error',
+                  confirmButtonText: 'OK'
+                });
+              }
+            },
+            error: function() {
+              Swal.fire({
+                title: 'Error!',
+                text: 'An error occurred',
+                icon: 'error',
+                confirmButtonText: 'OK'
+              });
+            }
+          });
+        }
+      });
+    }
+
     function unlistCategory(id) {
-      Swal.fire({
-        title: 'Are you sure?',
-        text: "You want to unlist this category?",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, unlist it!'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          fetch(`/admin/listCategory?id=${id}`, {
-            method: 'GET'
-          })
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              Swal.fire('Unlisted!', 'Category has been unlisted.', 'success').then(() => {
-                location.reload();
-              });
-            } else {
-              Swal.fire('Error', data.message || 'Failed to unlist category', 'error');
-            }
-          })
-          .catch(error => {
-            console.error('Error:', error);
-            Swal.fire('Error', 'An error occurred while unlisting the category', 'error');
-          });
-        }
-      });
+      confirmAction(
+        `/admin/listCategory?id=${id}`,
+        'Are you sure?',
+        'You want to unlist this category?',
+        'Category has been unlisted.',
+        'warning'
+      );
     }
 
-    // List Category Function
     function listCategory(id) {
+      confirmAction(
+        `/admin/unListCategory?id=${id}`,
+        'Are you sure?',
+        'You want to list this category?',
+        'Category has been listed.',
+        'warning'
+      );
+    }
+
+    // Offer Management Functions
+    function offerDialog(title, currentValue, url, successMessage) {
       Swal.fire({
-        title: 'Are you sure?',
-        text: "You want to list this category?",
-        icon: 'warning',
+        title: title,
+        input: 'number',
+        inputValue: currentValue || '',
+        inputAttributes: {
+          min: 1,
+          max: 99,
+          step: 1
+        },
         showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, list it!'
+        confirmButtonText: 'Submit',
+        showLoaderOnConfirm: true,
+        preConfirm: (percentage) => {
+          return $.ajax({
+            url: url,
+            type: 'POST',
+            data: { percentage: parseInt(percentage) },
+            success: function(response) {
+              if (!response.status) {
+                throw new Error(response.message);
+              }
+              return response;
+            }
+          });
+        },
+        allowOutsideClick: () => !Swal.isLoading()
       }).then((result) => {
         if (result.isConfirmed) {
-          fetch(`/admin/unListCategory?id=${id}`, {
-            method: 'GET'
-          })
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              Swal.fire('Listed!', 'Category has been listed.', 'success').then(() => {
-                location.reload();
-              });
-            } else {
-              Swal.fire('Error', data.message || 'Failed to list category', 'error');
-            }
-          })
-          .catch(error => {
-            console.error('Error:', error);
-            Swal.fire('Error', 'An error occurred while listing the category', 'error');
+          Swal.fire({
+            title: 'Success!',
+            text: successMessage,
+            icon: 'success',
+            confirmButtonText: 'OK'
+          }).then(() => {
+            location.reload();
           });
         }
       });
     }
 
     function addOffer(categoryId) {
-      Swal.fire({
-        title: 'Add Offer',
-        input: 'number',
-        inputAttributes: {
-          min: 1,
-          max: 99,
-          step: 1
-        },
-        showCancelButton: true,
-        confirmButtonText: 'Add',
-        showLoaderOnConfirm: true,
-        preConfirm: (percentage) => {
-          return fetch('/admin/addCategoryOffer', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ categoryId, percentage: parseInt(percentage) })
-          })
-          .then(response => response.json())
-          .then(data => {
-            if (!data.status) {
-              throw new Error(data.message)
-            }
-            return data
-          })
-          .catch(error => {
-            Swal.showValidationMessage(`Request failed: ${error}`)
-          })
-        },
-        allowOutsideClick: () => !Swal.isLoading()
-      }).then((result) => {
-        if (result.isConfirmed) {
-          Swal.fire({
-            title: 'Success!',
-            text: result.value.message,
-            icon: 'success'
-          }).then(() => {
-            location.reload();
-          });
-        }
-      })
+      offerDialog(
+        'Add Offer',
+        0,
+        `/admin/addCategoryOffer?categoryId=${categoryId}`,
+        'Offer has been added successfully!'
+      );
     }
 
     function editOffer(categoryId, currentOffer) {
-      Swal.fire({
-        title: 'Edit Offer',
-        input: 'number',
-        inputValue: currentOffer,
-        inputAttributes: {
-          min: 1,
-          max: 99,
-          step: 1
-        },
-        showCancelButton: true,
-        confirmButtonText: 'Update',
-        showLoaderOnConfirm: true,
-        preConfirm: (percentage) => {
-          return fetch('/admin/editCategoryOffer', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ categoryId, percentage: parseInt(percentage) })
-          })
-          .then(response => response.json())
-          .then(data => {
-            if (!data.status) {
-              throw new Error(data.message)
-            }
-            return data
-          })
-          .catch(error => {
-            Swal.showValidationMessage(`Request failed: ${error}`)
-          })
-        },
-        allowOutsideClick: () => !Swal.isLoading()
-      }).then((result) => {
-        if (result.isConfirmed) {
-          Swal.fire({
-            title: 'Success!',
-            text: result.value.message,
-            icon: 'success'
-          }).then(() => {
-            location.reload();
-          });
-        }
-      })
+      offerDialog(
+        'Edit Offer',
+        currentOffer,
+        `/admin/editCategoryOffer?categoryId=${categoryId}`,
+        'Offer has been updated successfully!'
+      );
     }
 
     function deleteOffer(categoryId) {
-      Swal.fire({
-        title: 'Are you sure?',
-        text: "You won't be able to revert this!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          fetch('/admin/removeCategoryOffer', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ categoryId })
-          })
-          .then(response => response.json())
-          .then(data => {
-            if (data.status) {
-              Swal.fire(
-                'Deleted!',
-                'The offer has been deleted.',
-                'success'
-              ).then(() => {
-                location.reload();
-              });
-            } else {
-              Swal.fire(
-                'Error!',
-                data.message,
-                'error'
-              );
-            }
-          })
-          .catch(error => {
-            Swal.fire(
-              'Error!',
-              'An error occurred while deleting the offer.',
-              'error'
-            );
-          });
-        }
-      })
+      confirmAction(
+        `/admin/removeCategoryOffer?categoryId=${categoryId}`,
+        'Are you sure?',
+        "You won't be able to revert this!",
+        'The offer has been deleted.',
+        'warning'
+      );
     }
 
     function deleteCategory(categoryId) {
-      Swal.fire({
-        title: 'Are you sure?',
-        text: "You won't be able to revert this!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          fetch(`/admin/deleteCategory/${categoryId}`, {
-            method: 'DELETE',
-          })
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              Swal.fire(
-                'Deleted!',
-                'The category has been deleted.',
-                'success'
-              ).then(() => {
-                location.reload();
-              });
-            } else {
-              Swal.fire(
-                'Error!',
-                data.message,
-                'error'
-              );
-            }
-          })
-          .catch(error => {
-            console.error('Error:', error);
-            Swal.fire(
-              'Error!',
-              'An error occurred while deleting the category.',
-              'error'
-            );
-          });
-        }
-      });
+      confirmAction(
+        `/admin/deleteCategory/${categoryId}`,
+        'Are you sure?',
+        "You won't be able to revert this!",
+        'The category has been deleted.',
+        'warning'
+      );
     }
+    // Update the toggleSidebar function
+function toggleSidebar() {
+  document.querySelector('.sidebar-menu').classList.toggle('show');
+}
+
+// Add event listener for the toggle button
+document.querySelector('.sidebar-toggle').addEventListener('click', function(e) {
+  e.stopPropagation();
+  toggleSidebar();
+});
+
+// Close sidebar when clicking outside
+document.addEventListener('click', function(event) {
+  if (!event.target.closest('.sidebar') && !event.target.closest('.sidebar-toggle')) {
+    document.querySelector('.sidebar-menu').classList.remove('show');
+  }
+});
   </script>
-    </div>
-  
-  </div>
+</body>
+</html>

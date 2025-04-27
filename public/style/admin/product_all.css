@@ -1,365 +1,178 @@
 /* General Styles */
+:root {
+    --sidebar-width: 250px;
+    --sidebar-bg: #2c3e50;
+    --sidebar-text: #ecf0f1;
+    --content-bg: #f8f9fa;
+    --transition: all 0.3s ease;
+}
+
 body {
     font-family: 'Arial', sans-serif;
-    background-color: #f8f9fa;
+    background-color: var(--content-bg);
+    color: #333;
+    line-height: 1.6;
     margin: 0;
     padding: 0;
 }
-.center{
-    justify-content:center;
-    color: black;
+
+.admin-container {
+    display: flex;
+    min-height: 100vh;
+    position: relative;
 }
 
-.content-main {
-    padding-top: 50px;
-    padding-bottom: 50px;
+/* Sidebar Styles */
+.sidebar {
+    width: var(--sidebar-width);
+    background-color: var(--sidebar-bg);
+    color: var(--sidebar-text);
+    position: fixed;
+    height: 100vh;
+    transition: var(--transition);
+    z-index: 1000;
+    padding: 20px;
 }
 
-/* Header */
+/* Main Content */
+.main-content {
+    margin-left: var(--sidebar-width);
+    flex: 1;
+    padding: 30px;
+    transition: var(--transition);
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Mobile Toggle */
+.menu-toggle {
+    display: none;
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1100;
+    background: var(--sidebar-bg);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+/* Responsive Styles */
+@media (max-width: 1200px) {
+    .sidebar {
+        transform: translateX(-100%);
+    }
+    
+    .sidebar.active {
+        transform: translateX(0);
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+    }
+    
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+        padding: 20px;
+    }
+    
+    .menu-toggle {
+        display: block;
+    }
+}
+
+/* Existing Content Styles */
 .content-header {
-    margin-bottom: 40px; /* Space between header and form */
+    margin-bottom: 30px;
+    text-align: center;
 }
 
 .content-title {
     font-size: 2rem;
     font-weight: 600;
-    color: #000000;
-    text-align: left; /* Align title to the left */
-}
-
-/* Form Card */
-.card {
-    border-radius: 10px;
-    border: none;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.card-body {
-    padding: 30px;
-}
-
-/* Form Elements */
-.form-label {
-    font-size: 1rem;
-    font-weight: 500;
-    color: #000000;
-    display: inline-block;
-    vertical-align: middle;
-    line-height: 1.2;   
-    margin-bottom: 8px; /* Space between label and field */
-}
-
-.form-control {
-    border-radius: 8px;
-    border: 1px solid #ddd;
-    padding: 12px 15px;
-    font-size: 1rem;
-    background-color: #fff;
-    color: #000000;
-    display: block;
-    width: 100%;
-    height: 40px;
-    vertical-align: middle; /* Align input with label */
-    margin-bottom: 20px; /* Gap between fields */
-}
-
-.form-control:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-}
-
-.gap-1{
-    margin-left: 5px;
-}
-
-.form-select {
-    border-radius: 8px;
-    border: 1px solid #ddd;
-    padding: 12px 15px;
-    font-size: 1rem;
-    background-color: #fff;
-    color: #000000;
-    display: block;
-    height: 50px; /* Increased height */
-    vertical-align: middle;
-    margin-bottom: 20px; /* Gap between fields */
-}
-
-/* Adjust spacing between the fields in a row */
-.row {
-    display: flex;
-    gap: 30px; /* Increased gap between columns */
-    flex-wrap: wrap; /* Ensure proper wrapping of fields */
-}
-
-.row .col-lg-4 {
-    flex: 1;
-    min-width: 250px; /* Set a minimum width for fields in the row */
-}
-
-/* Buttons */
-.btn {
-    font-size: 1rem;
-    font-weight: 600;
-    border-radius: 8px;
-    padding: 12px 20px;
-    margin-top: 20px; /* Add margin on top of the button */
-}
-
-.btn-primary {
-    background-color: #007bff;
-    border-color: #007bff;
-    color: #fff;
-}
-
-.btn-primary:hover {
-    background-color: #0056b3;
-    border-color: #0056b3;
-}
-
-.btn-sm {
-    font-size: 0.875rem;
-    padding: 6px 12px;
-}
-
-.w-100 {
-    width: 100%;
-}
-
-/* Image Upload & Preview */
-#image-preview {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 20px;
-}
-
-.image-container {
-    position: relative;
-    width: 100px;
-    height: 100px;
-    overflow: hidden;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-}
-
-.image-container img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.image-container button {
-    position: absolute;
-    top: 5px;
-    left: 5px;
-    z-index: 10;
-    padding: 5px 10px;
-    font-size: 0.75rem;
-    background-color: rgba(0, 123, 255, 0.8);
-    color: white;
-    border: none;
-    border-radius: 5px;
-}
-
-.image-container button:hover {
-    background-color: rgba(0, 123, 255, 1);
-}
-
-/* Modal Overlay */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 999;
-}
-.content-title{
-    text-align: center;
-}
-
-.modal-content {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    width: 80%;
-    max-width: 600px;
-    text-align: center;
-}
-
-#cropper-image {
-    width: 100%;
-    height: auto;
+    color: #2c3e50;
     margin-bottom: 20px;
 }
 
-#saveCrop, #cancelCrop {
-    width: 100px;
-    margin: 10px 5px;
+/* Search Form */
+.search-form {
+    margin-bottom: 30px;
+}
+
+.input-group {
+    display: flex;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.search-input {
+    flex: 1;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px 0 0 4px;
     font-size: 1rem;
 }
 
-#saveCrop {
-    background-color: #28a745;
-    border-color: #28a745;
-}
-
-#cancelCrop {
-    background-color: #dc3545;
-    border-color: #dc3545;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .content-title {
-        font-size: 1.5rem;
-    }
-
-    .card-body {
-        padding: 20px;
-    }
-
-    .col-lg-8 {
-        width: 100%;
-    }
-
-    .form-control {
-        font-size: 0.9rem;
-    }
-
-    .image-container {
-        width: 80px;
-        height: 80px;
-    }
-
-    .btn-primary {
-        font-size: 0.875rem;
-    }
-}
-/* General Button Styling */
-.btn {
-    padding: 6px 12px;
-    font-size: 14px;
-    font-weight: 600;
-    border-radius: 4px;
+.search-button {
+    padding: 10px 20px;
+    background-color: #4a6fa5;
+    color: white;
+    border: none;
+    border-radius: 0 4px 4px 0;
     cursor: pointer;
-    transition: background-color 0.3s, border-color 0.3s;
-    text-decoration: none; /* Removes underline on links */
-    display: inline-block;
+    transition: background-color 0.3s;
+}
+
+/* Table Styles */
+.table-responsive {
+    overflow-x: auto;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+}
+
+.table th, .table td {
+    padding: 12px 15px;
     text-align: center;
+    vertical-align: middle;
+    border-bottom: 1px solid #dee2e6;
 }
 
-/* Button Sizes */
-.btn-sm {
-    padding: 4px 8px;
-    font-size: 12px;
-    line-height: 1.5;
+/* ... (keep existing table, button, and other styles) ... */
+
+@media (max-width: 768px) {
+    .main-content {
+        padding: 15px;
+    }
+    
+    .table th, .table td {
+        padding: 8px 6px;
+        font-size: 0.8125rem;
+    }
+    
+    .product-image {
+        width: 40px;
+        height: 40px;
+    }
 }
 
-/* Block Button (Red - Danger) */
-.btn-danger {
-    background-color: #f46e09;
-    border-color: #dc3545;
-    color: white;
-}
-
-.btn-danger:hover {
-    background-color: #f58106;
-    border-color: #bd2130;
-}
-
-.btn-danger:focus, .btn-danger:active {
-    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.5);
-}
-
-/* Unblock Button (Green - Success) */
-.btn-success {
-    background-color: #28a745;
-    border-color: #28a745;
-    color: white;
-}
-
-.btn-success:hover {
-    background-color: #218838;
-    border-color: #1e7e34;
-}
-
-.btn-success:focus, .btn-success:active {
-    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.5);
-}
-
-/* Custom Button Alignment & Margins (Optional) */
-.table td .btn {
-    margin-right: 5px;
-}
-
-.table td .btn:last-child {
-    margin-right: 0;
-}
-
-/* Styling for the Delete button */
-
-
-.btn-danger:focus {
-    outline: none;
-    box-shadow: none;
-}
-/* Remove the default decoration */
-.pagination {
-    list-style: none; /* Remove bullets */
-    margin: 0;
-    padding: 0;
-    text-align: center; /* Center the pagination */
-}
-
-.pagination .page-item {
-    display: inline-block;
-    margin: 0 5px; /* Space between pagination items */
-}
-
-.pagination .page-link {
-    display: inline-block;
-    padding: 8px 16px; /* Adjust size */
-    text-decoration: none; /* Remove underline */
-    color: #007bff; /* Set text color */
-    border: 1px solid #ddd; /* Add border around pagination links */
-    border-radius: 4px; /* Round corners */
-    background-color: #fff; /* White background */
-    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transitions */
-}
-
-/* Style for active pagination link */
-.pagination .page-item.active .page-link {
-    background-color: #007bff; /* Active page color */
-    color: #fff; /* Active page text color */
-    border-color: #007bff;
-}
-
-/* Hover effect */
-.pagination .page-link:hover {
-    background-color: #f8f9fa; /* Hover background color */
-    color: #0056b3; /* Hover text color */
-}
-
-/* Disabled page link */
-.pagination .page-item.disabled .page-link {
-    color: #ccc; /* Disabled text color */
-    border-color: #ddd; /* Disabled border color */
-    pointer-events: none; /* Disable clicking */
-}
-
-/* Pagination alignment in the center */
-.pagination {
-    display: flex;
-    justify-content: center; /* Center horizontally */
-    align-items: center; /* Center vertically */
-}
-td{
-    text-align: center;
-   
+@media (max-width: 576px) {
+    .input-group {
+        flex-direction: column;
+    }
+    
+    .search-input {
+        border-radius: 4px;
+        margin-bottom: 10px;
+    }
+    
+    .search-button {
+        border-radius: 4px;
+    }
 }

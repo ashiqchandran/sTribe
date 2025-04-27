@@ -10,6 +10,7 @@
 	<link rel="stylesheet" href="/style/user/product-details.css">
    
 </head>
+
 <body class="bg-white text-gray-800">
     
 <div class="relative">
@@ -37,29 +38,331 @@
                     <h1 class="text-3xl font-bold mb-2"><%= product.productName %></h1>
                     <p class="text-gray-500 mb-4">Category: <span class="font-semibold"><%= product.category.name %></span></p>
                     <div class="flex items-center space-x-4 text-lg font-semibold">
-                        <span class="line-through text-gray-500">₹ <%= product.regularPrice %>.00</span>
-                        <span class="text-teal-500 text-2xl">₹ <%= product.salePrice %>.00</span>
-                        <span class="bg-red-500 text-white px-2 py-1 text-sm rounded"> <%= product.productOffer %>% Off</span>
+                        <span class="line-through text-gray-500"><s>₹ <%= product.regularPrice %>.00</s></span>
+                        <span class="text-teal-500 text-2xl">₹ <%= Math.floor(product.salePrice)%>.00</span>
+                        <span class="bg-red-500 text-white px-2 py-1 text-sm rounded"> <%=totalOffer %>% Off</span>
                     </div>
                     <p class="rating">
-                        ★★★★☆ <!-- 4 filled yellow stars and 1 empty star -->
-                     </p>
-                  
+                    
+                        <p class="rating">
+                      <div class="variants" style="display: flex;">
+    <div>
+        <% if (averageRating > 0) { %>
+            <% for (let i = 0; i < Math.floor(averageRating); i++) { %>
+                <span style="color: gold; font-size: 24px;">★</span>
+            <% } %>
+            <% if (averageRating % 1 !== 0) { %>
+                <span style="color: gold; font-size: 24px;">☆</span> <!-- Half star -->
+            <% } %>
+            <span> (<%= averageRating.toFixed(1) %> / 5)</span>
+        <% } else { %>
+            <span>No ratings yet</span>
+        <% } %>
+    </div>
+
+</div>
+
+
+<!-- Replace your variant section with this -->
+<div class="mt-6 space-y-4">
+    <% if(product.variants && product.variants.length > 0) { %>
+        <!-- Size Selection -->
+        <div class="variant-section">
+            <h3 class="text-lg font-semibold mb-2">Size</h3>
+            <div class="flex flex-wrap gap-2" id="sizeOptions">
+                <% 
+                const uniqueSizes = [...new Set(product.variants.map(v => v.size))];
+                uniqueSizes.forEach(size => { %>
+                    <button 
+                        onclick="selectVariant('size', '<%= size %>')"
+                        class="size-btn px-4 py-2 border rounded-md hover:bg-gray-100 transition <%= product.size === size ? 'bg-teal-500 text-white border-teal-500' : 'border-gray-300' %>"
+                        data-size="<%= size %>"
+                    >
+                        <%= size %>
+                    </button>
+                <% }); %>
+            </div>
+        </div>
+<!-- Color Selection -->
+<div class="variant-section mt-4">
+    <h3 class="text-lg font-semibold mb-2">Color</h3>
+    <div class="flex flex-wrap gap-2" id="colorOptions">
+        <% 
+        // First get all unique colors from all variants
+        const allColors = [...new Set(product.variants.map(v => v.color))];
+        
+        // If size is selected, filter colors for that size
+        const colorsToShow = product.size 
+            ? [...new Set(product.variants
+                .filter(v => v.size === product.size)
+                .map(v => v.color))]
+            : allColors;
+        
+        colorsToShow.forEach(color => { 
+            const textColor = ['white', 'yellow', 'pink'].includes(color.toLowerCase()) ? 'black' : 'white';
+        %>
+            <button 
+                onclick="selectVariant('color', '<%= color %>')"
+                class="color-btn px-4 py-2 border rounded-md hover:bg-gray-100 transition <%= product.color === color ? 'bg-teal-500 text-white border-teal-500' : 'border-gray-300' %>"
+                style="background-color: '<%= color %>; color: <%= textColor %>'"
+                data-color="<%= color %>"
+            >
+                <%= color %>
+            </button>
+        <% }); %>
+    </div>
+</div>
+        <!-- Set Variant Button -->
+        <div class="mt-4">
+            <button 
+                onclick="updateProductVariant()" 
+                id="setVariantBtn"
+                class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition disabled:opacity-50"
+                disabled
+            >
+                Set Variant
+            </button>
+        </div>
+
+        <!-- Selected Variant Info -->
+        <div class="mt-4 p-3 bg-gray-50 rounded-lg" id="variantInfo">
+            <% if (product.size && product.color) { %>
+                <p class="text-lg font-semibold">
+                    Current: <%= product.size %>, <%= product.color %>
+                </p>
+            <% } else { %>
+                <p class="text-gray-500">No variant selected</p>
+            <% } %>
+        </div>
+    <% } %>
+</div>
+
+<script>
+    // Global product data
+    const productData = {
+        _id: "<%= product._id %>",
+        variants: '<%- JSON.stringify(product.variants) || "[]" %>',
+        color: "<%= product.color || '' %>",
+        size: "<%= product.size || '' %>",
+        regularPrice: '<%= product.regularPrice %>',
+        salePrice: '<%= product.salePrice %>'
+    };
+
+    // Track selected but not yet saved variants
+    const selectedVariant = {
+        color: null,
+        size: null
+    };
+
+    function selectVariant(type, value) {
+        // Update the selected property
+        selectedVariant[type] = value;
+        
+        // Update UI buttons
+        document.querySelectorAll(`.${type}-btn`).forEach(btn => {
+            const isSelected = btn.dataset[type] === value;
+            btn.classList.toggle('bg-teal-500', isSelected);
+            btn.classList.toggle('text-white', isSelected);
+            btn.classList.toggle('border-teal-500', isSelected);
+        });
+
+        // If size changed, reset color selection
+        if (type === 'size') {
+            selectedVariant.color = null;
+            document.querySelectorAll('.color-btn').forEach(btn => {
+                btn.classList.remove('bg-teal-500', 'text-white', 'border-teal-500');
+            });
+            
+            // Filter available colors for the selected size
+            const availableColors = productData.variants
+                .filter(v => v.size === value)
+                .map(v => v.color);
+            
+            document.querySelectorAll('.color-btn').forEach(btn => {
+                btn.style.display = availableColors.includes(btn.dataset.color) ? '' : 'none';
+            });
+        }
+
+        // Enable/disable Set Variant button
+        document.getElementById('setVariantBtn').disabled = !(selectedVariant.size && selectedVariant.color);
+    }
+
+    async function updateProductVariant() {
+        if (!selectedVariant.size || !selectedVariant.color) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Selection Required',
+                text: 'Please select both size and color',
+                timer: 2000
+            });
+            return;
+        }
+
+        try {
+            const response = await fetch('/updateProductVariant', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    productId: productData._id,
+                    size: selectedVariant.size,
+                    color: selectedVariant.color
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                // Update the displayed variant info
+                productData.size = selectedVariant.size;
+                productData.color = selectedVariant.color;
+                
+                document.getElementById('variantInfo').innerHTML = `
+                    <p class="text-lg font-semibold">
+                        Current: ${productData.size}, ${productData.color}
+                    </p>
+                `;
+                
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Variant Set',
+                    text: 'Your selection has been saved',
+                    timer: 2000
+                });
+            } else {
+                throw new Error(data.message);
+            }
+        } catch (error) {
+            console.error('Error updating variant:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Failed to save variant selection',
+                timer: 2000
+            });
+        }
+    }
+
+    function addToCart(productId) {
+        if (!productData.size || !productData.color) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Variant Required',
+                text: 'Please set your variant before adding to cart',
+                timer: 2000
+            });
+            return;
+        }
+
+        const quantity = document.getElementById('quantity').value;
+        const variant = productData.variants.find(v => 
+            v.size === productData.size && 
+            v.color === productData.color
+        );
+
+        let url = `/addToCart?id=${productId}&quantity=${quantity}`;
+        if (variant) {
+            url += `&size=${encodeURIComponent(variant.size)}&color=${encodeURIComponent(variant.color)}`;
+        }
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                Swal.fire({
+                    icon: data.success ? 'success' : 'error',
+                    title: data.success ? 'Added to Cart' : 'Error',
+                    text: data.message,
+                    timer: 2000
+                });
+            })
+            .catch(error => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Something went wrong. Please try again.'
+                });
+            });
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', () => {
+        if (productData.variants.length > 0) {
+            // Show current variant
+            if (productData.size && productData.color) {
+                document.getElementById('variantInfo').innerHTML = `
+                    <p class="text-lg font-semibold">
+                        Current: ${productData.size}, ${productData.color}
+                    </p>
+                `;
+            }
+            
+            // Filter colors based on current size
+            if (productData.size) {
+                const availableColors = productData.variants
+                    .filter(v => v.size === productData.size)
+                    .map(v => v.color);
+                
+                document.querySelectorAll('.color-btn').forEach(btn => {
+                    btn.style.display = availableColors.includes(btn.dataset.color) ? '' : 'none';
+                });
+            }
+        }
+    });
+</script>       
                     <p class="mt-4 text-gray-700 leading-relaxed"><%= product.description %></p>
                 
                     <div class="mt-6 flex items-center space-x-4">
-                        <input type="number" id="quantity" value="1" min="1" max="5" class="w-20 px-2 py-2 border rounded text-center">
-                        <button onclick="addToCart('<%= product._id %>')" class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary-600 transition"
-						    >Add to Cart</button>
-                        <button onclick="addToWishlist('<%= product._id %>')" class="bg-gray-800 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition">Wishlist</button>
-                    </div>
+                        <div class="flex items-center space-x-2">
+                            <button 
+                                onclick="updateQuantity(-1)" 
+                                class="w-10 h-10 flex items-center justify-center bg-gray-200 text-gray-700 hover:bg-gray-300 rounded-full shadow transition duration-200 text-xl font-semibold"
+                            >
+                                –
+                            </button>
+                            
+                            <input 
+                                type="text" 
+                                id="quantity" 
+                                value="1" 
+                                readonly 
+                                class="w-12 text-center border border-gray-300 rounded-md shadow-sm py-2 text-lg font-medium"
+                            />
+                            
+                            <button 
+                                onclick="updateQuantity(1)" 
+                                class="w-10 h-10 flex items-center justify-center bg-gray-200 text-gray-700 hover:bg-gray-300 rounded-full shadow transition duration-200 text-xl font-semibold"
+                            >
+                                +
+                            </button>
+                            <button onclick="addToCart('<%= product._id %>')" class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary-500   transition" style="border-radius: 30px; "
+                                >Add to Cart</button>
+                            <button onclick="addToWishlist('<%= product._id %>')" class=" bg-success-800 px-6 py-3 rounded-lg hover:bg-success-700 transition" style="border-radius: 20px;  ">Add To Wishlist</button>
+                        
+                        </div>
+                        
+                        
+                        
+                   </div>
                
             </div>
         </div>
     </div>
     
     <%- include('../partials/user/footer') %>
+    
 <script>
+ function updateQuantity(change) {
+        const input = document.getElementById('quantity');
+        let current = parseInt(input.value) || 1;
+        let newVal = current + change;
+
+        if (newVal < 1) newVal = 1;
+        if (newVal > 5) newVal = 5;
+
+        input.value = newVal;
+    }
+
     function changeImage(src) {
         document.getElementById('mainImage').src = src;
         document.getElementById('zoomBox').style.backgroundImage = `url(${src})`;

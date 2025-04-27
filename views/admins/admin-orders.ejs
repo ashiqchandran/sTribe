@@ -1,6 +1,362 @@
-<%- include('../partials/admin/header') %>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 <link rel="stylesheet" href="/style/admin/orders-page.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<style>
+    :root {
+      --primary: #4361ee;
+      --secondary: #3a0ca3;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --gray: #6c757d;
+      --primary-bg-color: #f4f4f4;
+      --primary-text-color: #333;
+      --sidebar-width: 15vw;
+      --sidebar-bg: #333;
+      --sidebar-text: #fff;
+      --sidebar-hover: #555;
+      --dropdown-bg: #f8f9fa;
+      --dropdown-text: #212529;
+      --dropdown-hover: #e9ecef;
+      --transition: all 0.3s ease;
+    }
 
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: var(--primary-bg-color);
+      color: var(--primary-text-color);
+     
+    }
+
+    .admin-container {
+      display: flex;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    /* Desktop Sidebar */
+    .sidebar {
+      width: var(--sidebar-width);
+      background-color: var(--sidebar-bg);
+      color: var(--sidebar-text);
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      transition: var(--transition);
+      z-index: 1000;
+      padding:9px;
+      overflow-y: auto; 
+    }
+
+    .sidebar-menu {
+      list-style: none;
+      padding: 0;
+      margin-top: 2vh; 
+       
+     
+    }
+
+    .sidebar-menu li {
+      margin: 1.5vh 0;
+      
+    }
+
+    .sidebar-menu li a {
+      color: var(--sidebar-text);
+      text-decoration: none;
+      display: flex;
+      align-items: center;   
+      padding: 10px 20px;
+      transition: var(--transition); font-size:1.8vh;
+      margin-top:0;
+      font-size:1rem;
+    }
+
+    .sidebar-menu li a i {
+      margin-right: 10px; 
+      width: 20px;
+      text-align: center;
+  
+      padding: 0.3rem;
+      
+    }
+
+    .sidebar-menu li a:hover,
+    .sidebar-menu li a.active {
+      background-color: var(--sidebar-hover);
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      margin-left: var(--sidebar-width);
+      padding: 30px;
+      transition: var(--transition);
+      min-height: 100vh;
+    }
+
+    /* Mobile Toggle Button */
+    .menu-toggle {
+      display: none;
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1100;
+      background: var(--sidebar-bg);
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      cursor: pointer;
+      border-radius: 4px;
+      font-size: 1.2rem;
+    }
+
+    /* Responsive Styles */
+    @media (max-width: 1200px) {
+      :root {
+        --sidebar-width: 100%;
+      }
+      
+      .sidebar {
+        width: 300px;
+        transform: translateX(-100%);
+        box-shadow: none;
+      }
+      
+      .sidebar.active {
+        transform: translateX(0);
+        box-shadow: 2px 0 15px rgba(0,0,0,0.2);
+      }
+      
+      .main-content {
+        margin-left: 0;
+        width: 100%;
+      }
+      
+      .menu-toggle {
+        display: block;
+      }
+      
+      /* Dropdown Menu Styles */
+      .sidebar-menu {
+        background-color: var(--dropdown-bg);
+        margin-top: 0;
+      }
+      
+      .sidebar-menu li a {
+        color: var(--dropdown-text);
+        padding: 14px 25px;
+      }
+      
+      .sidebar-menu li a:hover,
+      .sidebar-menu li a.active {
+        background-color: var(--dropdown-hover);
+        color: var(--primary);
+      }
+      
+      /* Adjust font sizes */
+      body {
+        font-size: 15px;
+      }
+      
+      .card {
+        padding: 15px;
+      }
+      
+      .table th, 
+      .table td {
+        padding: 10px;
+        font-size: 0.9rem;
+      }
+      
+      .btn {
+        padding: 5px 10px;
+        font-size: 0.85rem;
+      }
+    }
+
+    @media (max-width: 992px) {
+      body {
+        font-size: 14px;
+      }
+      
+      .sidebar {
+        width: 280px;
+      }
+      
+      .main-content {
+        padding: 20px;
+      }
+      
+      .card-header, 
+      .card-body {
+        padding: 1rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      body {
+        font-size: 13px;
+      }
+      
+      .sidebar {
+        width: 100%;
+        height: auto;
+        max-height: 80vh;
+        overflow-y: auto;
+      }
+      
+      .sidebar-menu li a {
+        padding: 12px 20px;
+      }
+      
+      .table-responsive {
+        overflow-x: auto;
+      }
+      
+      .table th, 
+      .table td {
+        padding: 8px;
+        font-size: 0.85rem;
+      }
+      
+      .btn {
+        padding: 4px 8px;
+        font-size: 0.8rem;
+      }
+    }
+
+    @media (max-width: 576px) {
+      body {
+        font-size: 12px;
+      }
+      
+      .menu-toggle {
+        padding: 8px 12px;
+        font-size: 1rem;
+      }
+      
+      .main-content {
+        padding: 15px;
+      }
+      
+      .card {
+        padding: 10px;
+      }
+      
+      .table th, 
+      .table td {
+        padding: 6px;
+        font-size: 0.8rem;
+      }
+    }
+
+    /* Card Styles */
+    .card {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    /* Table Styles */
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    .table th {
+      background-color: var(--sidebar-bg);
+      color: white;
+      padding: 12px;
+      text-align: left;
+    }
+
+    .table td {
+      padding: 12px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .table-striped tbody tr:nth-of-type(odd) {
+      background-color: rgba(0,0,0,0.05);
+    }
+
+    /* Button Styles */
+    .btn {
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: var(--transition);
+      font-size: 14px;
+    }
+
+    .btn-sm {
+      padding: 4px 10px;
+      font-size: 13px;
+    }
+
+    .btn-info {
+      background-color: #17a2b8;
+      color: white;
+    }
+
+    .btn-danger {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    .btn-success {
+      background-color: #28a745;
+      color: white;
+    }
+
+    /* Status Badges */
+    .status-badge {
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: white;
+    }
+
+    .bg-success { background-color: #28a745; }
+    .bg-danger { background-color: #dc3545; }
+    .bg-info { background-color: #17a2b8; }
+    .bg-warning { background-color: #ffc107; color: #212529; }
+</style>
+<button class="menu-toggle" id="sidebarToggle">☰</button>
+    
+<div class="admin-container">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar" style="background-color: #333 !important; width:14vw;">
+        <!-- <div class="sidebar-header">
+        
+        </div> -->
+        <nav>
+            <ul class="sidebar-menu">
+                <li><a href="/admin/dashboard"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+                <li ><a href="/admin/users"><i class="fas fa-users"></i> <span>Customers</span></a></li>
+                <li><a href="/admin/category"><i class="fas fa-list"></i> <span>Categories</span></a></li>
+                <li><a href="/admin/orders" class="active"><i class="fas fa-shopping-bag"></i> <span>Orders</span></a></li>
+                <li><a href="/admin/products"><i class="fas fa-plus-circle"></i> <span>Add Products</span></a></li>
+                <li><a href="/admin/allProducts"><i class="fas fa-box"></i> <span>Products</span></a></li>
+                <li><a href="/admin/coupon"><i class="fas fa-tags"></i> <span>Coupons</span></a></li>
+                <li><a href="/admin/transaction"><i class="fas fa-money-bill-wave"></i> <span>Transactions</span></a></li>
+                <li><a href="/admin/complaints"><i class="fas fa-exclamation-circle"></i> <span>Complaints</span></a></li>
+                <li><a href="/admin/report"><i class="fas fa-chart-bar"></i> <span>Report</span></a></li>
+            </ul>
+        </nav>
+    </aside>
+
+
+
+    <main class="main-content">
+      
 <div class="container-fluid px-4">
     <h1 class="mt-4">Order Management</h1>
     
@@ -26,6 +382,7 @@
                     </thead>
                     <tbody>
                         <% orders.forEach(order => { %>
+                            <% if (order.status !== 'failed'){%>
                             <tr>
                                 <td>#<%= order.orderId %></td>
                                 <td><%= new Date(order.createdOn).toLocaleDateString() %></td>
@@ -50,12 +407,12 @@
                                         <%= order.status.toUpperCase() %>
                                     </span>
                                 </td>
-                                <td class="order-actions">
-                                    <a href="/admin/orders/<%= order._id %>" 
-                                       class="btn btn-primary btn-sm">
+                                <td class="order-actions" >
+                                    <!-- <a href="/admin/orders/<%= order._id %>"  class="btn btn-primary btn-sm" style="color: black;text-decoration: none;border-radius: 10px;">
                                         View Details
-                                    </a>
-                                    <% if (order.status !== 'cancelled' && order.status !== 'delivered') { %>
+                                    </a> -->
+                                    
+                                    <% if ( order.status !== 'cancelled' && order.status !== 'delivered' && order.returnStatus!='approved' && order.returnStatus!='rejected') { %>
                                         <button onclick="updateStatus('<%= order._id %>')" 
                                                 class="btn btn-info btn-sm">
                                             Update Status
@@ -65,8 +422,24 @@
                                             Cancel
                                         </button>
                                     <% } %>
+                                
+                                    <% if (order.returnStatus === 'requested') { %>
+                                        <button onclick="approveRefund('<%= order._id %>')" class="btn btn-success btn-sm mt-1" style="background-color: rgb(9, 230, 9);color: black; width: 90px;border-radius: 10px;" >
+                                            Approve Refund
+                                        </button>
+                                        <button onclick="Rejected('<%= order._id %>')" class="btn btn-success btn-sm mt-1" style="background-color: rgb(233, 85, 11); width: 90px; border-radius: 10px;">
+                                            Rejected Refund
+                                        </button>
+                                    <% } %>
+                                       
+                                    <% if (order.returnStatus === 'rejected') { %>
+                                        <span style="color: red;">No Refund  </span>
+                                    <% } %>
+                                    
                                 </td>
+                                
                             </tr>
+                            <% } %>
                         <% }); %>
                         
                     </tbody>
@@ -75,9 +448,138 @@
         </div>
     </div>
 </div>
+        </div>
+    </main>
+
+
+
+
+
+
+
+
+<script>
+    // Toggle Sidebar
+document.getElementById('sidebarToggle').addEventListener('click', () => {
+    document.querySelector('.sidebar').classList.toggle('active');
+});
+
+// Close sidebar when clicking outside on mobile
+document.addEventListener('click', (e) => {
+    const sidebar = document.querySelector('.sidebar');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    
+    if (window.innerWidth <= 1200 && 
+        !sidebar.contains(e.target) && 
+        !sidebarToggle.contains(e.target)) {
+        sidebar.classList.remove('active');
+    }
+});
+    async function approveRefund(orderId) {
+        const result = await Swal.fire({
+            title: 'Approve Refund',
+            text: 'Are you sure you want to approve the refund?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#28a745',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, approve it!'
+        });
+
+        if (result.isConfirmed) {
+            try {
+                const response = await fetch('/admin/orders/approve-refund', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ orderId }),
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    await Swal.fire({
+                        icon: 'success',
+                        title: 'Refund Approved',
+                        text: 'Refund has been processed successfully!',
+                        timer: 1500
+                    });
+                    location.reload();
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                await Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message || 'Failed to approve refund'
+                });
+            }
+        }
+    }
+    async function Rejected(orderId, itemId) {
+    const { value: reason, isConfirmed } = await Swal.fire({
+        title: 'Reject Refund',
+        input: 'textarea',
+        inputLabel: 'Reason for Rejection',
+        inputPlaceholder: 'Enter the reason here...',
+        inputAttributes: {
+            'aria-label': 'Reason for rejection'
+        },
+        showCancelButton: true,
+        confirmButtonColor: '#e74c3c',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Yes, reject it!',
+        preConfirm: (reason) => {
+            if (!reason) {
+                Swal.showValidationMessage('Reason is required!');
+            }
+            return reason;
+        }
+    });
+
+    if (isConfirmed && reason) {
+        try {
+            const response = await fetch('/admin/orders/reject-refund', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ orderId, itemId, adminMessage: reason }),
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'Refund Rejected',
+                    text: 'Refund has been rejected successfully!',
+                    timer: 1500
+                });
+                location.reload();
+            } else {
+                throw new Error(data.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            await Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error.message || 'Failed to reject refund'
+            });
+        }
+    }
+}
+
+
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+     
     async function updateStatus(orderId) {
         const { value: status } = await Swal.fire({
             title: 'Update Order Status',
@@ -108,7 +610,7 @@
                 });
 
                 const data = await response.json();
-                
+                let ordersWindow = window.open('/orders', '_blank');
                 if (data.success) {
                     await Swal.fire({
                         icon: 'success',
@@ -117,6 +619,7 @@
                         timer: 1500
                     });
                     location.reload();
+                    ordersWindow.location.reload();
                 } else {
                     throw new Error(data.message);
                 }

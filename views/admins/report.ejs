@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sales Report</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.css">
+  <link rel="stylesheet" href="/style/admin/report.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+   /* Sidebar Container */
+.sidebar {
+    width: 250px;
+    background-color: #333;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    overflow-y: auto;
+    color: rgb(44, 43, 43);
+    padding-top: 20px;
+
+}
+
+/* Hidden sidebar for small screens */
+@media (max-width: 1200px) {
+    .sidebar {
+        left: -250px;
+    }
+    .sidebar.active {
+        left: 0;
+    }
+}
+
+/* Sidebar Menu */
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-menu li a {
+    display: flex;
+    align-items: center;
+    color: white;
+    text-decoration: none;
+    padding: 12px 15px;
+    transition: all 0.3s ease;
+    border-left: 4px solid transparent;
+    font-size: 1rem; /* Updated font size for menu items */
+    margin-top: 2px;
+}
+
+.sidebar-menu li a i {
+    width: 24px;
+    padding: 6px;
+    text-align: center;
+    margin-right: 10px;
+    font-size: 1.2rem; /* Updated icon size */
+}
+
+.sidebar-menu li a:hover,
+.sidebar-menu li a.active {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-left: 4px solid #1a73e8;
+}
+
+/* Content Main Section */
+.content-main {
+    margin-left: 250px; /* Ensure the content is not hidden behind the sidebar */
+    padding: 20px;
+    font-size: 1rem; /* General font size for the content */
+}
+
+@media (max-width: 1200px) {
+    .content-main {
+        margin-left: 0; /* Ensure content does not shift left on smaller screens */
+        margin-top: 50px; /* Add space to avoid content being hidden behind the hamburger button */
+    }
+}
+
+/* Content Header */
+.content-header {
+    margin-bottom: 20px;
+    font-size: 1.5rem; /* Updated title font size */
+    font-weight: bold;
+}
+
+/* Button Styles */
+button {
+    font-size: 1rem; /* Adjusted button font size */
+    padding: 8px 15px;
+}
+
+/* Download Buttons */
+#downloadButton, #downloadCsvButton {
+    font-size: 1rem; /* Ensure buttons have a consistent font size */
+    padding: 10px 20px;
+    margin-top: 2vh;
+}
+
+/* Date Range Filter */
+#filterForm select,
+#filterForm input {
+    font-size: 1rem; /* Ensure consistency in input font size */
+}
+
+/* Table Styling */
+.report-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1rem; /* Table font size */
+}
+
+.report-table th, .report-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.report-table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+
+/* Sidebar Overlay */
+
+
+.sidebar-overlay.active {
+    display: block;
+}
+
+/* Hamburger Button */
+.hamburger {
+    display: block;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 10px;
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1100;
+    color: #4d4e50;
+    font-size: 24px;
+}
+
+@media (min-width: 1201px) {
+    .hamburger {
+        display: none;
+    }
+}
+
+/* Total Box */
+.totals-box {
+    margin-top: 20px;
+}
+
+.totals-box h3 {
+    font-size: 1.2rem; /* Updated font size for totals */
+}
+
+.totals-box p {
+    font-size: 1.1rem; /* Ensure consistency in text size */
+}
+
+/* Sidebar Menu Hover Effect */
+.sidebar-menu li a:hover,
+.sidebar-menu li a.active {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-left: 4px solid #1a73e8;
+}
+
+/* Sidebar Responsiveness */
+@media (max-width: 1200px) {
+    .sidebar {
+        left: -250px; /* Hidden initially */
+    }
+    .sidebar.active {
+        left: 0; /* Slide in when active */
+    }
+
+    .sidebar-overlay {
+        display: block; /* Dimmed background when sidebar is open */
+    }
+
+    .hamburger {
+        display: block;
+    }
+
+    .content-main {
+        margin-left: 0 !important; /* Avoid being pushed right */
+        margin-top: 60px; /* Ensure content is not hidden behind hamburger */
+    }
+}
+
+@media (min-width: 1201px) {
+    .sidebar {
+        left: 0;
+    }
+    .hamburger {
+        display: none;
+    }
+    .sidebar-overlay {
+        display: none !important;
+    }
+}
+
+
+  </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar" style="width: 15vw;">
+  <ul class="sidebar-menu">
+    <li><a href="/admin/dashboard"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+    <li><a href="/admin/users"><i class="fas fa-users"></i> <span>Customers</span></a></li>
+    <li><a href="/admin/category"><i class="fas fa-list"></i> <span>Categories</span></a></li>
+    <li><a href="/admin/orders"><i class="fas fa-shopping-bag"></i> <span>Orders</span></a></li>
+    <li><a href="/admin/products"><i class="fas fa-plus-circle"></i> <span>Add Products</span></a></li>
+    <li><a href="/admin/allProducts"><i class="fas fa-box"></i> <span>Products</span></a></li>
+    <li><a href="/admin/coupon"><i class="fas fa-tags"></i> <span>Coupons</span></a></li>
+    <li><a href="/admin/transaction"><i class="fas fa-money-bill-wave"></i> <span>Transactions</span></a></li>
+    <li><a href="/admin/complaints"><i class="fas fa-exclamation-circle"></i> <span>Complaints</span></a></li>
+    <li><a href="/admin/report"><i class="fas fa-chart-bar"></i> <span>Report</span></a></li>
+  </ul>
+</div>
+
+<!-- Hamburger and Overlay -->
+<button class="hamburger" id="hamburgerToggle"><i class="fas fa-bars"></i></button>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- Main Content -->
+<section class="content-main">
+  <div class="content-header">
+    <h2 class="content-title">Sales Report</h2>
+  </div>
+
+  <div class="card mb-4">
+    <div class="container mt-5">
+      <h2>Sales Report</h2>
+
+      <!-- Download Buttons -->
+      <div style="display: flex;">
+        <button class="btn btn-success mt-4" id="downloadButton">Download Order Report</button>
+        <button class="btn btn-primary mt-4" id="downloadCsvButton" style="margin-left:1vh; margin-top: 2vh; width: 15vw;height: 5vh;">
+          <i class="fas fa-file-csv"></i> Download in Excel
+        </button>
+      </div>
+
+      <!-- Filter Form -->
+      <form id="filterForm" action="/admin/report" method="GET">
+        <div class="row d-flex align-items-center">
+          <div class="col-md-3">
+            <select name="reportType" class="form-control" id="reportType">
+              <option value="daily" <%= reportType === 'daily' ? 'selected' : '' %>>Daily</option>
+              <option value="weekly" <%= reportType === 'weekly' ? 'selected' : '' %>>Weekly</option>
+              <option value="monthly" <%= reportType === 'monthly' ? 'selected' : '' %>>Monthly</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <input type="date" name="startDate" class="form-control" id="startDate"
+              value="<%= startDate instanceof Date ? startDate.toISOString().split('T')[0] : '' %>">
+          </div>
+          <div class="col-md-3">
+            <input type="date" name="endDate" class="form-control" id="endDate"
+              value="<%= endDate instanceof Date ? endDate.toISOString().split('T')[0] : '' %>">
+          </div>
+          <div class="col-md-3">
+            <button type="submit" class="btn btn-primary">Filter</button>
+          </div>
+        </div>
+      </form>
+
+      <!-- Report Table -->
+      <div class="topbottom">
+        <div class="report-container">
+          <table class="report-table">
+            <thead>
+              <tr >
+                <th style="color: #333;">Product Name</th>
+                <th style="color: #333;">Total Orders</th>
+                <th style="color: #333;">Total Sales</th>
+                <th style="color: #333;">Total discount</th>
+                <th style="color: #333;">Total Amount</th>
+                <th style="color: #333;">Average Order Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% salesData.forEach(function(product) { %>
+              <tr>
+                <td><%= product.productName %></td>
+                <td><%= product.totalOrders %></td>
+                <td><%= Math.floor(product.totalSales) %></td>
+                <td><%= product.totalDiscount %></td>
+                <td><%= Math.floor(product.totalAmount) %></td>
+                <td><%= Math.floor(product.averageOrderValue) %></td>
+              </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="totals-box">
+          <h3>Total Products Ordered So Far</h3>
+          <p><%= totalOrders %> Nos</p>
+
+          <h3>Total Amount Spent on All Products</h3>
+          <p>₹ <%= totalSales %></p>
+
+          <h3>Total discount on All Products</h3>
+          <p>₹ <%= totalDiscount %></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  document.getElementById('downloadButton').addEventListener('click', function (e) {
+    e.preventDefault();
+    const reportType = document.getElementById('reportType').value;
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+
+    const previewUrl = `/admin/report?download=order_pdf&reportType=${reportType}&startDate=${startDate}&endDate=${endDate}`;
+    const previewWindow = window.open(previewUrl, '_blank');
+
+    setTimeout(() => {
+      const downloadUrl = previewUrl + '&forceDownload=true';
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.src = downloadUrl;
+      document.body.appendChild(iframe);
+      setTimeout(() => document.body.removeChild(iframe), 1000);
+    }, 2000);
+  });
+
+  document.getElementById('downloadCsvButton').addEventListener('click', function (e) {
+    e.preventDefault();
+    const reportType = document.getElementById('reportType').value;
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+
+    if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+      return alert('End date must be after start date');
+    }
+
+    const downloadUrl = `/admin/csvreport?reportType=${reportType}&startDate=${startDate}&endDate=${endDate}`;
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = `sales_report_${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  });
+
+  // Sidebar toggle logic
+  const hamburger = document.getElementById('hamburgerToggle');
+  const sidebar = document.querySelector('.sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+
+  hamburger.addEventListener('click', () => {
+    sidebar.classList.toggle('active');
+    overlay.classList.toggle('active');
+  });
+
+  overlay.addEventListener('click', () => {
+    sidebar.classList.remove('active');
+    overlay.classList.remove('active');
+  });
+</script>
+
+</body>
+</html>

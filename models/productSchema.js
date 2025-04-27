@@ -15,6 +15,9 @@ const productSchema = new Schema({
         ref: 'Category',
         required: true
     },
+    size: { type: String},
+    
+    color: { type: String},
     regularPrice: {
         type: Number,
         required: true
@@ -27,15 +30,15 @@ const productSchema = new Schema({
         type: Number,
         required: true
     },
-    size:{
-        type:String,
-        default:"M",
-      },
-      color:{
-        type:String,
-        default:"blue",
-        required:true,
-      },
+    
+      variants: [{
+        
+        size: { type: String, required: true },
+        color: { type: String, required: true },
+        price: { type: Number, required: true },
+        quantity: { type: Number, required: false },
+      }
+      ],
     productImage: {
         type: [String],
         required: true,
@@ -59,6 +62,32 @@ const productSchema = new Schema({
         type:Number,
         default:0
       },
+      bestOffer: { type: Number, default: 0 },
+      ratings: [
+        {
+          user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+           
+          },
+          stars: {
+            type: Number,
+            min: 1,
+            max: 5,
+            default:0
+          },
+          message: {
+            type: String,
+            maxlength: 500
+          },
+          createdAt: {
+            type: Date,
+            default: Date.now
+          }
+        }
+      ]
+      
+      
 }, { timestamps: true });
 
 const Product = mongoose.model('Product', productSchema);

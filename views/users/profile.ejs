@@ -1,374 +1,351 @@
 <%- include("../../views/partials/user/header") %>
 
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <link rel="stylesheet" href="/style/user/profile.css">
-
-
-<main class="hero"  >
-    <div class="hero-content">   
-      <p class="hero-description">
-        <a href="/" class="bread">Home</a> <span>/</span> 
-        <a href="/wishlist"  class="bread">Account</a>
-      </p>
+<style>/* Sidebar Wrapper */
+    /* Desktop Styles */
+   .ultra-sidebar-container {
+       width: 18vw;
+       min-width: 250px;
+       background-color: #f8f9fa;
+       border-right: 2px solid #e0e0e0;
+       padding: 20px;
+       min-height: 100vh;
+       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+   }
+   
+   .ultra-sidebar-header h2 {
+       font-size: 22px;
+       margin-bottom: 20px;
+       color: #333;
+       display: flex;
+       align-items: center;
+       gap: 10px;
+   }
+   
+   .ultra-sidebar-menu a {
+       display: flex;
+       align-items: center;
+       gap: 10px;
+       padding: 12px 15px;
+       margin-bottom: 10px;
+       color: #555;
+       text-decoration: none;
+       background-color: #fff;
+       border-radius: 6px;
+       transition: all 0.3s ease;
+       font-size: 16px;
+   }
+   
+   .ultra-sidebar-menu a:hover,
+   .ultra-sidebar-menu a.ultra-active {
+       background-color: #007bff;
+       color: #fff;
+   }
+   
+   .ultra-sidebar-menu a i {
+       font-size: 18px;
+   }
+   
+   .ultra-sidebar-menu .ultra-logout-btn {
+       color: #dc3545;
+   }
+   
+   .ultra-sidebar-menu .ultra-logout-btn:hover {
+       background-color: #dc3545;
+       color: white;
+   }
+   
+   /* Tablet Screens */
+   @media (max-width: 991px) {
+       .ultra-sidebar-container {
+           width: 100%;
+           min-width: 100%;
+           border-right: none;
+           border-bottom: 1px solid #ddd;
+           padding: 15px;
+           display: flex;
+           flex-direction: row;
+           overflow-x: auto;
+           white-space: nowrap;
+           gap: 10px;
+       }
+   
+       .ultra-sidebar-header {
+           display: none;
+       }
+   
+       .ultra-sidebar-menu {
+           display: flex;
+           flex-direction: row;
+           gap: 10px;
+           width: 100%;
+       }
+   
+       .ultra-sidebar-menu a {
+           display: flex;
+           flex-direction: column;
+           align-items: center;
+           justify-content: center;
+           font-size: 13px;
+           padding: 8px;
+           min-width: 80px;
+           border-radius: 10px;
+       }
+   
+       .ultra-sidebar-menu a i {
+           font-size: 18px;
+       }
+   }
+   
+   /* Small Mobile Screens */
+   @media (max-width: 576px) {
+       .ultra-sidebar-menu a {
+           padding: 6px;
+           min-width: 65px;
+           font-size: 12px;
+       }
+   
+       .ultra-sidebar-menu a i {
+           font-size: 16px;
+       }
+   }
+   
+       </style>
+   
+<main class="hero-banner">
+    <div class="breadcrumb-container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Account</li>
+            </ol>
+        </nav>
     </div>  
+</main>
 
-    
-</head>
 <body>
-    <div class="container mt-5 main box">
+    <div class="container main-container">
         <div class="row">
-            <!-- Sidebar -->
-            <div class="col-md-3 sidebar">
-                <h2>My Account</h2>
-                <a href="/Profile" class="active"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
-                    <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10s-3.516.68-4.168 1.332c-.678.678-.83 1.418-.832 1.664z"/>
-                  </svg> Account Details</a>
-                <a href="/address"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-geo-alt" viewBox="0 0 16 16">
-                    <path d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A32 32 0 0 1 8 14.58a32 32 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10"/>
-                    <path d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4m0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
-                  </svg> Address</a>
-                <a href="/orders"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart2" viewBox="0 0 16 16">
-                    <path d="M0 2.5A.5.5 0 0 1 .5 2H2a.5.5 0 0 1 .485.379L2.89 4H14.5a.5.5 0 0 1 .485.621l-1.5 6A.5.5 0 0 1 13 11H4a.5.5 0 0 1-.485-.379L1.61 3H.5a.5.5 0 0 1-.5-.5M3.14 5l1.25 5h8.22l1.25-5zM5 13a1 1 0 1 0 0 2 1 1 0 0 0 0-2m-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0m9-1a1 1 0 1 0 0 2 1 1 0 0 0 0-2m-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0"/>
-                  </svg> Orders</a>
-               <a href="/wishlist"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
-                    <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
-                  </svg> Wishlist</a> 
-                  <a href="/cart"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart2" viewBox="0 0 16 16">
-                    <path d="M0 2.5A.5.5 0 0 1 .5 2H2a.5.5 0 0 1 .485.379L2.89 4H14.5a.5.5 0 0 1 .485.621l-1.5 6A.5.5 0 0 1 13 11H4a.5.5 0 0 1-.485-.379L1.61 3H.5a.5.5 0 0 1-.5-.5M3.14 5l1.25 5h8.22l1.25-5zM5 13a1 1 0 1 0 0 2 1 1 0 0 0 0-2m-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0m9-1a1 1 0 1 0 0 2 1 1 0 0 0 0-2m-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0"/>
-                  </svg>Cart</a> 
-                <a href="/wallet"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-wallet-fill" viewBox="0 0 16 16">
-                    <path d="M1.5 2A1.5 1.5 0 0 0 0 3.5v2h6a.5.5 0 0 1 .5.5c0 .253.08.644.306.958.207.288.557.542 1.194.542s.987-.254 1.194-.542C9.42 6.644 9.5 6.253 9.5 6a.5.5 0 0 1 .5-.5h6v-2A1.5 1.5 0 0 0 14.5 2z"/>
-                    <path d="M16 6.5h-5.551a2.7 2.7 0 0 1-.443 1.042C9.613 8.088 8.963 8.5 8 8.5s-1.613-.412-2.006-.958A2.7 2.7 0 0 1 5.551 6.5H0v6A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5z"/>
-                  </svg> Wallet</a>
-                <a href="mycoupons"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cash" viewBox="0 0 16 16">
-                    <path d="M8 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4"/>
-                    <path d="M0 4a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1zm3 0a2 2 0 0 1-2 2v4a2 2 0 0 1 2 2h10a2 2 0 0 1 2-2V6a2 2 0 0 1-2-2z"/>
-                  </svg> My Coupons</a>
-                  <a href="/refferal" ><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-geo-alt" viewBox="0 0 16 16">
-                    <path d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A32 32 0 0 1 8 14.58a32 32 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10"/>
-                    <path d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4m0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
-                  </svg> refferal</a>
-                <a href="#" onclick="confirmLogout(event)" class="text-danger mt-4"><i class="fas fa-sign-out-alt"></i> Logout</a>
-            </div>
+            <!-- Sidebar Navigation -->
+          
+<div class="col-lg-3 col-md-4 ultra-sidebar-container">
+    <div class="ultra-sidebar-header">
+        <h2><i class="fas fa-user-circle me-2"></i>My Account</h2>
+    </div>
+    <div class="ultra-sidebar-menu">
+        <a href="/Profile"class="ultra-active">
+            <i class="fas fa-user"></i>Account Details
+        </a>
+        <a href="/address" >
+            <i class="fas fa-map-marker-alt"></i>Address
+        </a>
+        <a href="/orders">
+            <i class="fas fa-box-open"></i>Orders
+        </a>
+        <a href="/wishlist">
+            <i class="fas fa-heart"></i>Wishlist
+        </a>
+        <a href="/cart">
+            <i class="fas fa-shopping-cart"></i>Cart
+        </a>
+        <a href="/wallet">
+            <i class="fas fa-wallet"></i>Wallet
+        </a>
+        <a href="/mycoupons">
+            <i class="fas fa-tag"></i>My Coupons
+        </a>
+        <a href="#" onclick="confirmLogout(event)" class="ultra-logout-btn">
+            <i class="fas fa-sign-out-alt me-2"></i>Logout
+        </a>
+    </div>
+</div>
+
+            
+
             <!-- Main Content -->
-            <div class="col-md-9 main-content">
-                <h2>Personal Information</h2>
-                <div class="personalfullbox">
-                    <div class="personalleftbox">
-                    <form id="profileForm">
-                
-                        <div class="form-row">
-                            <div class="form-group col-md-6">
-                                <label>Full Name <span class="text-danger">*</span></label>
-                                <input name="name" type="text" value="<%= user.name %>" class="form-control" required>
-                             </div>
-                            <div class="form-group col-md-6">
-                                <label>Username <span class="text-danger">*</span></label>
-                                <input name="username" type="text" value="<%= user.username %>" placeholder="Set your Username" class="form-control" required>
-                                <small class="text-muted">Choose a unique username</small>
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label>Email address</label>
-                                <input type="email" value="<%= user.email %>" class="form-control" disabled>
-                                <small class="text-muted">Email cannot be changed here</small>
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label>Phone Number <span class="text-danger">*</span></label>
-                                <div class="input-group">
-                                 <div class="input-group-prepend">
-                                        <select class="form-control" id="countryCode" disabled>
-                                        <option value="+91">+91</option>
-                                    </select>
+            <div class="col-lg-9 col-md-8 main-content" >
+                <div class="content-card"style="min-height: 60vh;">
+                    <h2 class="section-title"><i class="fas fa-user-edit me-2"></i>Personal Information</h2>
+                    
+                    <div class="profile-section">
+                        <!-- Left Column - Form -->
+                        <div class="profile-form">
+                            <form id="profileForm">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Full Name <span class="required">*</span></label>
+                                        <input name="name" type="text" value="<%= user.fullname %>" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Username <span class="required">*</span></label>
+                                        <input name="username" type="text" value="<%= user.fullname %>" placeholder="Set your Username" class="form-control" required>
+                                        <small class="form-text">Choose a unique username</small>
+                                    </div>
                                 </div>
-                                <input type="text" name="phone" class="form-control" value="<%= user.phone %>" 
-                                       pattern="[0-9]{10}" title="Please enter a valid 10-digit phone number"
-                                       placeholder="Enter phone number" required>
+                                
+                                <div class="row" >
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Email address</label>
+                                        <input type="email" value="<%= user.email %>" class="form-control" disabled>
+                                        <small class="form-text">Email cannot be changed here</small>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Phone Number <span class="required">*</span></label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">+91</span>
+                                            <input type="text" name="phone" class="form-control" 
+                                                   value="<%= user.phone %>" 
+                                                   pattern="[0-9]{10}" 
+                                                   title="Please enter a valid 10-digit phone number"
+                                                   placeholder="Enter phone number" required>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                                
+                            
+                                
+                             <!-- Inside your form div, replace the current button section with this: -->
+                            <div class="button-group d-flex flex-wrap align-items-center gap-3 mt-4">
+                                <button type="submit" class="btn btn-primary flex-grow-0">
+                                    <i class="fas fa-save me-2"></i>Save Changes
+                                </button>
+    
+                                 <a class="btn btn-outline-primary flex-grow-0" href="/change-email">
+                                 <i class="fas fa-envelope me-2"></i>Change Email
+                                </a>    
+                                <a href="/forgotpassword" class="btn btn-outline-secondary flex-grow-0 forgot-password">
+                                <i class="fas fa-key me-2"></i>Change Password
+                                </a>
                             </div>
+                         </form>
                         </div>
                         
-                        <div class="form-group col-md-6">
-                            <a class="btn btn-primary" href="/change-email">Change Your Email</a>
+                        <!-- Right Column - Profile Picture -->
+                        <div class="profile-picture-section">
+                            <img id="profileImagePreview" 
+                                 src="<%= user.image ? user.image[0] : 'uploads/profile/profileImage-1742477923692.webp' %>" 
+                                 class="profile-picture" 
+                                 alt="Profile">
+                            
+                            <form id="profilePicForm" enctype="multipart/form-data">
+                                <input type="file" id="profileImage" accept="image/*" hidden onchange="previewImage(event)">
+                                <button type="button" onclick="document.getElementById('profileImage').click()" class="btn btn-outline-secondary mt-3">
+                                    <i class="fas fa-camera me-2"></i>Change Photo
+                                </button>
+                            </form>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-success">Save Changes</button>
-                </form>
-            </div>
-           
-            <div class="personalrignt">
-                  
-        <!-- Profile Picture Section -->
-        <div class="profile-picture-section">
-            <!-- Display user image or fallback image -->
-            <img id="profileImagePreview" src="<%= user.image ? user.image[0] : 'uploads/profile/profileImage-1742477923692.webp' %>" class="profile-picture" alt="Profile">
-        
-            <form id="profilePicForm" enctype="multipart/form-data">
-                <!-- Hidden file input for uploading images -->
-                <input type="file" id="profileImage" accept="image/*" hidden onchange="previewImage(event)">
-                <br>
-                <!-- Button to trigger file input -->
-                <button type="button" onclick="document.getElementById('profileImage').click()" class="btn-gold">
-                    <i class="fas fa-camera"></i> Change Photo
-                </button>
-            </form>
-        </div>
-        </div> </div>
-      
-           
+                      <!-- Change Password Section -->
                 
-    <div class="edit-profile-container">
-        <h2 class="text-center mb-4">Edit Profile</h2>
-      
-    
-
-          
-                <hr class="mt-4 mb-4">
-<h3>Change Password</h3>
-<form id="changePasswordForm">
-    <div class="form-group">
-        <label for="currentPassword">Current Password</label>
-        <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
-        <small id="currentPasswordError" class="text-danger"></small>
-    </div>
-    <div class="form-group">
-        <label for="newPassword">New Password</label>
-        <input type="password" class="form-control" id="newPassword" name="newPassword" required>
-        <small id="newPasswordError" class="text-danger"></small>
-    </div>
-    <div class="form-group">
-        <label for="confirmPassword">Confirm New Password</label>
-        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
-        <small id="confirmPasswordError" class="text-danger"></small>
-    </div>
-    <button type="submit" class="btn btn-primary">Change Password</button>
-</form>
+                  
+                </div>
             </div>
         </div>
     </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- Include the external JavaScript file for image submission -->
-<script src="/path/to/imageSubmission.js"></script>
-
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-
-
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
+        // Image Preview Function
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('profileImagePreview').src = e.target.result;
+                    
+                    // Upload image immediately after selection
+                    const formData = new FormData();
+                    formData.append('profileImage', file);
 
-
-
-
-
-// Function to handle image preview
-function previewImage(event) {
-        const file = event.target.files[0]; // Get the selected file
-        const reader = new FileReader(); // Create a FileReader to read the file
-
-        reader.onload = function(e) {
-            // Once the file is read, update the image source
-            const imgElement = document.getElementById('profileImagePreview');
-            imgElement.src = e.target.result; // Set the src to the data URL
-        };
-
-        // If a file is selected, read it as a data URL
-        if (file) {
-            reader.readAsDataURL(file);
-        }
-    }
-
-
-// imageUpload.js
-
-document.addEventListener("DOMContentLoaded", function() {
-    const profileImageInput = document.getElementById('profileImage');
-    const profilePicture = document.querySelector('.profile-picture');
-    
-    // Image preview handler
-    profileImageInput.addEventListener('change', function (e) {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const formData = new FormData();
-        formData.append('profileImage', file);
-
-        // Upload image to the server
-        fetch(`/upload-profile-pic/<%= user._id %>`, {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                profilePicture.src = data.imagePath; // Update profile picture
-                Swal.fire('Success!', 'Profile picture updated successfully.', 'success');
-            } else {
-                Swal.fire('Error!', 'Failed to upload image.', 'error');
+                    fetch(`/upload-profile-pic/<%= user._id %>`, {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire('Success!', 'Profile picture updated successfully.', 'success');
+                        } else {
+                            Swal.fire('Error!', data.message || 'Failed to upload image.', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire('Error!', 'Something went wrong.', 'error');
+                    });
+                };
+                reader.readAsDataURL(file);
             }
-        })
-        .catch(error => Swal.fire('Error!', 'Something went wrong.', 'error'));
-    });
-});
+        }
 
+        // Profile Form Submission
+        document.getElementById('profileForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
 
-
-
-
-
-    document.getElementById('profileForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const formData = new FormData(e.target);
-        const data = Object.fromEntries(formData.entries());
-    
-        try {
-            const response = await fetch('/update-profile', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data),
-            });
-    
-            const result = await response.json();
-    
-            if (result.success) {
-                await Swal.fire({
-                    icon: 'success',
-                    title: 'Success!',
-                    text: 'Profile updated successfully',
-                    timer: 2000,
-                    showConfirmButton: false
+            try {
+                const response = await fetch('/update-profile', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
                 });
-                window.location.href = '/address';
-            } else {
+
+                const result = await response.json();
+
+                if (result.success) {
+                    await Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: 'Profile updated successfully',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    window.location.reload();
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: result.message,
+                    });
+                }
+            } catch (error) {
+                console.error('Error:', error);
                 Swal.fire({
                     icon: 'error',
                     title: 'Oops...',
-                    text: result.message,
+                    text: 'An unexpected error occurred. Please try again.',
                 });
             }
-        } catch (error) {
-            console.error('Error:', error);
+        });
+
+  
+  
+        // Logout Confirmation
+        function confirmLogout(event) {
+            event.preventDefault();
             Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: 'An unexpected error occurred. Please try again.',
+                title: "Are you sure?",
+                text: "You will be logged out!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, Logout"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "/logout";
+                }
             });
         }
-    });
-
-    document.getElementById('changePasswordForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    // Reset error messages
-    document.getElementById('currentPasswordError').textContent = '';
-    document.getElementById('newPasswordError').textContent = '';
-    document.getElementById('confirmPasswordError').textContent = '';
-
-    const currentPassword = document.getElementById('currentPassword').value;
-    const newPassword = document.getElementById('newPassword').value;
-    const confirmPassword = document.getElementById('confirmPassword').value;
-
-    // Client-side validation
-    let isValid = true;
-
-    if (newPassword.length < 8 || !/[a-zA-Z]/.test(newPassword) || !/\d/.test(newPassword)) {
-        document.getElementById('newPasswordError').textContent = 'Password must be at least 8 characters long and contain both letters and numbers.';
-        isValid = false;
-    }
-
-    if (newPassword !== confirmPassword) {
-        document.getElementById('confirmPasswordError').textContent = 'Passwords do not match.';
-        isValid = false;
-    }
-
-    if (!isValid) return;
-
-    try {
-        const response = await fetch('/change-password', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ currentPassword, newPassword, confirmPassword }),
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-            await Swal.fire({
-                icon: 'success',
-                title: 'Success!',
-                text: 'Password changed successfully',
-                timer: 2000,
-                showConfirmButton: false
-            });
-            window.location.href = '/address';
-        } else {
-            if (result.error === 'current_password_incorrect') {
-                document.getElementById('currentPasswordError').textContent = 'Current password is incorrect.';
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: result.message,
-                });
-            }
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            text: 'An unexpected error occurred. Please try again.',
-        });
-    }
-});
-
-function confirmLogout(event) {
-        event.preventDefault(); // Prevent default link behavior
-
-        Swal.fire({
-            title: "Are you sure?",
-            text: "You will be logged out!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Yes, Logout"
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = "/logout"; // Redirect only if confirmed
-            }
-        });
-    }
-
-
-
     </script>
 
-<!-- Bootstrap JS and dependencies -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
-
-
-<br><br>
-
 <%- include("../../views/partials/user/footer") %>
-
-
-
-
-

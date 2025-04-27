@@ -1,8 +1,7 @@
 
-    /* Container Styling */
-    .container-fluid {
-        padding: 30px;
-    }
+    .sidebar{
+        width: 16vw;
+      }
     
     /* Heading Styling */
     h1.mt-4 {

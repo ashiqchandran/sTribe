@@ -1,0 +1,60 @@
+<%- include("../partials/user/header") %>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <div class="payment-status-card failure-card">
+                <div class="status-icon">
+                    <i class="fas fa-times-circle fa-5x text-danger"></i>
+                </div>
+                <h1 class="mt-4 text-danger">Payment Failed for orderId <%= orderId %></h1>
+                <p class="lead">We're sorry, your payment could not be processed.</p>
+                
+                <div class="failure-details">
+                    <p>Possible reasons for failure:</p>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-ban text-danger"></i> Insufficient funds</li>
+                        <li><i class="fas fa-ban text-danger"></i> Network issues</li>
+                        <li><i class="fas fa-ban text-danger"></i> Payment declined by bank</li>
+                        <li><i class="fas fa-ban text-danger"></i> Transaction timeout</li>
+                    </ul>
+                </div>
+
+                <div class="mt-5 action-buttons">
+                    <button id="retryPaymentBtn" class="btn btn-primary btn-lg">
+                        <a href="/order" class="btn btn-outline-secondary btn-lg">
+                            <i class="fas fa-shopping-cart"></i> Retry
+                        </a>
+                    </button>
+                    <a href="/cart" class="btn btn-outline-secondary btn-lg">
+                        <i class="fas fa-shopping-cart"></i> Return to Cart
+                    </a>
+                </div>
+
+                <div class="mt-4 text-muted">
+                    <p>If the problem persists, please contact our support team.</p>
+                    <p>Email: support@yourstore.com | Phone: +91-1234567890</p>
+                </div>
+
+                <div class="mt-3">
+                    <p>Redirecting in <span id="countdown">10</span> seconds...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Style and Script -->
+<script>
+    let seconds = 10;
+    const timer = setInterval(() => {
+        document.getElementById('countdown').textContent = seconds;
+        seconds--;
+        if (seconds < 0) {
+            clearInterval(timer);
+            window.location.href = '/cart';
+        }
+    }, 1000);
+</script>
+
+<%- include("../partials/user/footer") %>

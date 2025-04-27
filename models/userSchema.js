@@ -1,3 +1,4 @@
+const { defaultMaxListeners } = require('connect-mongo');
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
@@ -9,6 +10,11 @@ const userSchema = new Schema({
     fullname: {
         type: String,
         required: true
+    },
+    username: {
+        type: String,
+        
+        required: false
     },
     email: {
         type: String,
@@ -65,10 +71,7 @@ const userSchema = new Schema({
         type: Date,
         default: Date.now
     },
-    referalCode: {
-        type: String,
-        default: ""
-    },
+ 
     searchHistory: [{
         category: {
             type: Schema.Types.ObjectId,
@@ -87,6 +90,21 @@ const userSchema = new Schema({
         type:[String],
         // required:true
       },
+      referralCode: { type: String, required: true, unique: true },
+     referalPoint:{
+        type:Number,
+        default:0
+     },
+     coupons: [{ type: Schema.Types.ObjectId, ref: 'Coupon' }],
+     referredBy: { type: String, default: null },
+     
+     bankAccount: {
+        name: String,
+        accountNumber: String,
+        ifsc: String,
+        verified: Boolean
+      }
+   
 });
 
 const User = mongoose.model("User", userSchema);

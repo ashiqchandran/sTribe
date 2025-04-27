@@ -128,18 +128,49 @@ const updateCoupon = async (req, res) => {
     }
 };
 
-const deleteCoupon = async (req,res) => {
+
+
+const deleteCoupon = async (req, res) => {
     try {
-        console.log("delete came here")
-       
-return res.render('coupons')
+        // Correct way to get the couponId from query parameters
+        const couponId = req.query.id;
+        console.log(req.query)
+        console.log(req.body)
+        // Validate couponId exists
+        if (!couponId) {
+            return res.status(400).json({ message: "Coupon ID is required" });
+        }
+
+        // Validate ID format
+        if (!mongoose.Types.ObjectId.isValid(couponId)) {
+            return res.status(400).json({ message: "Invalid coupon ID format" });
+        }
+
+        // Delete the coupon
+        const result = await Coupon.findByIdAndDelete(couponId);
+        
+        if (!result) {
+            return res.status(404).json({ message: "Coupon not found" });
+        }
+
+        // Consistent response - choose either JSON or render
+        // Option 1: Return JSON response
+       res.render("adminSuccess")
+
+        // Option 2: Render a success page (if you prefer)
+        // return res.render("success", { 
+        //     message: "Coupon deleted successfully",
+        //     coupon: result
+        // });
+
     } catch (error) {
-        console.error("Error Deleting Coupon",error)
-        res.status(500).send({success:false,message:"Internal Server Error"})
+        console.error("Delete coupon error:", error);
+        return res.status(500).json({ 
+            message: "Failed to delete coupon",
+            error: error.message 
+        });
     }
 }
-
-
 
 
 module.exports = {

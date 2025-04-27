@@ -69,6 +69,8 @@
                         <span class="badge bg-<%= 
                             order.status === 'delivered' ? 'success' :
                             order.status === 'cancelled' ? 'danger' :
+                            order.status === 'returned' ? 'grey' :
+
                             order.status === 'shipped' ? 'info' :
                             'warning'
                         %>">
@@ -80,7 +82,7 @@
                     <!-- Status Timeline -->
                     <div class="status-timeline">
                         <div class="status-line"></div>
-                        <% const statuses = ['pending', 'confirmed', 'shipped', 'delivered']; %>
+                        <% const statuses = ['pending', 'confirmed', 'shipped', 'delivered','returned']; %>
                         <% statuses.forEach(status => { %>
                             <div class="status-point">
                                 <div class="status-dot <%= order.status === status || statuses.indexOf(order.status) > statuses.indexOf(status) ? 'status-active' : 'status-inactive' %>"></div>
@@ -112,7 +114,7 @@
                                             <span><%= order.orderItems[0].product.productName %></span>
                                         </div>
                                     </td>
-                                    <td>&nbsp&nbsp&nbsp&nbsp₹<%= order.orderItems[0].price %></td>
+                                    <td>&nbsp&nbsp&nbsp&nbsp₹<%= Math.floor(order.orderItems[0].price) %></td>
                                     <td>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.orderItems[0].quantity %></td>
                                     <td>&nbsp&nbsp&nbsp&nbsp₹<%= order.finalAmount %></td>
                                 </tr>
@@ -156,18 +158,18 @@
                         <h6>Order Summary</h6>
                         <div class="d-flex justify-content-between mb-2">
                             <span>Subtotal:</span>
-                            <span>₹<%= order.totalPrice %></span>
+                            <span>₹<%= Math.floor(order.totalPrice) %>.00</span>
                         </div>
                         <% if (order.discount > 0) { %>
                             <div class="d-flex justify-content-between mb-2">
                                 <span>Discount:</span>
-                                <span>-₹<%= order.discount %></span>
+                                <span>-<%= order.discount %>%</span>
                             </div>
                         <% } %>
                         <hr>
                         <div class="d-flex justify-content-between fw-bold">
                             <span>Total:</span>
-                            <span>₹<%= order.finalAmount %></span>
+                            <span>₹<%= Math.floor(order.totalPrice) %>.00</span>
                         </div>
                     </div>
 
@@ -192,7 +194,8 @@
                 'pending': 'Pending',
                 'confirmed': 'Confirmed',
                 'shipped': 'Shipped',
-                'delivered': 'Delivered'
+                'delivered': 'Delivered',
+                'returned':'Returned'
             },
             inputPlaceholder: 'Select status',
             showCancelButton: true,

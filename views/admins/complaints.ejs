@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <title>Admin - Complaints</title>
+  <style>
+    :root {
+      --primary: #4361ee;
+      --secondary: #3a0ca3;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --gray: #6c757d;
+      --primary-bg-color: #f4f4f4;
+      --primary-text-color: #333;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: var(--primary-bg-color);
+      color: var(--primary-text-color);
+    }
+
+    .admin-container {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar Styles */
+    .sidebar {
+      width: 15vw;
+      background-color: #333;
+      color: #fff;
+      padding: 20px 0;
+      position: fixed;
+      height: 100vh;
+      transition: all 0.3s ease;
+      z-index: 1000;
+    }
+
+    .sidebar-header {
+      padding: 0 20px;
+      display: none; /* Hidden by default, shown on mobile */
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .menu-toggle {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 10px;
+    }
+
+    .sidebar-menu {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .sidebar-menu > li {
+      position: relative;
+    }
+
+    .sidebar-menu li a {
+      color: #fff;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      padding: 12px 20px;
+      transition: all 0.3s;padding: 0.8rem; 
+    }
+
+    .sidebar-menu li a:hover,
+    .sidebar-menu li a.active {
+      background-color: #555;
+    }
+
+    .sidebar-menu li a i {
+      margin-right: 10px;
+      width: 20px;
+      text-align: center;
+      padding: 8px;
+    }
+
+    /* Dropdown arrow */
+    .dropdown-arrow {
+      margin-left: auto;
+      transition: transform 0.3s ease;
+      font-size: 0.8rem;
+    }
+
+    .sidebar-menu li.active .dropdown-arrow {
+      transform: rotate(90deg);
+    }
+
+    /* Submenu styles */
+    .submenu {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      background-color: rgba(0, 0, 0, 0.2);
+    }
+
+    .sidebar-menu li.active .submenu {
+      max-height: 500px;
+    }
+
+    .submenu li a {
+      padding-left: 40px;
+      font-size: 0.9em;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      padding: 20px;
+      margin-left: 15vw;
+      transition: all 0.3s ease;
+    }
+
+    .admin-info-box {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #fff;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .logout-btn {
+      background-color: #d33;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .logout-btn:hover {
+      background-color: #b71c1c;
+    }
+
+    .container {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      color: var(--primary);
+      margin-bottom: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    th {
+      background-color: var(--primary);
+      color: #fff;
+      padding: 15px;
+      text-align: left;
+    }
+
+    td {
+      padding: 15px;
+      border-bottom: 1px solid #eee;
+    }
+
+    tr:hover {
+      background-color: #f5f7ff;
+    }
+
+    .email-link {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .email-link:hover {
+      text-decoration: underline;
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 20px;
+      gap: 10px;
+    }
+
+    .pagination button {
+      background-color: var(--primary);
+      color: #fff;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .pagination button:hover:not(:disabled) {
+      background-color: var(--secondary);
+    }
+
+    .pagination button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+    }
+
+    .empty-state h3 {
+      color: var(--gray);
+      margin-bottom: 10px;
+    }
+
+    /* Responsive Styles */
+    @media (max-width: 1200px) {
+      .admin-container {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        padding: 0;
+      }
+
+      .sidebar-header {
+        display: flex;
+        padding: 15px;
+        background-color: #444;
+      }
+
+      .sidebar-menu {
+        display: none;
+        width: 100%;
+      }
+
+      .sidebar-menu.show {
+        display: block;
+      }
+
+      .sidebar-menu li {
+        margin: 0;
+        border-bottom: 1px solid #444;
+      }
+
+      .sidebar-menu li a {
+        padding: 15px 20px;
+      }
+
+      .main-content {
+        margin-left: 0;
+        padding: 15px;
+      }
+    }
+
+    /* For screens larger than 1200px - hide toggle button */
+    @media (min-width: 1201px) {
+      .menu-toggle {
+        display: none;
+      }
+      
+      .sidebar-menu {
+        display: block !important;
+      }
+      
+      /* Show submenus by default on desktop */
+      .submenu {
+        display: block;
+        max-height: none !important;
+      }
+      
+      /* Hide dropdown arrows on desktop */
+      .dropdown-arrow {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="admin-container">
+  <div class="sidebar" style=" width:15vw;">
+    <div class="sidebar-header">
+      <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+    </div>
+    <ul class="sidebar-menu">
+      <li><a href="/admin/dashboard"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+              <li><a href="/admin/users"><i class="fas fa-users"></i> <span>Customers</span></a></li>
+              <li><a href="/admin/category"><i class="fas fa-list"></i> <span>Categories</span></a></li>
+              <li><a href="/admin/orders"><i class="fas fa-shopping-bag"></i> <span>Orders</span></a></li>
+              <li><a href="/admin/products"><i class="fas fa-plus-circle"></i> <span>Add Products</span></a></li>
+              <li><a href="/admin/allProducts"><i class="fas fa-box"></i> <span>Products</span></a></li>
+              <li><a href="/admin/coupon"><i class="fas fa-tags"></i> <span>Coupons</span></a></li>
+              <li><a href="/admin/transaction"><i class="fas fa-money-bill-wave"></i> <span>Transactions</span></a></li>
+              <li><a href="/admin/complaints"><i class="fas fa-exclamation-circle"></i> <span>Complaints</span></a></li>
+              <li><a href="/admin/report"><i class="fas fa-chart-bar"></i> <span>Report</span></a></li>
+    </ul>
+  </div>
+
+  <div class="main-content">
+    <div class="admin-info-box">
+      <span>Welcome, <%= adminname %></span>
+      <button class="logout-btn" onclick="confirmAdminLogout(event)">Logout</button>
+    </div>
+
+    <div class="container">
+      <h1>Customer Complaints and Suggestions</h1>
+
+      <% if (complaints.length === 0) { %>
+        <div class="empty-state">
+          <h3>No complaints found</h3>
+          <p>There are currently no customer complaints.</p>
+        </div>
+      <% } else { %>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Message</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% complaints.forEach(complaint => { %>
+              <tr>
+                <td><%= complaint.name %></td>
+                <td>
+                  <a href="mailto:<%= complaint.email %>" class="email-link"><%= complaint.email %></a>
+                </td>
+                <td><%= complaint.message %></td>
+                <td><%= new Date(complaint.submittedAt).toLocaleString() %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+
+        <div class="pagination">
+          <button onclick="window.location.href='/admin/complaints?page=<%= pagination.page - 1 %>&limit=<%= pagination.limit %>'"
+            <%= pagination.page === 1 ? 'disabled' : '' %>>
+            Previous
+          </button>
+
+          <span>Page <%= pagination.page %> of <%= pagination.totalPages %></span>
+
+          <button onclick="window.location.href='/admin/complaints?page=<%= pagination.page + 1 %>&limit=<%= pagination.limit %>'"
+            <%= pagination.page === pagination.totalPages ? 'disabled' : '' %>>
+            Next
+          </button>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  function confirmAdminLogout(event) {
+    event.preventDefault();
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You will be logged out of the admin panel!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, Logout!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        window.location.href = "/admin/logout";
+      }
+    });
+  }
+
+  function toggleSidebar() {
+    document.querySelector('.sidebar-menu').classList.toggle('show');
+  }
+
+  // Handle dropdown functionality
+  document.addEventListener("DOMContentLoaded", function() {
+    const dropdownArrows = document.querySelectorAll('.dropdown-arrow');
+    
+    dropdownArrows.forEach(arrow => {
+      arrow.addEventListener('click', function(e) {
+        if (window.innerWidth <= 1200) {
+          e.preventDefault();
+          e.stopPropagation();
+          const parentLi = this.closest('li');
+          parentLi.classList.toggle('active');
+        }
+      });
+    });
+
+    // Highlight active menu item
+    const links = document.querySelectorAll(".sidebar-menu li a");
+    const currentPath = window.location.pathname;
+
+    links.forEach(link => {
+      const linkPath = new URL(link.href).pathname;
+      if (linkPath === currentPath || 
+          currentPath.startsWith(linkPath + '/') || 
+          (linkPath === '/admin/dashboard' && currentPath === '/admin')) {
+        link.classList.add("active");
+        // Also activate the parent li for dropdown
+        const parentLi = link.closest('li');
+        if (parentLi) {
+          parentLi.classList.add("active");
+          // If this is a submenu item, also activate its parent
+          const grandparentLi = parentLi.closest('li');
+          if (grandparentLi) {
+            grandparentLi.classList.add("active");
+          }
+        }
+      }
+    });
+
+    // Close dropdown when clicking outside on mobile
+    document.addEventListener('click', function(e) {
+      if (window.innerWidth <= 1200) {
+        if (!e.target.closest('.sidebar')) {
+          document.querySelector('.sidebar-menu').classList.remove('show');
+        }
+      }
+    });
+  });
+
+  // Handle window resize
+  window.addEventListener('resize', function() {
+    if (window.innerWidth > 1200) {
+      document.querySelector('.sidebar-menu').classList.add('show');
+    }
+  });
+</script>
+
+</body>
+</html>
+<%- include("../partials/admin/footer") %>

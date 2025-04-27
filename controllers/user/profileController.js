@@ -33,6 +33,10 @@ const getprofile = async (req, res) => {
         res.status(500).send('Server Error')
     }
 }
+
+
+
+
 const loadAddressPage = async (req,res) => {
     try {
         const userId = req.session.user;
@@ -73,7 +77,7 @@ const addAddress = async (req,res) => {
 
 const postAddAddress = async (req,res) => {
     try {
-        
+        const checkoutAdd=req.query
         const userId = req.session.user;
         const userData = await User.findOne({_id:userId})
         const { addressType, name, country, city, landMark, state, streetAddress, pincode, phone, email, altPhone } = req.body;
@@ -91,8 +95,11 @@ const postAddAddress = async (req,res) => {
             userAddress.address.push({addressType, name, country, city, landMark, state, streetAddress, pincode, phone, email, altPhone})
             await userAddress.save();
         }
-
-        res.redirect("/address")
+        
+           return res.redirect("/checkout")
+       
+       
+        
 
     } catch (error) {
 
@@ -212,102 +219,118 @@ const deleteAddress = async (req,res) => {
         
     }
 }
-
 const updateProfile = async (req, res) => {
     try {
-        const userId = req.session.user; // Ensure session stores only userId
+        const userId = req.session.user._id;
+        console.log("userId = ", userId);
+        
         if (!userId) {
             return res.status(401).json({ success: false, message: 'User not authenticated.' });
         }
 
         const { name, username, phone } = req.body;
+        console.log("Request data:", { name, username, phone });
 
-        // Validate phone number
-        if (!/^\d{10}$/.test(phone)) {
-            return res.status(400).json({ success: false, message: 'Please enter a valid 10-digit phone number' });
+        // Create update object with only provided fields
+        const updateData = {};
+        
+        if (name !== undefined) {
+            updateData.fullname = name;
+        }
+        
+        if (username !== undefined) {
+            // Check if username already exists (except for current user)
+            const existingUser = await User.findOne({ 
+                username, 
+                _id: { $ne: userId } 
+            });
+            
+            if (existingUser) {
+                return res.status(400).json({ 
+                    success: false, 
+                    message: 'Username is already taken.' 
+                });
+            }
+            updateData.username = username;
+        }
+        
+        if (phone !== undefined) {
+            // Validate phone number format
+            if (!/^\d{10}$/.test(phone)) {
+                return res.status(400).json({ 
+                    success: false, 
+                    message: 'Please enter a valid 10-digit phone number' 
+                });
+            }
+            
+            // Check if phone number is already in use
+            const phoneExists = await User.findOne({ 
+                phone, 
+                _id: { $ne: userId } 
+            });
+            
+            if (phoneExists) {
+                return res.status(400).json({ 
+                    success: false, 
+                    message: 'Phone number already in use by another account' 
+                });
+            }
+            
+            updateData.phone = phone;
         }
 
-        // Check if username already exists (except for the current user)
-        const existingUser = await User.findOne({ username, _id: { $ne: userId } });
-        if (existingUser) {
-            return res.status(400).json({ success: false, message: 'Username is already taken.' });
+        // If no valid fields to update
+        if (Object.keys(updateData).length === 0) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'No valid fields provided for update' 
+            });
         }
 
-        // Update user profile
-        const updatedUser = await User.findByIdAndUpdate(userId, { name, username, phone }, { new: true, runValidators: true });
+        // Update user profile with only the provided fields
+        const updatedUser = await User.findByIdAndUpdate(
+            userId, 
+            updateData, 
+            { 
+                new: true, 
+                runValidators: true,
+                select: '-password -isAdmin -isBlocked' // Exclude sensitive fields
+            }
+        );
 
         if (!updatedUser) {
-            return res.status(404).json({ success: false, message: 'User not found' });
+            return res.status(404).json({ 
+                success: false, 
+                message: 'User not found' 
+            });
         }
 
-        res.json({ success: true, message: 'Profile updated successfully' });
+        res.json({ 
+            success: true, 
+            message: 'Profile updated successfully',
+            user: updatedUser 
+        });
     } catch (error) {
         console.error('Error updating profile:', error);
-        res.status(500).json({ success: false, message: 'An error occurred while updating your profile' });
+        
+        // Handle Mongoose validation errors
+        if (error.name === 'ValidationError') {
+            const messages = Object.values(error.errors).map(val => val.message);
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Validation error',
+                errors: messages 
+            });
+        }
+        
+        res.status(500).json({ 
+            success: false, 
+            message: 'An error occurred while updating your profile',
+            error: error.message 
+        });
     }
 };
 
-
-const changePassword = async (req, res) => {
-    try {
-        const { currentPassword, newPassword, confirmPassword } = req.body;
-        const userId = req.session.user; 
-
-        console.log("User ID from session:", userId); // Debugging Log
-
-        // Check if user is logged in
-        if (!userId) {
-            return res.status(401).json({ success: false, message: "User not logged in." });
-        }
-
-        // Fetch user from the database
-        const user = await User.findById(userId);
-        if (!user) {
-            console.log("User not found in database"); // Debugging Log
-            return res.status(404).json({ success: false, message: "User not found." });
-        }
-
-        console.log("User found:", user.email, "Password Exists:", !!user.password); // Debugging Log
-
-        // Ensure user has a password (prevents Google login issues)
-        if (!user.password) {
-            console.log("User does not have a password (Google Login detected)"); // Debugging Log
-            return res.status(400).json({ success: false, message: "Password cannot be changed for Google login users." });
-        }
-
-        // Compare passwords
-        console.log("Comparing passwords...");
-        const isMatch = await bcrypt.compare(currentPassword, user.password);
-        console.log("Password match result:", isMatch);
-
-        if (!isMatch) {
-            return res.status(400).json({ success: false, message: "Current password is incorrect." });
-        }
-
-        // Validate new password
-        if (newPassword.length < 8 || !/[a-zA-Z]/.test(newPassword) || !/\d/.test(newPassword)) {
-            return res.status(400).json({ success: false, message: "Password must be at least 8 characters long and contain both letters and numbers." });
-        }
-
-        if (newPassword !== confirmPassword) {
-            return res.status(400).json({ success: false, message: "Passwords do not match." });
-        }
-
-        // Hash and update password
-        console.log("Hashing new password...");
-        const hashedPassword = await bcrypt.hash(newPassword, 10);
-        user.password = hashedPassword;
-        await user.save();
-
-        console.log("Password updated successfully!"); // Debugging Log
-
-        res.json({ success: true, message: "Password changed successfully." });
-
-    } catch (error) {
-        console.error("Error changing password:", error); // Log the actual error
-        res.status(500).json({ success: false, message: "An error occurred while changing the password." });
-    }
-};
 
 
 
@@ -412,7 +435,6 @@ module.exports={
     editAddress,
     deleteAddress,
     updateProfile,
-changePassword ,
 updateEmail ,
  verifyEmailOtp ,
    changeEmailValid  ,

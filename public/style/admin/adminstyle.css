@@ -70,3 +70,12 @@ h2 {
     color: red;
     text-align: center;
 }
+#email, #password{
+    height:3vh;
+    width: 40vw;
+    font-size: 1.4rem;
+    text-align: center;
+}
+.login-container{
+    width: 40%;
+}

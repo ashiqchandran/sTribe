@@ -1,0 +1,258 @@
+/* Main Content Area */
+.content-main {
+    margin: 20px;
+}
+.sidebar{
+    width: 16vw;
+  }
+  
+/* Box for total products ordered and amount spent */
+.totals-box {
+    background: #f8f9fa;
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Header inside the totals box */
+.totals-box h3 {
+    margin-bottom: 10px;
+    font-size: 18px;
+    color: #333;
+}
+
+/* Paragraph for totals */
+.totals-box p {
+    font-size: 16px;
+    color: #555;
+}
+
+/* Flexbox for handling card layout */
+@media (max-width: 576px) {
+    .topbottom {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .totals-box {
+        width: 100%; /* Make the totals box take full width */
+        margin-top: 15px;
+    }
+
+    .report-container {
+        width: 100%;
+    }
+
+    table.report-table {
+        width: 100%;
+        font-size: 12px;
+    }
+
+    table.report-table th,
+    table.report-table td {
+        padding: 10px;
+        text-align: center;
+    }
+
+    .report-table th {
+        font-size: 14px;
+    }
+}
+
+/* Styling for the download button */
+#downloadButton {
+    display: inline-block;
+    margin-top: 15px;
+    font-size: 16px;
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#downloadButton:hover {
+    background-color: #218838;
+}
+
+/* Add spacing between different sections */
+.card {
+    padding: 20px;
+}
+
+.card.mb-4 {
+    margin-bottom: 30px;
+}
+
+/* Responsive adjustment for the sales chart */
+@media (max-width: 768px) {
+    #salesChart {
+        width: 100% !important;
+        height: auto !important;
+    }
+}
+
+/* Horizontal form layout */
+form[action="/admin/report"] .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px; /* Add space between the fields */
+}
+
+/* Adjust the form control width and padding */
+form[action="/admin/report"] .col-md-3 {
+    flex: 1 1 22%; /* Make the fields take up more space */
+}
+
+/* Make sure all inputs, selects, and buttons have enough padding */
+form[action="/admin/report"] select,
+form[action="/admin/report"] input[type="date"],
+form[action="/admin/report"] button {
+    width: 100%; /* Ensure each item takes full width of its container */
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 4px;
+    border: 1px solid #ced4da;
+}
+
+/* Styling for the submit button */
+form[action="/admin/report"] button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+}
+
+form[action="/admin/report"] button:hover {
+    background-color: #0056b3;
+}
+
+/* Adjust layout for smaller screens */
+@media (max-width: 768px) {
+    form[action="/admin/report"] .row {
+        flex-wrap: wrap; /* Allow the fields to wrap on smaller screens */
+        gap: 10px; /* Reduce the gap between fields */
+    }
+
+    form[action="/admin/report"] .col-md-3 {
+        flex: 1 1 48%; /* Take up 48% of the width on smaller screens */
+    }
+}
+
+/* Even smaller screens, like mobile phones */
+@media (max-width: 576px) {
+    form[action="/admin/report"] .col-md-3 {
+        flex: 1 1 100%; /* Make each item take full width on small devices */
+    }
+
+    form[action="/admin/report"] select,
+    form[action="/admin/report"] input[type="date"],
+    form[action="/admin/report"] button {
+        width: 100%; /* Make sure everything takes up full width */
+    }
+}
+
+/* Table and report styling */
+.report-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.report-table th, .report-table td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ccc;
+}
+
+.report-table th {
+    background-color: #343a40;
+    color: white;
+    font-size: 1.1rem;
+}
+
+.report-table tbody tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+/* Table row styling */
+table.table tbody tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+table.table td {
+    padding: 15px 20px; /* Increased padding for better readability */
+    text-align: center;
+    border: 1px solid #ddd; /* Border between table cells */
+}
+
+/* Styling for select dropdown */
+select.form-control {
+    width: 100%;
+    padding: 12px; /* Increased padding for better appearance */
+    border-radius: 4px;
+    border: 1px solid #ced4da;
+}
+
+/* Date input styling */
+input[type="date"] {
+    width: 100%;
+    padding: 12px; /* Increased padding for better appearance */
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+}
+
+/* Button styling */
+.btn-primary {
+    width: 100%;
+    background-color: #007bff;
+    border: none;
+    color: white;
+    padding: 12px; /* Increased padding for the button */
+    border-radius: 4px; /* Rounded button corners */
+    font-size: 1rem;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+/* Report type dropdown colors */
+select#reportType {
+    background-color: #f8f9fa;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    padding: 12px;
+}
+
+/* Dropdown colors for Daily, Weekly, Monthly */
+select#reportType option[value="daily"] {
+    background-color: #ffcccb; /* Light Red */
+}
+
+select#reportType option[value="weekly"] {
+    background-color: #ffeb99; /* Light Yellow */
+}
+
+select#reportType option[value="monthly"] {
+    background-color: #b3e0ff; /* Light Blue */
+}
+
+/* Spacing for rows */
+.row {
+    margin-bottom: 25px; /* Increased spacing between form rows */
+}
+
+/* Make sure the table is responsive on smaller screens */
+@media (max-width: 768px) {
+    table.table {
+        width: 100%;
+        font-size: 0.9rem; /* Smaller font size for mobile */
+    }
+
+    table.table th, table.table td {
+        padding: 10px; /* Reduced padding for smaller screens */
+    }
+}

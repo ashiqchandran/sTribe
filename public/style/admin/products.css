@@ -8,7 +8,9 @@ body {
     margin: 0 auto;
     padding: 20px;
 }
-
+.sidebar{
+    width: 16vw;
+  }
 /* Flexbox layout for the main content */
 .content-main {
     display: flex;

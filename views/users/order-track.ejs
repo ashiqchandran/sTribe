@@ -1,0 +1,335 @@
+<%- include("../../views/partials/user/header") %>
+<style>
+    :root {
+      --clr-primary: #3498db;
+      --clr-secondary: #2c3e50;
+      --clr-success: #2ecc71;
+      --clr-danger: #e74c3c;
+      --clr-info: #3498db;
+      --clr-light: #ecf0f1;
+      --clr-muted: #e0e0e0;
+    }
+  
+    .od-card {
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+      background-color: white;
+    }
+  
+    .od-status-timeline {
+      display: flex;
+      justify-content: space-between;
+      margin: 2rem 0;
+      position: relative;
+      padding: 0 1rem;
+    }
+  
+    .od-status-line {
+      position: absolute;
+      top: 10px;
+      left: 1rem;
+      right: 1rem;
+      height: 2px;
+      background-color: var(--clr-muted);
+      z-index: 0;
+    }
+  
+    .od-status-point {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 1;
+    }
+  
+    .od-dot {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      margin-bottom: 8px;
+      background-color: var(--clr-muted);
+    }
+  
+    .od-dot.active {
+      background-color: var(--clr-success);
+    }
+  
+    .od-customer-box {
+      background-color: var(--clr-light);
+      border-radius: 10px;
+      padding: 1.2rem;
+    }
+  
+    .od-product-img {
+      width: 50px;
+      height: 50px;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+  
+    .od-product-name {
+      padding-left: 1rem;
+      padding-top: 0.5rem;
+      font-weight: 500;
+    }
+  
+    .od-summary-line {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+  
+    .od-table th, .od-table td {
+      padding: 0.75rem 1rem;
+      vertical-align: middle;
+    }
+  
+    @media (max-width: 768px) {
+      .od-status-timeline {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+  
+      .od-status-line {
+        display: none;
+      }
+  
+      .od-status-point {
+        flex-direction: row;
+        margin-bottom: 1rem;
+      }
+  
+      .od-dot {
+        margin-bottom: 0;
+        margin-right: 10px;
+      }
+  
+      .od-product-name {
+        padding-left: 0.5rem;
+        padding-top: 0;
+      }
+  
+      .od-summary-line {
+        flex-direction: column;
+        gap: 0.3rem;
+      }
+    }
+  </style>
+  
+  <div class="container-fluid px-4">
+    <h1 class="mt-4">Order Details</h1>
+    <ol class="breadcrumb mb-4">
+      <li class="breadcrumb-item active">Order #<%= order.orderId %></li>
+    </ol>
+  
+    <div class="row">
+      <div class="col-xl-8">
+        <div class="card mb-4 od-card">
+          <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+              <h5 class="mb-0">Order #<%= order.orderId %></h5>
+              <span class="badge bg-<%= 
+                order.status === 'delivered' ? 'success' :
+                order.status === 'cancelled' ? 'danger' :
+                order.status === 'returned' ? 'grey' :
+                order.status === 'shipped' ? 'info' :
+                'warning'
+              %>">
+                <%= order.status.toUpperCase() %>
+              </span>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="od-status-timeline">
+              <div class="od-status-line"></div>
+              <% const statuses = ['pending', 'confirmed', 'shipped', 'delivered','returned']; %>
+              <% statuses.forEach(status => { %>
+                <div class="od-status-point">
+                  <div class="od-dot <%= order.status === status || statuses.indexOf(order.status) > statuses.indexOf(status) ? 'active' : '' %>"></div>
+                  <small><%= status.toUpperCase() %></small>
+                </div>
+              <% }); %>
+            </div>
+  
+            <h5 class="mb-3">Product Information</h5>
+            <div class="table-responsive">
+              <table class="table od-table">
+                <thead>
+                  <tr>
+                    <th style="padding-left: 5vw;">Product</th>
+                    <th>&nbsp;&nbsp;Price</th>
+                    <th>&nbsp;&nbsp;Quantity</th>
+                    <th>&nbsp;&nbsp;Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <div class="d-flex align-items-center" style="display: flex;">
+                        <img src="<%= order.orderItems[0].product.productImage[0] %>" alt="Product" class="od-product-img me-2">
+                        <div class="od-product-name">
+                          <%= order.orderItems[0].product.productName %>
+                        </div>
+                      </div>
+                    </td>
+                    <td>&nbsp;&nbsp;&nbsp;&nbsp;₹<%= Math.floor(order.orderItems[0].price) %></td>
+                    <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<%= order.orderItems[0].quantity %></td>
+                    <td>&nbsp;&nbsp;&nbsp;&nbsp;₹<%=  Math.floor(order.totalPrice) %></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <div class="col-xl-4">
+        <div class="card mb-4 od-card">
+          <div class="card-header">
+            <h5 class="mb-0">Customer Information</h5>
+          </div>
+          <div class="card-body">
+            <div class="od-customer-box">
+              <h6>Shipping Address</h6>
+              <p class="mb-1"><strong><%= order.address.name %></strong></p>
+              <p class="mb-1"><%= order.address.streetAddress %></p>
+              <p class="mb-1"><%= order.address.city %>, <%= order.address.state %></p>
+              <p class="mb-1"><%= order.address.pincode %></p>
+              <p class="mb-1">Phone: <%= order.address.phone %></p>
+              <p class="mb-0">Email: <%= order.address.email %></p>
+            </div>
+  
+            <div class="mt-4">
+              <h6>Order Summary</h6>
+              <div class="od-summary-line">
+                <span>Subtotal:</span>
+                <span>₹<%= Math.floor(order.totalPrice) %>.00</span>
+              </div>
+              <% if (order.discount > 0) { %>
+                <div class="od-summary-line">
+                  <span>Discount:</span>
+                  <span>-<%= order.discount %>%</span>
+                </div>
+              <% } %>
+              <hr>
+              <div class="od-summary-line fw-bold">
+                <span>Total:</span>
+                <span>₹<%= Math.floor(order.totalPrice-((order.discount/100)*order.totalPrice)) %>.00</span>
+              </div>
+            </div>
+  
+            <div class="mt-4">
+              <h6>Order Information</h6>
+              <p class="mb-1"><strong>Order Date:</strong> <%= new Date(order.createdOn).toLocaleString() %></p>
+              <p class="mb-0"><strong>Order Status:</strong> <%= order.status.toUpperCase() %></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    async function updateStatus(orderId) {
+      const { value: status } = await Swal.fire({
+        title: 'Update Order Status',
+        input: 'select',
+        inputOptions: {
+          'pending': 'Pending',
+          'confirmed': 'Confirmed',
+          'shipped': 'Shipped',
+          'delivered': 'Delivered',
+          'returned': 'Returned'
+        },
+        inputPlaceholder: 'Select status',
+        showCancelButton: true,
+        inputValidator: (value) => {
+          if (!value) {
+            return 'You need to select a status!';
+          }
+        }
+      });
+  
+      if (status) {
+        try {
+          const response = await fetch('/admin/orders/update-status', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ orderId, status }),
+          });
+  
+          const data = await response.json();
+  
+          if (data.success) {
+            await Swal.fire({
+              icon: 'success',
+              title: 'Success',
+              text: 'Order status updated successfully',
+              timer: 1500
+            });
+            location.reload();
+          } else {
+            throw new Error(data.message);
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          await Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error.message || 'Failed to update status'
+          });
+        }
+      }
+    }
+  
+    async function cancelOrder(orderId) {
+      const result = await Swal.fire({
+        title: 'Cancel Order',
+        text: 'Are you sure you want to cancel this order?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, cancel it!'
+      });
+  
+      if (result.isConfirmed) {
+        try {
+          const response = await fetch('/admin/orders/cancel', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ orderId }),
+          });
+  
+          const data = await response.json();
+  
+          if (data.success) {
+            await Swal.fire({
+              icon: 'success',
+              title: 'Success',
+              text: 'Order cancelled successfully',
+              timer: 1500
+            });
+            location.reload();
+          } else {
+            throw new Error(data.message);
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          await Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error.message || 'Failed to cancel order'
+          });
+        }
+      }
+    }
+  </script>
+  
+  <%- include('../partials/admin/footer') %>
+  
