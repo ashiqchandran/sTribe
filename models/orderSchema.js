@@ -114,7 +114,9 @@
                 type: String,
                 default: false
             },
-        
+        Transtype:{
+            type:String
+        },
        
             orderGroupId:{
                 type:String

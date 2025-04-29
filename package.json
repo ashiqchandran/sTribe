@@ -40,7 +40,7 @@
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "path": "^0.12.7",
-    "pdfkit": "^0.16.0",
+    "pdfkit": "^0.17.0",
     "pdfmake": "^0.2.18",
     "puppeteer": "^24.6.0",
     "razorpay": "^2.9.6",

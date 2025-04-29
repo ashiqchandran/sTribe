@@ -40,14 +40,10 @@ console.log("balance = ",user)
         });
     }
 };
-
 const placeOrder = async (req, res) => {
     try {
         const userId = req.session.user._id;
-        // console.log("user id = ", userId);
         const { addressId } = req.body;
-        
-        // console.log("address id = ", addressId);
 
         // Aggregate to fetch cart and product details
         const cart = await Cart.aggregate([
@@ -72,7 +68,7 @@ const placeOrder = async (req, res) => {
                     color: "$productDetails.color",
                     productName: "$productDetails.productName",
                     salePrice: "$productDetails.salePrice",
-                    productqty:"$productDetails.quantity",
+                    productqty: "$productDetails.quantity",
                     quantity: "$items.quantity"
                 }
             }
@@ -85,10 +81,16 @@ const placeOrder = async (req, res) => {
             });
         }
 
-        if(cart.productqty<cart.quantity)
-        {
-            return res.send("items quantity is less than the  sufficient")
+        // Check stock availability for all items first
+        for (const item of cart) {
+            if (item.productqty < item.quantity) {
+                return res.status(400).json({
+                    success: false,
+                    message: `Insufficient stock for product: ${item.productName}`
+                });
+            }
         }
+
         // Get address details
         const address = await Address.aggregate([
             { $match: { userId: new mongoose.Types.ObjectId(userId) } },
@@ -104,13 +106,24 @@ const placeOrder = async (req, res) => {
         }
 
         const selectedAddress = address[0].address;
+        const discount = Coupon.discount ? parseFloat(Coupon.discount) : 0;
+        const orderGroupId = new mongoose.Types.ObjectId(); // Single group ID for all orders
 
-        // Get the discount value from Coupon (ensure this is numeric)
-        const discount = Coupon.discount ? parseFloat(Coupon.discount) : 0;  // Handle discount as a number
+        // Create all orders
+        const orderPromises = cart.map(async (item) => {
+            // Update product quantity first
+            const updatedProduct = await Product.findByIdAndUpdate(
+                item.productId,
+                { $inc: { quantity: -item.quantity } },
+                { new: true }
+            );
 
-        // Create orders from cart items
-        const orders = await Promise.all(cart.map(async (item) => {
-            const order = new Order({
+            if (!updatedProduct) {
+                throw new Error(`Failed to update stock for product ${item.productId}`);
+            }
+
+            // Create the order
+            return new Order({
                 orderItems: [{
                     product: item.productId,
                     orderProductImage: item.productImage[0],
@@ -124,40 +137,29 @@ const placeOrder = async (req, res) => {
                 userId: userId,
                 discount: discount,
                 totalPrice: item.salePrice * item.quantity,
-                finalAmount: item.salePrice * item.quantity * (1 - discount / 100),
+                finalAmount: (item.salePrice * item.quantity * (1 - discount / 100))+100,
                 address: selectedAddress,
                 status: 'pending',
+                Transtype:"COD",
                 createdOn: new Date(),
-                orderGroupId: new mongoose.Types.ObjectId()  // Unique ObjectId
-            });
+                orderGroupId: orderGroupId // Same group ID for all orders in this transaction
+            }).save();
+        });
 
-            // Update the product quantity
-            const count=  await Product.findByIdAndUpdate(item.productId, {
-                $inc: { quantity: -item.quantity }
-            });
-            if(count>0)
-            {
-                return order.save();
-            }
-            else{
-                return res.json({
-                    success: true,
-                    totalAmount: orders.map(order => order.finalAmount),
-                    orderIds: orders.map(order => order._id),
-                    message: 'Orders failed'
-                });
-            }
+        // Execute all order creations
+        const orders = await Promise.all(orderPromises);
 
-            
-        }));
-
-        // Clear cart after placing the order
-        await Cart.findOneAndUpdate({ userId: userId }, { $set: { items: [] } });
+        // Clear cart after successful order placement
+        await Cart.findOneAndUpdate(
+            { userId: userId },
+            { $set: { items: [] } }
+        );
 
         res.json({
             success: true,
-            totalAmount: orders.map(order => order.finalAmount),
+            totalAmount: orders.reduce((sum, order) => sum + order.finalAmount, 0),
             orderIds: orders.map(order => order._id),
+            orderGroupId: orderGroupId,
             message: 'Orders placed successfully'
         });
 
@@ -165,11 +167,11 @@ const placeOrder = async (req, res) => {
         console.error('Error in placeOrder:', error);
         res.status(500).json({
             success: false,
-            message: 'Failed to place order'
+            message: 'Failed to place order',
+            error: error.message
         });
     }
 };
-
 
  const getOrders = async (req, res) => {
     try {
@@ -357,7 +359,6 @@ const loadOrderDetails = async (req, res) => {
     }
 };
 
-
 const cancelOrder = async (req, res) => {
     try {
         const { orderId, reason } = req.body;
@@ -374,91 +375,105 @@ const cancelOrder = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Order not found' });
         }
 
-        
-
         // If the order is neither cancelled nor delivered, cancel it
         if (order.status !== 'cancelled' && order.status !== 'delivered') {
             
-
             // Check if order has items
             if (!Array.isArray(order.orderItems) || order.orderItems.length === 0) {
                 return res.status(400).json({ success: false, message: 'No items to cancel' });
             }
-            const discount=order.discount||0
-            // Calculate refund amount based on individual product prices
-            let refundAmount = order.orderItems.reduce((total, item) => {
-                const itemTotal = item.price * item.quantity;
-                const discountAmount = (discount/ 100) * itemTotal;
-                return total + (itemTotal - discountAmount);
-            }, 0);
 
-           
-
-            console.log("Calculated refund amount:", refundAmount);
-
-            // Step 1: Refund the amount to the user's wallet
-            let user = await User.findById(userId);
-            if (!user) {
-                return res.status(404).json({ success: false, message: 'User not found' });
-            }
-
-            user.wallet += refundAmount; // Add the refund amount to the user's wallet
-
-            // Step 2: Update the user wallet balance
-            await user.save();
-
-            // Step 3: Create a refund transaction in the transaction collection
-            const refundTransaction = new Transaction({
-                userId: user._id,
-                amount: refundAmount,
-                transactionType: 'Refund',
-                status: 'Success',
-                description: `Order ${orderId} cancelled - Refund processed`
-            });
-
-            await refundTransaction.save();
-
-            // Step 4: Update the order to 'cancelled' and apply the cancellation reason to the items
-            const updateOrder = await Order.updateOne(
-                { orderId: orderId, userId: userId },
-                {
-                    $set: {
-                        status: 'cancelled',
-                        cancelReason: reason,
-                        'orderItems.$[].status': 'cancelled',
-                        'orderItems.$[].cancelReason': reason
-                    },
-                  
-                }
-            );
-
-            // Step 5: Update product stock for each item
-            const productUpdates = order.orderItems.map(async (item) => {
-                console.log(`Restocking product: ${item.product}, Quantity: ${item.quantity}`);
-
-                const productUpdateResult = await Product.findByIdAndUpdate(
-                    item.product,
-                    { $inc: { quantity: item.quantity } }
+            // Handle COD orders (no refund needed)
+            if (order.Transtype && order.Transtype === "COD") {
+                const updateOrder = await Order.updateOne(
+                    { orderId: orderId, userId: userId },
+                    {
+                        $set: {
+                            status: 'cancelled',
+                            cancelReason: reason,
+                            'orderItems.$[].status': 'cancelled',
+                            'orderItems.$[].cancelReason': reason
+                        }
+                    }
                 );
 
-                if (!productUpdateResult) {
-                    console.log(`Failed to update product: ${item.product}`);
-                    throw new Error(`Failed to update product stock for ${item.product}`);
+                // Restock products
+                await Promise.all(order.orderItems.map(async (item) => {
+                    await Product.findByIdAndUpdate(
+                        item.product,
+                        { $inc: { quantity: item.quantity } }
+                    );
+                }));
+
+                return res.json({ 
+                    success: true, 
+                    message: 'COD order cancelled successfully'
+                });
+            }
+            // For non-COD orders (wallet/Razorpay)
+            else {
+                const discount = order.discount || 0;
+                // Calculate refund amount based on individual product prices
+                let refundAmount = order.orderItems.reduce((total, item) => {
+                    const itemTotal = item.price * item.quantity;
+                    const discountAmount = (discount/ 100) * itemTotal;
+                    return total + (itemTotal - discountAmount);
+                }, 0);
+
+                console.log("Calculated refund amount:", refundAmount);
+
+                // Step 1: Refund the amount to the user's wallet
+                let user = await User.findById(userId);
+                if (!user) {
+                    return res.status(404).json({ success: false, message: 'User not found' });
                 }
 
-                console.log(`Product ${item.product} stock updated successfully.`);
-            });
+                user.wallet += refundAmount; // Add the refund amount to the user's wallet
 
-            await Promise.all(productUpdates);
+                // Step 2: Update the user wallet balance
+                await user.save();
 
-            return res.json({ 
-                success: true, 
-                message: 'Order cancelled and refund processed successfully',
-                data: {
-                    refundAmount,
-                    cancelledItems: order.orderItems.length
-                }
-            });
+                // Step 3: Create a refund transaction in the transaction collection
+                const refundTransaction = new Transaction({
+                    userId: user._id,
+                    amount: refundAmount,
+                    transactionType: 'Refund',
+                    status: 'Success',
+                    description: `Order ${orderId} cancelled - Refund processed`
+                });
+
+                await refundTransaction.save();
+
+                // Step 4: Update the order to 'cancelled' and apply the cancellation reason to the items
+                const updateOrder = await Order.updateOne(
+                    { orderId: orderId, userId: userId },
+                    {
+                        $set: {
+                            status: 'cancelled',
+                            cancelReason: reason,
+                            'orderItems.$[].status': 'cancelled',
+                            'orderItems.$[].cancelReason': reason
+                        }
+                    }
+                );
+
+                // Step 5: Update product stock for each item
+                await Promise.all(order.orderItems.map(async (item) => {
+                    await Product.findByIdAndUpdate(
+                        item.product,
+                        { $inc: { quantity: item.quantity } }
+                    );
+                }));
+
+                return res.json({ 
+                    success: true, 
+                    message: 'Order cancelled and refund processed successfully',
+                    data: {
+                        refundAmount,
+                        cancelledItems: order.orderItems.length
+                    }
+                });
+            }
         } else {
             return res.status(400).json({ 
                 success: false, 
@@ -475,6 +490,7 @@ const cancelOrder = async (req, res) => {
         });
     }
 };
+
 const failure = async (req, res) => {
     try {
       const { orderId, subtotal, addressId, couponCode, couponDiscount } = req.query;
