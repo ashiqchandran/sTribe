@@ -27,8 +27,6 @@ router.post("/adminsignin", adminController.adminsignin);
 
 
 router.post("/dashboard",adminController.adminDashboard)
-
-
 router.get("/dashboard",adminController.adminDashboard)
 
 router.get("/pageError",adminController.pageError_404)

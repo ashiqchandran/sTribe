@@ -336,7 +336,7 @@ const updateProfile = async (req, res) => {
 
 const changeEmail = async (req, res) => {
     try {
-        const userId = req.session.user; // Ensure session contains only userId
+        const userId = req.session.user._id; // Ensure session contains only userId
         if (!userId) {
             return res.redirect('/pageNotFound');
         }
@@ -350,32 +350,48 @@ const changeEmail = async (req, res) => {
 };
 
 
-const changeEmailValid = async (req, res) => {
+
+const resetEmail = async (req, res) => {
+    const { currentEmail, newEmail, currentPassword } = req.body;
+
+    // Validate input
+    if (!currentEmail || !newEmail || !currentPassword) {
+        return res.status(400).json({ message: 'All fields are required' });
+    }
+
     try {
-        const { email } = req.body;
-        const userExist = await User.findOne({ email });
+        // Find user by current email
+        const user = await User.findOne({ email: currentEmail });
 
-        if (!userExist) {
-            return res.render('change-email', { message: 'User with this email does not exist.' });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
         }
 
-        const otp = generateOtp();
-        const emailSent = await sendVerificationEmail(email, otp);
-
-        if (emailSent) {
-            req.session.userOtp = otp;
-            req.session.userdata = req.body;
-            req.session.email = email;
-            res.render('change-email-otp');
-            console.log(`Email Sent: ${email}, OTP: ${otp}`);
-        } else {
-            res.json('email-error');
+        // Check if the current password is correct
+        const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+        if (!isPasswordValid) {
+            return res.status(403).json({ message: 'Incorrect password' });
         }
-    } catch (error) {
-        res.redirect('/pageNotFound');
+
+        // Check if the new email is valid
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailPattern.test(newEmail)) {
+            return res.status(400).json({ message: 'Invalid email format' });
+        }
+
+        // Update the user's email
+        user.email = newEmail;
+        await user.save();
+
+        // Send success message
+      
+        res.status(200).json({ message: 'Email updated successfully' });
+
+    } catch (err) {
+        console.error('Error:', err);
+        res.status(500).json({ message: 'Internal server error' });
     }
 };
-
 
 
 const verifyEmailOtp = async (req, res) => {
@@ -426,6 +442,25 @@ const addProfile =  async (req, res) => {
   }
   
   
+const newpasswordpage= async(req,res)=>{
+    try {
+        res.render('newpasswordpage')
+    } catch (error) {
+        res.render("error")
+    }
+}
+
+  
+const verifyemailotp= async(req,res)=>{
+    try {
+        res.render('verifyemailotp')
+    } catch (error) {
+        res.render("error")
+    }
+}
+
+
+
 module.exports={
     getprofile,
     loadAddressPage,
@@ -437,8 +472,10 @@ module.exports={
     updateProfile,
 updateEmail ,
  verifyEmailOtp ,
-   changeEmailValid  ,
    changeEmail,
-   addProfile
+   addProfile,
+   newpasswordpage,
+   resetEmail,
+   verifyemailotp
 
 }

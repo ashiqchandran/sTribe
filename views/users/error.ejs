@@ -3,15 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>404 Not Found</title>
-    <link rel="stylesheet" href="/style/error.css">
+    <title>User Not Found</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .error-container {
+            max-width: 600px;
+            margin: 100px auto;
+            padding: 40px;
+            text-align: center;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            font-size: 5rem;
+            color: #dc3545;
+            margin-bottom: 20px;
+        }
+        
+        h2 {
+            color: #343a40;
+            margin-bottom: 20px;
+        }
+        
+        p {
+            color: #6c757d;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+        
+        .home-button {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: #0d6efd;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .home-button:hover {
+            background-color: #0b5ed7;
+            transform: translateY(-2px);
+        }
+        
+        .user-email {
+            font-weight: bold;
+            color: #212529;
+        }
+        
+        .suggestions {
+            text-align: left;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+    </style>
 </head>
 <body>
     <div class="error-container">
         <h1>404</h1>
-        <h2>Oops! Page Not Found</h2>
-        <p>We're sorry, but the page you are looking for does not exist.</p>
-        <a href="/home" class="home-button">Go to Homepage</a>
+        <h2>User Not Found</h2>
+        <p>We couldn't find an account associated with <span class="user-email" id="email-placeholder">[email]</span>.</p>
+        
+        <div class="suggestions">
+            <h5>Suggestions:</h5>
+            <ul>
+                <li>Check if you entered the correct email address</li>
+                <li>Try a different email address</li>
+                <li>Contact support if you believe this is an error</li>
+            </ul>
+        </div>
+        
+        <a href="/home" class="home-button mt-4">Go to Homepage</a>
+        <a href="/signup" class="home-button mt-4 ms-3" style="background-color: #198754;">Create Account</a>
     </div>
+
+    <script>
+        // Extract email from URL query parameters and display it
+        const urlParams = new URLSearchParams(window.location.search);
+        const email = urlParams.get('email');
+        if (email) {
+            document.getElementById('email-placeholder').textContent = email;
+        }
+    </script>
 </body>
 </html>

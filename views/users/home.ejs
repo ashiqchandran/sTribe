@@ -84,7 +84,13 @@
             <div class="brands-header">
                 <h4 class="brand-head">Loved brands</h2>
                 <p class="brandcaption">We provide branded and trusted products direct from factory .</p>
-                <div class="homebrandbox"><a href="/shop"  class="seebutton">See all brands</a></div>
+                <div class="homebrandbox d-flex justify-content-center align-items-center" 
+                style="background-color: #f39c12; border-radius: 10px; padding: 8px 0;">
+             <a href="/shop" class="seebutton text-white text-decoration-none fw-bold" 
+                style="font-size: clamp(0.8rem, 1.2vw, 1rem);">
+               See all brands
+             </a>
+           </div>
             </div>    
             <div class="brands-grid">
                   <div class="container">
@@ -153,7 +159,7 @@
                           </a>
                             <div class="prd-bottom">
 
-                                <a href="#" onclick="addToCart('<%=products[i]._id%>')" class="social-info">
+                                <a href="#" onclick="addToCart('<%=products[i]._id%>')" class="social-info ">
                                     <span class="ti-bag"></span>
                                     <p class="hover-text">add to cart &#128722</p>
                                 </a>
@@ -163,7 +169,7 @@
                                 </a>
                                 <a href="/productDetails?id=<%=products[i]._id%>" class="social-info">
                                     <span class="lnr lnr-move"></span>
-                                    <button class="hover-text view-btn">view more</button>
+                                    <button class="hover-text view-btn"  style="border-radius: 10px;";>view more</button>
                                 </a>
                             </div>
                         </div>

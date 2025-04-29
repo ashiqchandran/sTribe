@@ -1,215 +1,230 @@
-/* General Styles */
-.container {
-    display: flex;
-    min-height: 95vh;
-}
-
-/* Image Section */
-.image-section {
-    flex: 1;
-    background-color: #f5f5f5;
-    position: relative;
-}
-
-.image-section img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-.registeredlink{
-    font-weight: 700;
-}
-.signin-button{
-    background-color: rgb(72, 150, 238);
-    width: 100px;
-    height: 30px;
-    border-radius: 10px;
-}
-.asterisk {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    font-size: 24px;
-}
-
-/* Form Section */
-.form-section {
-    flex: 1;
-    padding: 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-   
-}
-
-.form-container {
-    width: 100%;
-    max-width: 400px; 
-    margin-left:auto;
-    margin-right: auto
-}
-.signup-forborder{
-    width: 600px;
-    border-radius: 10px;
-    border: 2px solid black;
-}
-
-.form-group {
-    margin-bottom: 1.5rem;
-    position: relative;
-}
-
-/* Input Fields */
-input {
-    width: 100%;
-    padding: 0.75rem 0;
-    border: none;
-    border-bottom: 1px solid #ddd;
-    outline: none;
-    font-size: 1rem;
-    background: transparent;
-}
-
-input:focus {
-    border-bottom-color: #000;
-}
-
-/* Password Toggle */
-.password-toggle {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
-    opacity: 0.6;
-    background: none;
-    border: none;
-    font-size: 0.9rem;
-}
-
-.password-toggle:hover {
-    opacity: 1;
-}
-
-/* Terms Section */
-.terms {
-    margin-bottom: 1.5rem;
-    display: flex;
-    gap: 0.5rem;
-    align-items: flex-start;
-}
-
-.terms input[type="checkbox"] {
-    width: auto;
-    margin-top: 4px;
-}
-
-.terms a {
-    color: #000;
-    text-decoration: none;
-}
-
-/* Signup & Google Buttons */
-#flex-clm {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-}
-
-.signup-button {
-    width: 30%;
-    padding: 1rem;
-    background: #000;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background 0.3s ease-in-out;
-}
-
-.signup-button:hover {
-    background: #444;
-}
-
-.google-button {
-    width: 50%;
-    padding: 1rem;
-    background: rgb(11, 63, 145);
-    color: white;
-    border: none;
-    height: 40px;
-    border-radius: 10px;
-    font-size: 1.2rem;
-    cursor: pointer;
-    margin-top:20px;
-   
- 
-}
-.google-btn{
-    margin-left: 10px;
-  
-}
-
-/* Error Messages */
-.error-message {
-    color: #d9534f;
-    font-size: 14px;
-    margin-top: 5px;
-    display: block;
-    font-weight: bold;
-}
-
-/* Specific Error Styling for Whitespace */
-.error-message.whitespace-error {
-    color: #ff0000;
-    font-weight: bold;
-    font-style: italic;
-    animation: fadeIn 0.5s ease-in-out;
-}
-
-/* Error Message Animation */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-5px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Links */
-a {
-    text-decoration: none;
-    color: rgb(116, 109, 249);
-}
-
-.registeredlink {
-    text-align: center;
-}
-
-.or-divider {
-    text-align: center;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
+    /* General Styles */
     .container {
-        flex-direction: column;
-        padding: 1rem;
-    }
-    .image-section {
-        height: auto;
-    }
-    .form-section {
-        padding: 2rem;
+        display: flex;
+        min-height: 95vh;
     }
 
-    .signup-button,
-    .google-button {
-        width: 100%;
+    /* Image Section */
+    .image-section {
+        flex: 1;
+        background-color: #f5f5f5;
+        position: relative;
     }
-}
+
+    .image-section img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .registeredlink{
+        font-weight: 700;
+    }
+    .signin-button{
+        background-color: rgb(72, 150, 238);
+        width: 100px;
+        height: 30px;
+        border-radius: 10px;
+    }
+    .asterisk {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        font-size: 24px;
+    }
+
+    /* Form Section */
+    .form-section {
+        flex: 1;
+        padding: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    
+    }
+
+    .form-container {
+        width: 100%;
+        max-width: 400px; 
+        margin-left:auto;
+        margin-right: auto
+    }
+    .signup-forborder{
+        width: 600px;
+        border-radius: 10px;
+        border: 2px solid black;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+
+    /* Input Fields */
+    input {
+        width: 100%;
+        padding: 0.75rem 0;
+        border: none;
+        border-bottom: 1px solid #ddd;
+        outline: none;
+        font-size: 1rem;
+        background: transparent;
+    }
+
+    input:focus {
+        border-bottom-color: #000;
+    }
+
+    /* Password Toggle */
+    .password-toggle {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        opacity: 0.6;
+        background: none;
+        border: none;
+        font-size: 0.9rem;
+    }
+
+    .password-toggle:hover {
+        opacity: 1;
+    }
+
+    /* Terms Section */
+    .terms {
+        margin-bottom: 1.5rem;
+        display: flex;
+        gap: 0.5rem;
+        align-items: flex-start;
+    }
+
+    .terms input[type="checkbox"] {
+        width: auto;
+        margin-top: 4px;
+    }
+
+    .terms a {
+        color: #000;
+        text-decoration: none;
+    }
+
+    /* Signup & Google Buttons */
+    #flex-clm {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .signin-button {
+        background-color: rgb(72, 150, 238);
+        width: 60%;                   /* Was 100px - more responsive now */
+        height:2vw;                 /* Slightly taller */
+        border-radius: 8px;
+        display: block;
+        margin: 0 auto;               /* Center it horizontally */
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+        border: none;
+        transition: background-color 0.3s ease;
+    }
+    
+    .signin-button:hover {
+        background-color: rgb(50, 130, 210);
+    }
+    
+
+    .signup-button:hover {
+        background: #444;
+    }
+    .google-button {
+        width: 55%;                    /* Reduced from 100% */
+        padding: 0.75rem;
+        background: rgb(11, 63, 145);
+        color: white;
+        border: none;
+        height:2vw;
+        border-radius: 8px;
+        font-size: 1rem;
+        cursor: pointer;
+        margin-left:5vw;
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        transition: background-color 0.3s ease;
+    }
+    
+    .google-button:hover {
+        background-color: rgb(9, 51, 120);
+    }
+    
+    .google-btn{
+        margin-left: 10px;
+    
+    }
+
+    /* Error Messages */
+    .error-message {
+        color: #d9534f;
+        font-size: 14px;
+        margin-top: 5px;
+        display: block;
+        font-weight: bold;
+    }
+
+    /* Specific Error Styling for Whitespace */
+    .error-message.whitespace-error {
+        color: #ff0000;
+        font-weight: bold;
+        font-style: italic;
+        animation: fadeIn 0.5s ease-in-out;
+    }
+
+    /* Error Message Animation */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-5px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Links */
+    a {
+        text-decoration: none;
+        color: rgb(116, 109, 249);
+    }
+
+    .registeredlink {
+        text-align: center;
+    }
+
+    .or-divider {
+        text-align: center;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .container {
+            flex-direction: column;
+            padding: 1rem;
+        }
+        .image-section {
+            height: auto;
+        }
+        .form-section {
+            padding: 2rem;
+        }
+
+        .signup-button,
+        .google-button {
+            width: 100%;
+        }
+    }

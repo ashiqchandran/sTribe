@@ -77,7 +77,7 @@ body {
    <div class="card mx-auto card-login col-4">
        <div class="card-body">
            <h4 class="card-title mb-4">Enter Current Email</h4>
-           <form method="post" action="/change-email" onsubmit="return validateLoginForm()">
+           <form method="post" action="/changeEmail" onsubmit="return validateLoginForm()">
                <div class="mb-3">
                    <input class="form-control"  name="email" placeholder="Email" type="text" id="email" >
                    <div class="error-message" id="email-error"></div>
@@ -90,31 +90,57 @@ body {
          
        </div>
    </div>
-</section>
+</section><!-- SweetAlert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
-   function validateLoginForm() {
-       const emailInput = document.getElementById('email');
-       const emailError = document.getElementById('email-error');
-       const emailValue = emailInput.value.trim();
-       const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+document.querySelector('form').addEventListener('submit', async function(e) {
+    e.preventDefault();
 
+    const emailInput = document.getElementById('email');
+    const email = emailInput.value.trim();
+    const emailError = document.getElementById('email-error');
+    const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
 
-       if (emailValue === '') {
-           emailError.textContent = 'Please enter your email.';
-           emailInput.classList.add('is-invalid');
-           return false;
-       } else if (!emailValue.match(emailPattern)) {
-           emailError.textContent = 'Please enter a valid email address';
-           emailInput.classList.add('is-invalid');
-           return false;
-       } else {
-           emailError.textContent = '';
-           emailInput.classList.remove('is-invalid');
-           return true;
-       }
-   }
+    // Client-side validation
+    if (email === '') {
+        emailError.textContent = 'Please enter your email.';
+        emailInput.classList.add('is-invalid');
+        return;
+    } else if (!email.match(emailPattern)) {
+        emailError.textContent = 'Please enter a valid email address.';
+        emailInput.classList.add('is-invalid');
+        return;
+    } else {
+        emailError.textContent = '';
+        emailInput.classList.remove('is-invalid');
+    }
+
+    // AJAX request to backend
+    try {
+        const response = await fetch('/changeEmail', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            window.location.href = data.redirect;
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops!',
+                text: data.message || 'Something went wrong!'
+            });
+        }
+    } catch (err) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Server Error',
+            text: 'Could not contact the server. Please try again later.'
+        });
+    }
+});
 </script>
-
-
-
-

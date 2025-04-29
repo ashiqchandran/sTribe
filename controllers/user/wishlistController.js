@@ -52,10 +52,10 @@ const addToWishlist = async (req, res) => {
         }
 
         // ✅ Check if product is in cart
-        const cart = await Cart.findOne({ userId, "items.productId": productId });
-        if (cart) {
-            return res.json({ success: false, message: "Item is already in the cart!" });
-        }
+        // const cart = await Cart.findOne({ userId, "items.productId": productId });
+        // if (cart) {
+        //     return res.json({ success: false, message: "Item is already in the cart!" });
+        // }
 
         // ✅ Get Wishlist
         let wishlist = await Wishlist.findOne({ userId });

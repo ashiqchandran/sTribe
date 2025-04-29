@@ -413,7 +413,7 @@
                                     </a> -->
                                     
                                     <% if ( order.status !== 'cancelled' && order.status !== 'delivered' && order.returnStatus!='approved' && order.returnStatus!='rejected') { %>
-                                        <button onclick="updateStatus('<%= order._id %>')" 
+                                        <button onclick="updateStatus('<%= order._id %>','<%=order.status %>')" 
                                                 class="btn btn-info btn-sm">
                                             Update Status
                                         </button>
@@ -579,60 +579,77 @@ document.addEventListener('click', (e) => {
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-     
-    async function updateStatus(orderId) {
-        const { value: status } = await Swal.fire({
-            title: 'Update Order Status',
-            input: 'select',
-            inputOptions: {
-                'pending': 'Pending',
-                'confirmed': 'Confirmed',
-                'shipped': 'Shipped',
-                'delivered': 'Delivered'
-            },
-            inputPlaceholder: 'Select status',
-            showCancelButton: true,
-            inputValidator: (value) => {
-                if (!value) {
-                    return 'You need to select a status!';
-                }
-            }
-        });
 
-        if (status) {
-            try {
-                const response = await fetch('/admin/orders/update-status', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ orderId, status }),
-                });
+async function updateStatus(orderId, currentStatus) {
+    // Define the status hierarchy
+    const statusOptions = {
+        'pending': 'Pending',
+        'confirmed': 'Confirmed',
+        'shipped': 'Shipped',
+        'delivered': 'Delivered'
+    };
 
-                const data = await response.json();
-                let ordersWindow = window.open('/orders', '_blank');
-                if (data.success) {
-                    await Swal.fire({
-                        icon: 'success',
-                        title: 'Success',
-                        text: 'Order status updated successfully',
-                        timer: 1500
-                    });
-                    location.reload();
-                    ordersWindow.location.reload();
-                } else {
-                    throw new Error(data.message);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                await Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: error.message || 'Failed to update status'
-                });
+    // Create an array of all the possible statuses
+    const statuses = Object.keys(statusOptions);
+
+    // Find the index of the current status
+    const currentStatusIndex = statuses.indexOf(currentStatus);
+
+    // Slice the statuses array to include only the allowed statuses from the current status onwards
+    const allowedStatuses = statuses.slice(currentStatusIndex);
+
+    // Create an object for input options
+    const inputOptions = allowedStatuses.reduce((acc, status) => {
+        acc[status] = statusOptions[status];
+        return acc;
+    }, {});
+
+    const { value: status } = await Swal.fire({
+        title: 'Update Order Status',
+        input: 'select',
+        inputOptions: inputOptions,
+        inputPlaceholder: 'Select status',
+        showCancelButton: true,
+        inputValidator: (value) => {
+            if (!value) {
+                return 'You need to select a status!';
             }
         }
+    });
+
+    if (status) {
+        try {
+            const response = await fetch('/admin/orders/update-status', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ orderId, status })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: 'Order status updated successfully',
+                    timer: 1500
+                });
+                window.location.reload();
+            } else {
+                throw new Error(data.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            await Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error.message || 'Failed to update status'
+            });
+        }
     }
+}
 
     async function cancelOrder(orderId) {
         const result = await Swal.fire({

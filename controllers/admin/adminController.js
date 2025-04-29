@@ -334,7 +334,7 @@ endDate = new Date(endDate);
         const salesitems = await Order.aggregate([
             {
                 $match: {
-                    createdOn: { $gte: startDate },
+                    createdOn: { $lte: new Date()},
                     status: "delivered"
                 }
             },

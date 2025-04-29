@@ -410,6 +410,29 @@ body {
         font-size: 0.8rem;
     }
 }
+.offer-cell-vertical {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.offer-text {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.offer-buttons {
+  display: flex;
+  gap: 6px;
+}
+
+.offer-buttons button {
+  padding: 2px 6px;
+  font-size: 0.75rem; /* smaller text */
+  line-height: 1;
+}
+
     </style>
     
 </head>
@@ -476,7 +499,7 @@ body {
                                 <th>&nbsp&nbsp Quantity</th>
                                 <th>&nbsp&nbsp Action</th>
                                 <th>&nbsp&nbsp Edit</th>
-                                <th>&nbsp&nbsp Delete</th>
+                                <!-- <th>&nbsp&nbsp Delete</th> -->
                             </tr>
                         </thead>
                         <tbody>
@@ -504,16 +527,23 @@ body {
                                 <td><%= data[i].color %></td>
 
                                 <td><%= data[i].brand %></td>
-                                <td>&nbsp&nbsp &nbsp&nbsp 
-                                    <% if (data[i].productOffer) { %>
-                                        <%= data[i].productOffer %>% Off
-                                        <button class="btn btn-sm btn-warning" onclick="editOffer('<%= data[i]._id %>', '<%= data[i].productOffer ? data[i].productOffer : 0 %>')">Edit</button>
-                                        <button class="btn btn-sm btn-danger" onclick="removeOffer('<%= data[i]._id %>')">Remove</button>
-                                    <% } else { %>
-                                        0%
-                                        <button class="btn btn-sm btn-info" onclick="addOffer('<%= data[i]._id %>')">Add Offer</button>
-                                    <% } %>
-                                </td>
+                                <td>
+                                    <div class="offer-cell-vertical">
+                                      <% if (data[i].productOffer) { %>
+                                        <div class="offer-text"><%= data[i].productOffer %>% Off</div>
+                                        <div class="offer-buttons">
+                                          <button class="btn btn-xs btn-warning" onclick="editOffer('<%= data[i]._id %>', '<%= data[i].productOffer ? data[i].productOffer : 0 %>')">Edit</button>
+                                          <button class="btn btn-xs btn-danger" onclick="removeOffer('<%= data[i]._id %>')">Remove</button>
+                                        </div>
+                                      <% } else { %>
+                                        <div class="offer-text">0% Off</div>
+                                        <div class="offer-buttons">
+                                          <button class="btn btn-xs btn-info" onclick="addOffer('<%= data[i]._id %>')">Add Offer</button>
+                                        </div>
+                                      <% } %>
+                                    </div>
+                                  </td>
+                                  
                                 <td><%= data[i].quantity %></td>
                                 <td>
                                     <% if (data[i].isBlocked == false) { %>
@@ -525,9 +555,9 @@ body {
                                 <td>
                                     <a href="/admin/editProduct?id=<%= data[i]._id %>" class="btn btn-info text-white">Edit</a>
                                 </td>
-                                <td>
+                                <!-- <td>
                                     <button class="btn btn-sm btn-danger" onclick="confirmDelete(event, '<%= data[i]._id %>')">Delete</button>
-                                </td>
+                                </td> -->
                             </tr>
                             <% } %>
                         </tbody>

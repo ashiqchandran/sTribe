@@ -10,6 +10,7 @@ const passport = require('./config/passport');
 const bodyParser = require('body-parser');
 const MongoStore = require('connect-mongo');
 const createError = require('http-errors');
+const User=require('./models/userSchema')
 
 // Initialize Express app
 const app = express();
@@ -23,6 +24,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // Session configuration
+// For User session
 app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
@@ -32,15 +34,65 @@ app.use(session({
         collectionName: 'sessions'
     }),
     cookie: {
-        secure: false,
+        secure: false, // Use true in production with HTTPS
         httpOnly: true,
-        maxAge: 72 * 60 * 60 * 1000
+        maxAge: 72 * 60 * 60 * 1000, // 3 days
+        name: 'user_sid',  // User session cookie name
     }
 }));
+
+// For Admin session (This session has its own separate cookie name)
+app.use('/admin', session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({
+        mongoUrl: process.env.MONGODB_URI,
+        collectionName: 'admin_sessions'  // Store admin sessions in a separate collection
+    }),
+    cookie: {
+        secure: false, // Use true in production with HTTPS
+        httpOnly: true,
+        maxAge: 72 * 60 * 60 * 1000, // 3 days
+        name: 'admin_sid',  // Admin session cookie name
+    }
+}));
+
 Database();
 // Passport initialization
 app.use(passport.initialize());
 app.use(passport.session());
+
+
+app.use(async (req, res, next) => {
+    try {
+        if (req.session.user) {
+            const userId = req.session.user._id;
+            const user = await User.findById(userId);
+
+            if (user.isBlocked) {
+                req.logout((err) => {
+                    if (err) return next(err);
+
+                    req.session.destroy((err) => {
+                        if (err) {
+                            console.error("Session destroy failed:", err);
+                            
+                        }
+
+                        res.clearCookie('connect.sid');
+                      
+                    });
+                });
+                return;
+            }
+        }
+        next();
+    } catch (error) {
+        console.error('Blocked check error:', error);
+        next(error);
+    }
+});
 
 // Local variables middleware
 app.use((req, res, next) => {
@@ -101,6 +153,7 @@ app.use((err, req, res, next) => {
         res.status(status).type('txt').send(`Error ${status}: ${err.message}`);
     }
 });
+
 
 // Database connection
 

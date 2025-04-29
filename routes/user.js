@@ -30,44 +30,44 @@ router.post("/signup", userController.loadRegister);
 //userprofile
 router.get("/about",aboutController.getAboutPage);
 router.get("/profile",userAuth,profileController.getprofile)
-router.patch('/update-profile', profileController.updateProfile);
+router.patch('/update-profile',userAuth, profileController.updateProfile);
 
 router.get("/contact",contactController.getContactPage);
 router.post('/contact', contactController.submitContactForm); // <--- this is important
 
-router.post("/verifyotp", userController.loadverifyotp);
-router.post("/resend-otp", userController.loadresendotp);
-router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }), (req, res) => {
+router.post("/verifyotp",userAuth, userController.loadverifyotp);
+router.post("/resend-otp",userAuth, userController.loadresendotp);
+router.get('/auth/google',userAuth, passport.authenticate('google', { scope: ['profile', 'email'] }), (req, res) => {
     req.session.user = req.user; // Store Google user in session
     console.log("Google User saved in session:", req.session.user); // Debugging
     res.redirect('/');
 });
-router.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/signup' }), (req, res) => {
+router.get('/auth/google/callback',userAuth, passport.authenticate('google', { failureRedirect: '/signup' }), (req, res) => {
     req.session.user = req.user; // Store Google user in session
     console.log("Google User saved in session:", req.session.user); // Debugging
     res.redirect('/');
 
 router.get("/pageNotFound",userController.pageNotFound)
 });
-router.get("/refferal",userController.getRefferalPage);
-router.get("/wallet",userController.getWalletPage);
-router.get("/mycoupons",userController.getmycouponspage);
+router.get("/refferal",userAuth,userController.getRefferalPage);
+router.get("/wallet",userAuth,userController.getWalletPage);
+router.get("/mycoupons",userAuth,userController.getmycouponspage);
 
-router.get("/logout", userController.logout);
-router.get("/forgotpassword", userController.loadforgotpasword);
-router.post("/forgotpassword", userController.changePassword);
+router.get("/logout",userAuth, userController.logout);
+router.get("/forgotpassword",userAuth, userController.loadforgotpasword);
+router.post("/forgotpassword",userAuth, userController.changePassword);
 
-router.get("/forgotpassword", userController.loadforgopasswordOtp);
+router.get("/forgotpassword",userAuth, userController.loadforgopasswordOtp);
 
-router.post("/VerifychangemailOtp", userController.VerifychangemailOtp);
+router.post("/VerifychangemailOtp",userAuth, userController.VerifychangemailOtp);
 
-router.get("/newemail", userController.loadnewpassword);
+router.get("/newemail", userAuth,userController.loadnewpassword);
 // router.post("/loadnewmailpage", userController.loadnewmail);
 // router.post("/newpassword", userController.loadnewpassword);
 
-router.post("/setNewPassword",userController.changepassword)
-router.get("/shop",userController.loadShoppingPage)
-router.get('/filter', userController.filterProduct);
+router.post("/setNewPassword",userAuth,userController.changepassword)
+router.get("/shop",userAuth,userController.loadShoppingPage)
+router.get('/filter',userAuth, userController.filterProduct);
 
 //checkout management
 router.get("/cart", userAuth, cartController.getCartPage);
@@ -114,6 +114,7 @@ console.log("off =",order)
 });
 
 router.get("/success",userAuth,orderController.success)
+router.get("/emailsuccess",userAuth,orderController.emailsuccess)
 router.post("/razorpayPayment", userAuth,orderController.razorpayPayment);
 router.post("/razorpayPaymentsuccess", userAuth,orderController.razorpayPaymentsuccess);
 router.post("/cancelgroup",userAuth,orderController.cancelgroup)
@@ -130,20 +131,20 @@ router.get("/orders/invoice", userAuth, orderController.invoiceDownload);
 
 //productloader shows all products 
 
-router.get('/wishlist',wishlistController.loadWishlist)
-router.get('/addToWishlist',wishlistController.addToWishlist)
-router.get('/removeFromWishlist',wishlistController.deleteFromWishlist)
+router.get('/wishlist',userAuth,wishlistController.loadWishlist)
+router.get('/addToWishlist',userAuth,wishlistController.addToWishlist)
+router.get('/removeFromWishlist',userAuth,wishlistController.deleteFromWishlist)
 
-router.get("/productloader", userController.getProductLoader);
+router.get("/productloader",userAuth, userController.getProductLoader);
 
 //loading products information to the user page filter-products
 router.post("/filterproducts",userAuth,productController.filterProducts)
 
-router.get("/productDetails",productController.productDetails);
-router.post("/updateProductVariant",productController.updateProductVariant);
+router.get("/productDetails",userAuth,productController.productDetails);
+router.post("/updateProductVariant",userAuth,productController.updateProductVariant);
 
 
-router.get("/filter",productController.productDetails);
+router.get("/filter",userAuth,productController.productDetails);
 
 router.get("/address",userAuth,profileController.loadAddressPage);
 router.get("/addAddress",userAuth,profileController.addAddress)
@@ -156,7 +157,11 @@ router.get("/deleteAddress",userAuth,profileController.deleteAddress)
 //profile management
 router.post("/update-profile",userAuth,profileController.updateProfile)
 router.get("/change-email",userAuth,profileController.changeEmail)
-router.post("/change-email",userAuth,profileController.changeEmailValid)
+router.post("/changeEmail",userAuth,userController.changeEmailValid)
+router.get("/newpasswordpage",userAuth,profileController.newpasswordpage)
+router.get("/verifyemailotp",userAuth,profileController.verifyemailotp)
+router.post("/verify-changemail-otp",userAuth,userController.changeEmailOtp)
+router.post("/resetemail",userAuth,profileController.resetEmail)
 router.post("/verify-email-otp",userAuth,profileController.verifyEmailOtp)
 router.post("/update-email",userAuth,profileController.updateEmail)
 router.post('/upload-profile-pic/:id', upload.single('profileImage'),profileController.addProfile)
@@ -164,18 +169,18 @@ router.post("/change-password", userAuth, userController.changePassword)
 
 //wallet management
 
-router.post('/wallet/create-razorpay-order', walletController.createRazorpayOrder);
-router.post('/wallet/verify-payment', walletController.verifyPayment);
+router.post('/wallet/create-razorpay-order',userAuth, walletController.createRazorpayOrder);
+router.post('/wallet/verify-payment',userAuth, walletController.verifyPayment);
 // In your walletRoutes.js
 // walletRoutes.js
 // walletRoutes.js
-router.post('/wallet/create-withdrawal-order',  walletController.createWithdrawalOrder);
-router.post('/wallet/verify-withdrawal',  walletController.verifyWithdrawal);
+router.post('/wallet/create-withdrawal-order',userAuth,  walletController.createWithdrawalOrder);
+router.post('/wallet/verify-withdrawal',userAuth,  walletController.verifyWithdrawal);
 // router.post("/purchase", userAuth,walletController.purchaseWithWallet);
 // router.post("/razorpay", userAuth,walletController.purchaseWithRazorpay);
 
 router.post("/addPromoCode", userAuth,walletController.addPromoCode);
-router.post('/clearCoupon', (req, res) => {
+router.post('/clearCoupon',userAuth, (req, res) => {
   // Assuming you're using session-based storage
   req.session.coupon = null;
   res.json({ success: true, message: 'Coupon cleared successfully.' });
@@ -183,7 +188,7 @@ router.post('/clearCoupon', (req, res) => {
 
 
 
-router.get('/order-status/:orderId', async (req, res) => {
+router.get('/order-status/:orderId', userAuth,async (req, res) => {
     try {
         const { orderId } = req.params;
         const order = await Order.findById(orderId);

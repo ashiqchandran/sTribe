@@ -802,17 +802,21 @@ const requestReturn = async (req, res) => {
 
 const success = async (req, res) => {
     try {
-        const orderId = req.query.orderId;
-        // const orderAmount =req.query.orderAmount
-
-    //   console.log("orderid",orderId)
-    //   console.log("total=",totalAmount)
-           
+               
             res.render("success");
-   
+          
+    } catch (error) {
+        console.error(error); // Log any error that occurs
+        res.render("error");
+    }
+};
 
-        // Add any further order-related logic, like fetching order details from DB
-        // Pass orderId to the view
+
+const emailsuccess= async (req, res) => {
+    try {
+               
+            res.render("emailsuccess");
+          
     } catch (error) {
         console.error(error); // Log any error that occurs
         res.render("error");
@@ -1373,6 +1377,8 @@ module.exports = {
  returnRequestStatus,
  getOrderDetails,
 retryPayment,
-verifypayment
+verifypayment,
+emailsuccess
+
 
 };

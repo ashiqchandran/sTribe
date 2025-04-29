@@ -300,12 +300,12 @@
                         </div>
                         
                         <div class="item-actions">
-                            <% if (order.status !== 'delivered' && order.status !== 'cancelled' && order.status !== 'failed') { %>
-                                <button onclick="cancelSingleItem('<%= order.orderId %>', '<%= order.productName.replace(/'/g, "\\'") %>')" 
-                                        class="btn btn-outline-danger btn-sm">
-                                  Cancel
-                                </button>
-                              <% } %>
+                          <% if (order.status !== 'delivered' && order.status !== 'cancelled' && order.status !== 'failed') { %>
+                            <button onclick="cancelSingleItem('<%= order.orderId %>', '<%= order.productName.replace(/'/g, "\\'") %>')"
+                                    class="btn btn-outline-danger btn-sm">
+                              Cancel
+                            </button>
+                          <% } %>
                           
                           <% if (order.status === 'delivered' && 
                                 !['requested', 'approved', 'rejected'].includes(order.returnStatus) && 

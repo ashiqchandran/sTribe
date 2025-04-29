@@ -176,6 +176,82 @@ function generateotp(){
  return Math.floor(100000+Math.random()*900000)
 }
 
+const changeEmailValid = async (req, res) => {
+    try {
+        const { email } = req.body;
+        console.log("email  = ", email);
+
+        const userExist = await User.findOne({ email });
+
+        if (!userExist) {
+            return res.status(404).json({ success: false, message: 'User with this email does not exist.' });
+        }
+
+        const otp = generateotp();
+        const emailSent = await sendVerificationEmail(email, otp);
+
+        console.log(`Email Sent: ${email}, OTP: ${otp}`);
+        if (emailSent) {
+            req.session.emailchangeOtp = otp;
+            req.session.userdata = req.body;
+            req.session.email = email;
+
+            return res.status(200).json({ success: true, redirect: '/verifyemailotp' });
+        } else {
+            return res.status(500).json({ success: false, message: 'Failed to send verification email.' });
+        }
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, message: 'Server error. Please try again.' });
+    }
+};
+
+const changeEmailOtp = async(req,res)=>{
+    try {
+        const { otp } = req.body;
+       const sessionOtp= req.session.emailchangeOtp
+        const currentUser = req.user;
+
+        // Validate session exists
+       
+
+        // // Check OTP expiry
+        // if (Date.now() > otpExpiry) {
+        //     req.session.otpData = null; // Clear expired OTP
+        //     return res.status(400).json({ 
+        //         success: false,
+        //         message: 'OTP has expired. Please request a new one.' 
+        //     });
+        // }
+
+        // Verify OTP matches
+     
+        if (otp != sessionOtp) {
+            res.json({
+                success: false
+        
+            });
+        }
+        // Send success response
+        res.json({
+            success: true,
+            message: 'Email successfully updated!',
+            redirectUrl: '/profile' // Where to redirect after success
+        });
+
+    } catch (error) {
+        console.error('Error in verifyChangeEmailOTP:', error);
+        res.status(500).json({ 
+            success: false,
+            message: 'An error occurred. Please try again.' 
+        });
+    }
+
+
+}
+
+
 async function sendVerificationEmail(email,otp)
 {
     try {
@@ -612,41 +688,127 @@ const getshop=async(req,res)=>{
         
     }
 }
-
 const loadShoppingPage = async (req, res) => {
     try {
         // Get user data if authenticated
         const user = req.session.user;
-        const categoryid =req.query.category?req.query.category:new ObjectId('67c547d22b720e19dfc14bf3')
-        
         const userData = user ? await User.findOne({ _id: user }) : null;
-        // const selectedCategory = user ? await User.findOne({ _id: user }) : null;
-
+        
+        // Default category ID from query parameter or set winter collection as default
+        let requestedCategoryId;
+        try {
+            requestedCategoryId = req.query.category ? 
+                new ObjectId(req.query.category) : 
+                new ObjectId('67c547d22b720e19dfc14bf3');
+        } catch (error) {
+            console.error("Invalid ObjectId format:", error);
+            requestedCategoryId = new ObjectId('67c547d22b720e19dfc14bf3'); // Default to winter collection
+        }
+        
         // Pagination setup
         const page = parseInt(req.query.page) || 1;
         const limit = 10;
         const skip = (page - 1) * limit;
+
+        // Get all listed categories with product counts
+        const categoriesWithCounts = await Category.aggregate([
+            {
+                $match: { isListed: true }
+            },
+            {
+                $lookup: {
+                    from: 'products',
+                    let: { categoryId: '$_id' },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $eq: ['$category', '$$categoryId'] },
+                                        { $eq: ['$isBlocked', false] },
+                                        { $gt: ['$quantity', 0] }
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                    as: 'products'
+                }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    name: 1,
+                    productCount: { $size: '$products' },
+                    categoryOffer: 1
+                }
+            }
+        ]);
+
+        console.log("Listed categories:", categoriesWithCounts.map(c => ({ id: c._id, name: c.name })));
+
+        // Check if requested category is listed
+        const requestedCategory = await Category.findOne({ 
+            _id: requestedCategoryId, 
+            isListed: true 
+        });
+
+        console.log("Requested category found:", requestedCategory ? "Yes" : "No");
+        
+        // If requested category isn't listed or doesn't exist, use the first listed category
+        let activeCategoryId;
+        if (!requestedCategory && categoriesWithCounts.length > 0) {
+            activeCategoryId = categoriesWithCounts[0]._id;
+            console.log("Using first available category:", activeCategoryId);
+        } else if (requestedCategory) {
+            activeCategoryId = requestedCategoryId;
+            console.log("Using requested category:", activeCategoryId);
+        } else {
+            activeCategoryId = null;
+            console.log("No active category found");
+        }
+
+        // If no active categories exist
+        if (!activeCategoryId && categoriesWithCounts.length === 0) {
+            console.log("No active categories available");
+            return res.render("shop", {
+                user: userData,
+                products: [],
+                category: [],
+                totalProducts: 0,
+                currentPage: page,
+                totalPages: 0,
+                search: req.query.search,
+                sort: req.query.sort,
+                priceFrom: 1,
+                priceTo: 2000,
+                req: req,
+                message: "No active categories found"
+            });
+        }
 
         // Build query object
         let query = {
             isBlocked: false,
             quantity: { $gt: 0 }
         };
+        
+        // Add category filter only if we have a valid category
+        if (activeCategoryId) {
+            query.category = activeCategoryId;
+        }
+
+        console.log("Product query:", JSON.stringify(query));
 
         // Add search functionality
         if (req.query.search) {
             query.productName = { $regex: req.query.search, $options: 'i' };
         }
 
-        // Price range filter (optional)
-        const priceFrom = parseInt(req.query['price-from']) || 1; // Default: 1
-        const priceTo = parseInt(req.query['price-to']) || 2000; // Default: 2000
-        query.salePrice = { $gte: priceFrom, $lte: priceTo }; // Apply price range filter
-
-        // Get categories and ensure they're listed
-        const categories = await Category.find({ _id:categoryid});
-        const categoryIds = categories.map(category => category._id);
-        query.category = { $in: categoryIds };
+        // Price range filter
+        const priceFrom = parseInt(req.query['price-from']) || 1;
+        const priceTo = parseInt(req.query['price-to']) || 2000;
+        query.salePrice = { $gte: priceFrom, $lte: priceTo };
 
         // Determine sort order
         let sort = {};
@@ -679,100 +841,137 @@ const loadShoppingPage = async (req, res) => {
                 sort = { createdAt: -1 };
         }
 
-        // Get categories with product counts
-        const categoriesWithCounts = await Category.aggregate([
-            {
-                $match: { isListed: true }
-            },
-            {
-                $lookup: {
-                    from: 'products',
-                    let: { categoryId: '$_id' },
-                    pipeline: [
-                        {
-                            $match: {
-                                $expr: {
-                                    $and: [
-                                        { $eq: ['$category', '$$categoryId'] },
-                                        { $eq: ['$isBlocked', false] },
-                                        { $gt: ['$quantity', 0] }
-                                    ]
-                                }
-                            }
-                        }
-                    ],
-                    as: 'products'
-                }
-            },
-            {
-                $project: {
-                    _id: 1,
-                    name: 1,
-                    productCount: { $size: '$products' },
-                    categoryOffer:1
-                }
-            }
-        ]);
+        // Test query by getting simple count first
+        const simpleCount = await Product.countDocuments(query);
+        console.log(`Simple query returned ${simpleCount} products`);
 
         // Fetch products with applied filters
         const products = await Product.aggregate([
             {
-                $match: query // Match products based on the provided query (filters like `isBlocked`, `quantity`, `salePrice`, etc.)
+                $match: query
             },
             {
                 $lookup: {
-                    from: 'categories', // The collection name for Category (should be lowercase 'categories')
-                    localField: 'category', // The 'category' field in the Product schema (ObjectId)
-                    foreignField: '_id', // The '_id' field in the Category schema
-                    as: 'categoryDetails' // Alias for the resulting category data
+                    from: 'categories',
+                    localField: 'category',
+                    foreignField: '_id',
+                    as: 'categoryDetails'
                 }
             },
             {
                 $unwind: {
-                    path: '$categoryDetails', // Flatten the 'categoryDetails' array into an object
-                    preserveNullAndEmptyArrays: true // Ensure products without a category are still included
+                    path: '$categoryDetails',
+                    preserveNullAndEmptyArrays: true
                 }
             },
             {
                 $project: {
-                    productName: 1, // Include product name
-                    description: 1, // Include product description
-                    category: 1, // Include category reference (ObjectId)
-                    categoryName: '$categoryDetails.name', // Include category name
-                    categoryDescription: '$categoryDetails.description', // Include category description
-                    categoryOffer: '$categoryDetails.categoryOffer', // Include category offer
-                    regularPrice: 1, // Include product regular price
-                    salePrice: 1, // Include sale price
-                    quantity: 1, // Include quantity
-                    size: 1, // Include size
-                    color: 1, // Include color
-                    productImage: 1, // Include product image
-                    isBlocked: 1, // Include blocked status
-                    brand: 1, // Include brand
-                    status: 1, // Include product status
-                    productOffer: 1, // Include product offer
-                    bestOffer: 1, // Include best offer
-                    ratings:1,
-                    createdAt: 1 // Include created date
+                    productName: 1,
+                    description: 1,
+                    category: 1,
+                    categoryName: '$categoryDetails.name',
+                    categoryDescription: '$categoryDetails.description',
+                    categoryOffer: '$categoryDetails.categoryOffer',
+                    regularPrice: 1,
+                    salePrice: 1,
+                    quantity: 1,
+                    size: 1,
+                    color: 1,
+                    productImage: 1,
+                    isBlocked: 1,
+                    brand: 1,
+                    status: 1,
+                    productOffer: 1,
+                    bestOffer: 1,
+                    ratings: 1,
+                    createdAt: 1
                 }
             },
             {
-                $sort: sort // Sort products based on the selected sort order
+                $sort: sort
             },
             {
-                $skip: skip // Skip the appropriate number of products for pagination
+                $skip: skip
             },
             {
-                $limit: limit // Limit the number of products to the specified page size
+                $limit: limit
             }
         ]);
+
+        console.log(`Found ${products.length} products after aggregation`);
         
-        
-// console.log("products from the shop page =",products)
+        // If no products found, try fallback to any listed category
+        if (products.length === 0 && categoriesWithCounts.length > 0) {
+            console.log("No products found for selected category, trying fallback...");
+            
+            // Find the first category that actually has products
+            for (const cat of categoriesWithCounts) {
+                if (cat.productCount > 0) {
+                    console.log(`Falling back to category ${cat.name} with ${cat.productCount} products`);
+                    // Update query with new category
+                    query.category = cat._id;
+                    break;
+                }
+            }
+            
+            // Try fetching products again with updated category
+            const fallbackProducts = await Product.aggregate([
+                { $match: query },
+                {
+                    $lookup: {
+                        from: 'categories',
+                        localField: 'category',
+                        foreignField: '_id',
+                        as: 'categoryDetails'
+                    }
+                },
+                {
+                    $unwind: {
+                        path: '$categoryDetails',
+                        preserveNullAndEmptyArrays: true
+                    }
+                },
+                {
+                    $project: {
+                        productName: 1,
+                        description: 1,
+                        category: 1,
+                        categoryName: '$categoryDetails.name',
+                        categoryDescription: '$categoryDetails.description',
+                        categoryOffer: '$categoryDetails.categoryOffer',
+                        regularPrice: 1,
+                        salePrice: 1,
+                        quantity: 1,
+                        size: 1,
+                        color: 1,
+                        productImage: 1,
+                        isBlocked: 1,
+                        brand: 1,
+                        status: 1,
+                        productOffer: 1,
+                        bestOffer: 1,
+                        ratings: 1,
+                        createdAt: 1
+                    }
+                },
+                { $sort: sort },
+                { $skip: skip },
+                { $limit: limit }
+            ]);
+            
+            if (fallbackProducts.length > 0) {
+                console.log(`Found ${fallbackProducts.length} products in fallback category`);
+                products = fallbackProducts;
+                activeCategoryId = query.category;
+            }
+        }
+
         // Get total products and pages
         const totalProducts = await Product.countDocuments(query);
         const totalPages = Math.ceil(totalProducts / limit);
-// console.log("cate with count = ",categoriesWithCounts)
+
+        console.log(`Total products: ${totalProducts}, Total pages: ${totalPages}`);
+
         // Render the shop page with necessary data
         res.render("shop", {
             user: userData,
@@ -783,9 +982,10 @@ const loadShoppingPage = async (req, res) => {
             totalPages: totalPages,
             search: req.query.search,
             sort: req.query.sort,
-            priceFrom: priceFrom, // Send back priceFrom to retain the value in the filter input
-            priceTo: priceTo, // Send back priceTo to retain the value in the filter input
-            req: req
+            priceFrom: priceFrom,
+            priceTo: priceTo,
+            req: req,
+            activeCategory: activeCategoryId
         });
 
     } catch (error) {
@@ -965,6 +1165,8 @@ module.exports = {
     filterProduct,
     getRefferalPage,
     getWalletPage,
-    getmycouponspage
+    getmycouponspage,
+changeEmailValid,
+changeEmailOtp,
   
 }
