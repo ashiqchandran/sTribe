@@ -146,7 +146,7 @@ const loadSignUpPage = async (req, res) => {
 
 const pageNotFound=async(req,res)=>{
     try{
-        res.render("page-404")
+        res.render("fullerror")
     }
     catch(error){
         res.redirect("/pageNotFound")

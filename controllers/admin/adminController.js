@@ -89,74 +89,102 @@ endDate = new Date(endDate);
 
         const topProducts = await Order.aggregate([
             {
-                $match: { status: 'delivered' } // Only consider delivered orders
+              $match: { status: 'delivered' }
             },
             {
-                $unwind: '$orderItems' // Flatten the orderItems array
+              $unwind: '$orderItems'
             },
             {
-                $group: {
-                    _id: '$orderItems.product', // Group by product ID
-                    totalSold: { $sum: '$orderItems.quantity' },
-                    revenue: {
-                        $sum: {
-                            $multiply: ['$orderItems.quantity', '$orderItems.price']
-                        }
+              $project: {
+                orderItems: 1,
+                discount: 1
+              }
+            },
+            {
+              $addFields: {
+                itemRevenue: {
+                  $multiply: [
+                    "$orderItems.quantity",
+                    "$orderItems.price"
+                  ]
+                }
+              }
+            },
+            {
+              $addFields: {
+                discountedItemRevenue: {
+                  $subtract: [
+                    "$itemRevenue",
+                    {
+                      $multiply: [
+                        "$itemRevenue",
+                        { $divide: ["$discount", 100] }
+                      ]
                     }
+                  ]
                 }
+              }
             },
             {
-                $lookup: {
-                    from: 'products', // Join with Product collection
-                    localField: '_id',
-                    foreignField: '_id',
-                    as: 'productDetails'
-                }
+              $group: {
+                _id: "$orderItems.product",
+                totalSold: { $sum: "$orderItems.quantity" },
+                revenue: { $sum: "$discountedItemRevenue" }
+              }
             },
             {
-                $unwind: {
-                    path: '$productDetails',
-                    preserveNullAndEmptyArrays: true
-                }
+              $lookup: {
+                from: 'products',
+                localField: '_id',
+                foreignField: '_id',
+                as: 'productDetails'
+              }
             },
             {
-                $lookup: {
-                    from: 'categories', // Join with Category collection
-                    localField: 'productDetails.category',
-                    foreignField: '_id',
-                    as: 'categoryDetails'
-                }
+              $unwind: {
+                path: '$productDetails',
+                preserveNullAndEmptyArrays: true
+              }
             },
             {
-                $unwind: {
-                    path: '$categoryDetails',
-                    preserveNullAndEmptyArrays: true
-                }
+              $lookup: {
+                from: 'categories',
+                localField: 'productDetails.category',
+                foreignField: '_id',
+                as: 'categoryDetails'
+              }
             },
             {
-                $project: {
-                    productImg: {
-                        $cond: [
-                            { $gt: [{ $size: '$productDetails.productImage' }, 0] },
-                            { $arrayElemAt: ['$productDetails.productImage', 0] },
-                            '/images/default-product.jpg' // Fallback if no image
-                        ]
-                    },
-                    productName: '$productDetails.productName',
-                    categoryName: '$categoryDetails.name',
-                    brand: '$productDetails.brand',
-                    price: '$productDetails.salePrice',
-                    stock: '$productDetails.quantity',
-                    totalSold: 1,
-                    revenue: 1
-                }
+              $unwind: {
+                path: '$categoryDetails',
+                preserveNullAndEmptyArrays: true
+              }
             },
-            { $sort: { totalSold: -1 } }, // Sort by total sold
-            { $limit: 10 } // Top 10 products
-        ]);
-        
+            {
+              $project: {
+                productImg: {
+                  $cond: [
+                    { $gt: [{ $size: '$productDetails.productImage' }, 0] },
+                    { $arrayElemAt: ['$productDetails.productImage', 0] },
+                    '/images/default-product.jpg'
+                  ]
+                },
+                productName: '$productDetails.productName',
+                categoryName: '$categoryDetails.name',
+                brand: '$productDetails.brand',
+                price: '$productDetails.salePrice',
+                stock: '$productDetails.quantity',
+                totalSold: 1,
+                revenue: 1
+              }
+            },
+            { $sort: { totalSold: -1 } },
+            { $limit: 10 }
+          ]);
+          
         console.log("product details : ",topProducts)
 
+       
         const categorySales = await Order.aggregate([
             { $match: { status: 'delivered' } },
             { $unwind: '$orderItems' },
@@ -179,15 +207,37 @@ endDate = new Date(endDate);
             },
             { $unwind: { path: '$categoryDetails', preserveNullAndEmptyArrays: true } },
             {
+                $addFields: {
+                    itemRevenue: { $multiply: ['$orderItems.quantity', '$orderItems.price'] },
+                    discount: { $ifNull: ['$discount', 0] } // ensure discount is never null
+                }
+            },
+            {
+                $addFields: {
+                    discountedRevenue: {
+                        $subtract: [
+                            '$itemRevenue',
+                            {
+                                $multiply: [
+                                    '$itemRevenue',
+                                    { $divide: ['$discount', 100] }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            },
+            {
                 $group: {
                     _id: '$categoryDetails._id',
                     categoryName: { $first: '$categoryDetails.name' },
                     totalSold: { $sum: '$orderItems.quantity' },
-                    revenue: { $sum: { $multiply: ['$orderItems.quantity', '$orderItems.price'] } }
+                    revenue: { $sum: '$discountedRevenue' }
                 }
             },
             { $sort: { revenue: -1 } }
         ]) || [];
+        
 
         
         const brandSales = await Order.aggregate([
@@ -316,25 +366,63 @@ endDate = new Date(endDate);
 
         const salesReport = await Order.aggregate([
             {
-                $match: {
-                    createdOn: { $gte: parsedStartDate },
-                    status: "delivered"
-                }
+              $match: {
+                createdOn: { $gte: parsedStartDate },
+                status: "delivered"
+              }
+            },
+            {
+              $project: {
+                orderItems: 1,
+                discount: 1 // Discount in percentage
+              }
             },
             { $unwind: "$orderItems" },
             {
-                $group: {
-                    _id: null,
-                    totalrevenue: { $sum: "$orderItems.price" }
-                }
+              $project: {
+                itemTotal: {
+                  $multiply: ["$orderItems.price", "$orderItems.quantity"]
+                },
+                discount: 1
+              }
             },
-            { $addFields: { defaultRevenue: 0 } }
-        ]);
+            {
+              $group: {
+                _id: "$_id", // Group by order ID
+                orderTotal: { $sum: "$itemTotal" },
+                discount: { $first: "$discount" } // same discount for all items in an order
+              }
+            },
+            {
+              $project: {
+                discountedTotal: {
+                  $subtract: [
+                    "$orderTotal",
+                    {
+                      $multiply: ["$orderTotal", { $divide: ["$discount", 100] }]
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              $group: {
+                _id: null,
+                totalrevenue: { $sum: "$discountedTotal" }
+              }
+            },
+            {
+              $addFields: {
+                defaultRevenue: 0
+              }
+            }
+          ]);
+          
         
         const salesitems = await Order.aggregate([
             {
                 $match: {
-                    createdOn: { $lte: new Date()},
+                    createdOn: { $gte: startDate },
                     status: "delivered"
                 }
             },

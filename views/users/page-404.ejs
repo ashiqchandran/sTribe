@@ -71,7 +71,7 @@
     <div class="error-container">
         <h1>404</h1>
         <h2>User Not Found</h2>
-        <p>We couldn't find an account associated with <span class="user-email" id="email-placeholder">[email]</span>.</p>
+        <p>We couldn't find an account  <span class="user-email" id="email-placeholder"></span>.</p>
         
         <div class="suggestions">
             <h5>Suggestions:</h5>
@@ -83,16 +83,7 @@
         </div>
         
         <a href="/home" class="home-button mt-4">Go to Homepage</a>
-        <a href="/signup" class="home-button mt-4 ms-3" style="background-color: #198754;">Create Account</a>
     </div>
 
-    <script>
-        // Extract email from URL query parameters and display it
-        const urlParams = new URLSearchParams(window.location.search);
-        const email = urlParams.get('email');
-        if (email) {
-            document.getElementById('email-placeholder').textContent = email;
-        }
-    </script>
 </body>
 </html>

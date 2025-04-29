@@ -34,26 +34,26 @@ app.use(session({
         collectionName: 'sessions'
     }),
     cookie: {
-        secure: false, // Use true in production with HTTPS
+        secure: false, // Set to true in production if using HTTPS
         httpOnly: true,
-        maxAge: 72 * 60 * 60 * 1000, // 3 days
+        maxAge: 72 * 60 * 60 * 1000,
         name: 'user_sid',  // User session cookie name
     }
 }));
 
-// For Admin session (This session has its own separate cookie name)
+// For Admin session
 app.use('/admin', session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
         mongoUrl: process.env.MONGODB_URI,
-        collectionName: 'admin_sessions'  // Store admin sessions in a separate collection
+        collectionName: 'sessions'
     }),
     cookie: {
-        secure: false, // Use true in production with HTTPS
+        secure: false,
         httpOnly: true,
-        maxAge: 72 * 60 * 60 * 1000, // 3 days
+        maxAge: 72 * 60 * 60 * 1000,
         name: 'admin_sid',  // Admin session cookie name
     }
 }));
