@@ -43,7 +43,9 @@ const getOrders = async (req, res) => {
                     "orderItems.productImage": "$orderItems.productDetails.productImage", // Extract product image
                     "orderItems.price": "$orderItems.productDetails.price", // Extract product price
                     "orderItems.quantity": "$orderItems.quantity" ,// Keep quantity from the order
-                    returnStatus:1
+                    returnStatus:1,
+                    cancelReason:1,
+                    returnReason:1
                 }
             },
             {

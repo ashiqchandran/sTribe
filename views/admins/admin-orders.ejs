@@ -422,8 +422,12 @@
                                             Cancel
                                         </button>
                                     <% } %>
-                                
+                                    <%if ( order.returnReason){%>
+                                        <button class="btn btn-primary me-2" style="height: 2wh;border-radius: 10px;" onclick="showCancelReason('<%= order.returnReason %>')">
+                                            Return Reason
+                                        </button><%}%>
                                     <% if (order.returnStatus === 'requested') { %>
+                                      
                                         <button onclick="approveRefund('<%= order._id %>')" class="btn btn-success btn-sm mt-1" style="background-color: rgb(9, 230, 9);color: black; width: 90px;border-radius: 10px;" >
                                             Approve Refund
                                         </button>
@@ -695,6 +699,15 @@ async function updateStatus(orderId, currentStatus) {
             }
         }
     }
+    function showCancelReason(reason) {
+        Swal.fire({
+        title: 'Cancellation Reason',
+        text: reason,
+        icon: 'info',
+        confirmButtonText: 'OK'
+         });
+    }
+                            
 </script>
 
 <%- include('../partials/admin/footer') %>

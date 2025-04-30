@@ -789,6 +789,8 @@ const cancelgroup = async (req, res) => {
 const requestReturn = async (req, res) => {
 
         try {
+
+           
             const userId = req.session.user;
             const { orderId ,reason} = req.body;
         
@@ -804,7 +806,8 @@ const requestReturn = async (req, res) => {
         
             // Just mark as requested — no refund here
             order.returnStatus = 'requested';
-            order.returnReason
+           
+            order.returnReason=reason
             await order.save();
         
             res.json({ success: true, message: 'Return request submitted. Waiting for admin approval.' });
